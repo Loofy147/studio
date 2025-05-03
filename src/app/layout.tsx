@@ -21,12 +21,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(
+      <body
+        className={cn(
           inter.variable,
           "font-sans antialiased flex flex-col min-h-screen bg-background"
         )}
       >
         <Header />
+        {/* Adjust main padding - might be overridden by page layout if sidebar exists */}
         <main className="flex-grow container mx-auto px-4 py-8">
           {children}
         </main>

@@ -8,6 +8,9 @@ export interface Product {
   price: number;
   imageUrl?: string;
   category: string; // e.g., 'laptops', 'shirts', 'vegetables'
+  storeId?: string; // Optional: Link back to the store
+  storeName?: string; // Optional: Denormalized store name
+  sales?: number; // Optional: Mock sales data for sorting
 }
 
 export interface Store {
@@ -20,12 +23,12 @@ export interface Store {
   rating?: number; // Optional average rating
 }
 
-// Mock function to simulate fetching stores
-export async function getStores(): Promise<Store[]> {
-  console.log("Fetching stores...");
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const fakeStores: Store[] = [
+// Mock data store (simulating a database)
+let mockStores: Store[] | null = null;
+let mockProducts: Product[] | null = null;
+
+function generateMockStores(): Store[] {
+     return [
         {
           id: "store-1",
           name: "ElectroMart",
@@ -91,65 +94,139 @@ export async function getStores(): Promise<Store[]> {
            rating: 3.9,
         },
       ];
-      console.log("Stores fetched:", fakeStores.length);
-      resolve(fakeStores);
-    }, 1000); // Simulate network delay
+}
+
+
+// Helper to generate mock products for ALL stores initially
+function generateAllMockProducts(stores: Store[]): Product[] {
+    let allProducts: Product[] = [];
+    stores.forEach(store => {
+         const storeProducts = generateMockProductsStore(store.id, store.category, 10 + Math.floor(Math.random() * 15)); // 10-24 products per store
+         // Add store info to each product
+         storeProducts.forEach(p => {
+             p.storeId = store.id;
+             p.storeName = store.name;
+             p.sales = Math.floor(Math.random() * 500); // Assign random sales count
+         });
+         allProducts = allProducts.concat(storeProducts);
+    });
+    return allProducts;
+}
+
+// Helper to generate mock products for a specific store/category
+function generateMockProductsStore(storeId: string, category: StoreCategory, count: number): Product[] {
+    const products: Product[] = [];
+    const baseNames: Record<StoreCategory, string[]> = {
+        electronics: ["Laptop", "Smartphone", "Headphones", "Monitor", "Keyboard", "Mouse", "Charger", "Tablet", "Smartwatch", "Camera"],
+        clothing: ["T-Shirt", "Jeans", "Jacket", "Dress", "Sweater", "Shoes", "Hat", "Scarf", "Socks", "Belt"],
+        groceries: ["Apple", "Banana", "Milk", "Bread", "Eggs", "Cheese", "Yogurt", "Chicken", "Rice", "Pasta", "Tomatoes"],
+        books: ["Novel", "Biography", "Cookbook", "History", "Sci-Fi", "Mystery", "Poetry", "Fantasy", "Self-Help"],
+        'home goods': ["Lamp", "Cushion", "Vase", "Frame", "Towel", "Cutlery", "Mug", "Plate", "Candle"],
+        toys: ["Action Figure", "Blocks", "Board Game", "Doll", "Puzzle", "Car", "Plush Toy", "Art Set"]
+    };
+    const adjectives = ["Premium", "Classic", "Modern", "Vintage", "Organic", "Wireless", "Smart", "Cozy", "Durable", "Ergonomic", "Handmade", "Deluxe"];
+
+    for (let i = 1; i <= count; i++) {
+        const baseNameList = baseNames[category] || ["Item"];
+        const baseName = baseNameList[Math.floor(Math.random() * baseNameList.length)];
+        const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const name = `${adj} ${baseName}`;
+        const price = parseFloat((Math.random() * (category === 'electronics' ? 400 : 80) + 5).toFixed(2)); // Adjusted price range
+
+        products.push({
+            id: `${storeId}-prod-${i}`,
+            name: name,
+            description: `A high-quality ${name.toLowerCase()} perfect for your needs. Features include durability and style.`,
+            price: price,
+            imageUrl: `https://picsum.photos/seed/${storeId}-${category}-${i}/300/200`,
+            category: baseName.toLowerCase().replace(/\s+/g, '-'), // Simple category based on name
+            // sales will be added later if needed globally
+        });
+    }
+    return products;
+}
+
+// Initialize mock data on first call
+async function initializeMockData() {
+    if (!mockStores) {
+        mockStores = generateMockStores();
+    }
+    if (!mockProducts) {
+        // Ensure stores are generated first
+        if (!mockStores) mockStores = generateMockStores();
+        mockProducts = generateAllMockProducts(mockStores);
+    }
+}
+
+// Mock function to simulate fetching stores
+export async function getStores(): Promise<Store[]> {
+  console.log("Fetching stores...");
+  await initializeMockData();
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("Stores fetched:", mockStores!.length);
+      resolve([...mockStores!]); // Return a copy
+    }, 300); // Simulate network delay
   });
 }
 
 // Mock function to simulate fetching a single store's details (including products)
 export async function getStoreById(storeId: string): Promise<Store | null> {
      console.log(`Fetching store by ID: ${storeId}`);
-    // First, get all stores (in a real app, you'd query the specific store)
-     const allStores = await getStores();
-     const store = allStores.find(s => s.id === storeId);
+     await initializeMockData();
+     const store = mockStores!.find(s => s.id === storeId);
 
      if (!store) {
         console.log("Store not found");
         return null;
      }
 
-     // Simulate fetching products for this specific store
+     // Find products for this store from the global list
+     const storeProducts = mockProducts!.filter(p => p.storeId === storeId);
+
      return new Promise((resolve) => {
         setTimeout(() => {
-            const fakeProducts: Product[] = generateMockProducts(store.category, 15); // Generate 15 products
-            const storeWithProducts = { ...store, products: fakeProducts };
+            const storeWithProducts = { ...store, products: storeProducts };
             console.log("Store details fetched:", storeWithProducts.name);
              resolve(storeWithProducts);
-        }, 500); // Shorter delay for product fetching simulation
+        }, 150); // Shorter delay
      });
 }
 
-// Helper to generate mock products based on category
-function generateMockProducts(category: StoreCategory, count: number): Product[] {
-    const products: Product[] = [];
-    const baseNames: Record<StoreCategory, string[]> = {
-        electronics: ["Laptop", "Smartphone", "Headphones", "Monitor", "Keyboard", "Mouse", "Charger", "Tablet"],
-        clothing: ["T-Shirt", "Jeans", "Jacket", "Dress", "Sweater", "Shoes", "Hat", "Scarf"],
-        groceries: ["Apple", "Banana", "Milk", "Bread", "Eggs", "Cheese", "Yogurt", "Chicken Breast"],
-        books: ["Novel", "Biography", "Cookbook", "History Book", "Sci-Fi Novel", "Mystery Thriller", "Poetry Collection"],
-        'home goods': ["Lamp", "Cushion", "Vase", "Picture Frame", "Towel Set", "Cutlery", "Coffee Maker"],
-        toys: ["Action Figure", "Building Blocks", "Board Game", "Doll", "Puzzle", "Stuffed Animal", "Toy Car"]
-    };
-    const adjectives = ["Premium", "Classic", "Modern", "Vintage", "Organic", "Wireless", "Smart", "Cozy", "Durable"];
+// Mock function to get products (e.g., best sellers across all stores)
+interface GetProductsOptions {
+    limit?: number;
+    sortBy?: 'sales' | 'rating' | 'price_asc' | 'price_desc'; // Add more sorting options
+    category?: string; // Filter by product category
+}
+export async function getProducts(options: GetProductsOptions = {}): Promise<Product[]> {
+    console.log("Fetching products with options:", options);
+    await initializeMockData();
 
-    for (let i = 1; i <= count; i++) {
-        const baseNameList = baseNames[category] || ["Product"];
-        const baseName = baseNameList[Math.floor(Math.random() * baseNameList.length)];
-        const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-        const name = `${adjective} ${baseName}`;
-        const price = parseFloat((Math.random() * (category === 'electronics' ? 500 : 100) + 10).toFixed(2)); // Random price
+    let filteredProducts = [...mockProducts!]; // Start with a copy
 
-        products.push({
-            id: `${category}-prod-${i}`,
-            name: name,
-            description: `A high-quality ${name.toLowerCase()} perfect for your needs. Features include durability and style.`,
-            price: price,
-            imageUrl: `https://picsum.photos/seed/${category}-${i}/300/200`,
-            category: baseName.toLowerCase().replace(' ', '-'), // Simple category based on name
-        });
+    // Apply filtering (example: by product category - could be added later)
+    // if (options.category) {
+    //     filteredProducts = filteredProducts.filter(p => p.category === options.category);
+    // }
+
+    // Apply sorting
+    if (options.sortBy === 'sales') {
+        filteredProducts.sort((a, b) => (b.sales ?? 0) - (a.sales ?? 0));
     }
-    return products;
+     // Add other sorting logic here if needed (rating, price)
+
+    // Apply limit
+    if (options.limit) {
+        filteredProducts = filteredProducts.slice(0, options.limit);
+    }
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            console.log("Products fetched:", filteredProducts.length);
+            resolve(filteredProducts);
+        }, 200); // Simulate delay
+    });
 }
 
 
@@ -176,22 +253,22 @@ export async function getUserOrders(userId: string): Promise<Order[]> {
             const fakeOrders: Order[] = [
                  {
                     id: 'order-123', userId: userId, storeId: 'store-1', storeName: 'ElectroMart',
-                    items: [{ productId: 'electronics-prod-1', name: 'Premium Laptop', quantity: 1, price: 1200 }],
+                    items: [{ productId: 'store-1-prod-1', name: 'Premium Laptop', quantity: 1, price: 1200 }],
                     totalAmount: 1200, orderDate: new Date(Date.now() - 86400000 * 2), // 2 days ago
                     status: 'Shipped', trackingNumber: 'TRK123456789', deliveryAddress: '1 Main St, Anytown'
                 },
                 {
                     id: 'order-456', userId: userId, storeId: 'store-3', storeName: 'FreshGrocer',
                     items: [
-                        { productId: 'groceries-prod-1', name: 'Organic Apple', quantity: 5, price: 0.8 },
-                        { productId: 'groceries-prod-3', name: 'Classic Milk', quantity: 1, price: 3.5 },
+                        { productId: 'store-3-prod-1', name: 'Organic Apple', quantity: 5, price: 0.8 },
+                        { productId: 'store-3-prod-3', name: 'Classic Milk', quantity: 1, price: 3.5 },
                     ],
                     totalAmount: 7.5, orderDate: new Date(Date.now() - 86400000 * 1), // 1 day ago
                     status: 'Processing', deliveryAddress: '1 Main St, Anytown'
                 },
                  {
                     id: 'order-789', userId: userId, storeId: 'store-2', storeName: 'Fashionista Boutique',
-                    items: [{ productId: 'clothing-prod-2', name: 'Modern Jeans', quantity: 1, price: 55 }],
+                    items: [{ productId: 'store-2-prod-2', name: 'Modern Jeans', quantity: 1, price: 55 }],
                     totalAmount: 55, orderDate: new Date(Date.now() - 86400000 * 5), // 5 days ago
                     status: 'Delivered', deliveryAddress: '1 Main St, Anytown'
                 }
@@ -222,11 +299,11 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
             if (userId === "user123") { // Simulate finding a user
                  const profile: UserProfile = {
                     id: userId,
-                    name: "John Doe",
-                    email: "john.doe@example.com",
-                    address: "1 Main St, Anytown, USA 12345",
-                    phone: "555-123-4567",
-                    loyaltyPoints: 150,
+                    name: "Alex Ryder", // Changed name
+                    email: "alex.ryder@example.com", // Changed email
+                    address: "123 Market St, Suite 400, Metropia, USA 54321", // Changed address
+                    phone: "555-987-6543", // Changed phone
+                    loyaltyPoints: 285, // Changed points
                 };
                 console.log("User profile fetched:", profile.name);
                 resolve(profile);

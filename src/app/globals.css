@@ -14,33 +14,33 @@ body {
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 185 80% 35%;  /* Slightly brighter Teal */
+    --primary: 173 70% 40%;  /* Turquoise */
     --primary-foreground: 0 0% 100%;
-    --secondary: 215 27.9% 95.9%; /* Even Lighter secondary */
+    --secondary: 215 27.9% 95.9%; /* Lighter secondary */
     --secondary-foreground: 224 7.1% 40.1%;
     --muted: 215 27.9% 95.9%;
     --muted-foreground: 224 7.1% 50.1%;
-    --accent: 40 95% 55%; /* Slightly brighter Orange */
+    --accent: 40 95% 55%; /* Orange */
     --accent-foreground: 224 71.4% 4.1%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 215 20.2% 90.0%; /* Softer border */
     --input: 215 20.2% 90.0%;
-    --ring: 185 80% 35%; /* Ring uses primary color */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --ring: 173 70% 40%; /* Ring uses primary color */
+    --chart-1: 173 70% 40%; /* Chart color 1 */
+    --chart-2: 40 95% 55%;  /* Chart color 2 */
+    --chart-3: 215 27.9% 55.9%; /* Chart color 3 */
+    --chart-4: 185 80% 35%; /* Teal (existing) */
+    --chart-5: 27 87% 67%; /* Existing orange */
     --radius: 0.75rem;
-    --sidebar-background: 220 13% 97%;
+    --sidebar-background: 220 13% 98%; /* Slightly off-white */
     --sidebar-foreground: 224 71.4% 10.1%;
-    --sidebar-primary: 185 80% 35%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 215 27.9% 92.0%;
-    --sidebar-accent-foreground: 224 71.4% 10.1%;
-    --sidebar-border: 215 20.2% 85.1%;
-    --sidebar-ring: 185 80% 35%;
+    --sidebar-primary: 173 70% 40%; /* Turquoise */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 173 70% 92%; /* Very light turquoise */
+    --sidebar-accent-foreground: 173 70% 20%; /* Darker turquoise text */
+    --sidebar-border: 215 20.2% 88.1%;
+    --sidebar-ring: 173 70% 40%;
   }
   .dark {
     --background: 224 71.4% 4.1%;
@@ -49,7 +49,7 @@ body {
     --card-foreground: 210 20% 98%;
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 210 20% 98%;
-    --primary: 185 75% 45%; /* Adjusted dark Teal */
+    --primary: 173 65% 50%; /* Darker Turquoise */
     --primary-foreground: 0 0% 100%;
     --secondary: 215 27.9% 12.0%; /* Slightly darker secondary */
     --secondary-foreground: 210 20% 80%;
@@ -61,21 +61,36 @@ body {
     --destructive-foreground: 0 0% 98%;
     --border: 215 27.9% 18.1%; /* Adjusted dark border */
     --input: 215 27.9% 18.1%;
-    --ring: 185 75% 45%; /* Ring uses dark primary */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
+    --ring: 173 65% 50%; /* Ring uses dark primary */
+    --chart-1: 173 65% 50%;
+    --chart-2: 40 90% 60%;
+    --chart-3: 215 27.9% 45.9%;
+    --chart-4: 185 75% 45%;
     --chart-5: 340 75% 55%;
     --sidebar-background: 224 71.4% 6.1%;
     --sidebar-foreground: 210 20% 96%;
-    --sidebar-primary: 185 75% 45%;
+    --sidebar-primary: 173 65% 50%; /* Darker Turquoise */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 27.9% 15.0%;
-    --sidebar-accent-foreground: 210 20% 96%;
+    --sidebar-accent: 173 65% 15%; /* Dark, desaturated turquoise */
+    --sidebar-accent-foreground: 173 65% 85%; /* Lighter turquoise text */
     --sidebar-border: 215 27.9% 18.1%;
-    --sidebar-ring: 185 75% 45%;
+    --sidebar-ring: 173 65% 50%;
   }
+
+  /* Category Specific Themes (Simple Example) */
+  .theme-category-electronics { --store-accent: 210 80% 50%; --store-accent-foreground: white; }
+  .theme-category-clothing { --store-accent: 330 80% 60%; --store-accent-foreground: white; }
+  .theme-category-groceries { --store-accent: 120 60% 45%; --store-accent-foreground: white; }
+  .theme-category-books { --store-accent: 30 70% 50%; --store-accent-foreground: white; }
+  .theme-category-home.goods { --store-accent: 190 50% 55%; --store-accent-foreground: white; }
+  .theme-category-toys { --store-accent: 50 100% 60%; --store-accent-foreground: 224 71.4% 4.1%; }
+
+  .dark .theme-category-electronics { --store-accent: 210 70% 60%; }
+  .dark .theme-category-clothing { --store-accent: 330 70% 70%; }
+  .dark .theme-category-groceries { --store-accent: 120 50% 55%; }
+  .dark .theme-category-books { --store-accent: 30 60% 60%; }
+  .dark .theme-category-home.goods { --store-accent: 190 40% 65%; }
+  .dark .theme-category-toys { --store-accent: 50 90% 70%; }
 }
 
 @layer base {
