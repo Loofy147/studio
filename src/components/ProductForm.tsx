@@ -35,7 +35,7 @@ const productSchema = z.object({
     message: "Please enter a valid URL.",
   }).optional().or(z.literal('')), // Allow empty string or valid URL
   category: z.string().min(1, { message: "Category is required." }).max(50, {message: "Category cannot exceed 50 characters."}), // Make category required
-  storeId: z.string(),
+  storeId: z.string().min(1, { message: "Store ID is required." }), // Ensure storeId is part of the schema and required
   // Add optional fields based on Product interface
   ingredients: z.array(z.string()).optional(),
   size: z.string().optional(),
@@ -62,13 +62,14 @@ export function ProductForm({ onProductCreated, storeId, storeCategory /*, initi
         price: initialData.price ?? 0.01, // Ensure price is a number
         imageUrl: initialData.imageUrl ?? '', // Handle optional image URL
         category: initialData.category ?? '', // Ensure category is a string
+        storeId: storeId, // Ensure storeId is always set
     } : */ {
       name: "",
       description: "",
       price: 0.01,
       category: "",
       imageUrl: "",
-      storeId: storeId,
+      storeId: storeId, // Set storeId from props
       ingredients: [],
       size: "",
     },
@@ -148,7 +149,7 @@ export function ProductForm({ onProductCreated, storeId, storeCategory /*, initi
                     <Input placeholder="e.g., Fruits, T-Shirts, Laptops, Main Course" {...field} />
                 </FormControl>
                 <FormDescription>
-                    A specific category for this product (e.g., 'Shirts', 'Vegetables').
+                    A specific category for this product (e.g., 'Shirts', 'Vegetables'). This helps customers filter items.
                 </FormDescription>
                 <FormMessage />
                 </FormItem>
@@ -187,7 +188,7 @@ export function ProductForm({ onProductCreated, storeId, storeCategory /*, initi
                         <FormLabel>Ingredients (Optional)</FormLabel>
                         <FormControl>
                             {/* Improve this input later - maybe tags input */}
-                            <Input placeholder="Comma-separated, e.g., Flour, Water, Salt" {...field} onChange={e => field.onChange(e.target.value.split(',').map(s => s.trim()).filter(s => s))} value={field.value?.join(', ')} />
+                            <Input placeholder="Comma-separated, e.g., Flour, Water, Salt" {...field} onChange={e => field.onChange(e.target.value.split(',').map(s => s.trim()).filter(s => s))} value={Array.isArray(field.value) ? field.value.join(', ') : ''} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>

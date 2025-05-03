@@ -14,7 +14,7 @@ export interface Product {
   price: number;
   imageUrl?: string;
   category: string; // e.g., 'laptops', 'shirts', 'vegetables', 'coffee beans', 'prepared meals'
-  storeId?: string; // Optional: Link back to the store
+  storeId: string; // Link back to the store (Required for product management)
   storeName?: string; // Optional: Denormalized store name
   sales?: number; // Optional: Mock sales count
   // Add specific fields if needed, e.g., ingredients for restaurants
@@ -22,16 +22,37 @@ export interface Product {
   size?: string; // Example for clothing/coffee
 }
 
+// Interface for Promotions
+export type PromotionScope = 'all_products' | 'specific_products' | 'specific_categories';
+export type DiscountType = 'percentage' | 'fixed_amount';
+
+export interface Promotion {
+    id: string;
+    storeId: string;
+    name: string; // e.g., "Summer Sale", "Weekend Special"
+    description?: string;
+    discountType: DiscountType;
+    discountValue: number; // Percentage (e.g., 10 for 10%) or fixed amount (e.g., 5 for $5)
+    scope: PromotionScope;
+    applicableIds?: string[]; // Product IDs or Category names depending on scope
+    startDate?: Date;
+    endDate?: Date;
+    promoCode?: string; // Optional code needed to redeem
+    isActive: boolean;
+}
+
+
 export interface Store {
   id: string;
   name: string;
   description: string;
   category: StoreCategory;
   imageUrl?: string; // Optional banner image for the store
-  products?: Product[]; // Products might be loaded separately or on demand
+  products: Product[]; // Products associated with the store
   rating?: number; // Optional average rating
   ownerId?: string; // Link to the user who owns the store
-  dailyOffers?: DailyOffer[]; // Specific offers for this store
+  dailyOffers: DailyOffer[]; // Specific offers for this store
+  promotions: Promotion[]; // Promotions offered by the store
   // Add store-specific details if needed
   openingHours?: string; // Example for restaurants/shops
   address?: string; // Example for physical locations
@@ -102,6 +123,7 @@ export interface Order {
 let mockStores: Store[] | null = null;
 let mockProducts: Product[] | null = null;
 let mockDailyOffers: DailyOffer[] | null = null;
+let mockPromotions: Promotion[] | null = null; // Add mock promotions store
 let mockSubscriptions: Subscription[] | null = null;
 let mockUserProfiles: UserProfile[] | null = null; // Add mock users store
 let mockOrders: Order[] | null = null; // Add mock orders store
@@ -113,51 +135,51 @@ function generateMockStores(): Store[] {
      return [
         {
           id: "store-1", name: "ElectroMart", description: "Your one-stop shop for the latest electronics.", category: "electronics",
-          imageUrl: `https://picsum.photos/seed/electromart/400/300`, rating: 4.5, ownerId: 'owner-001'
+          imageUrl: `https://picsum.photos/seed/electromart/400/300`, rating: 4.5, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: []
         },
         {
           id: "store-2", name: "Fashionista Boutique", description: "Trendy clothing and accessories.", category: "clothing",
-          imageUrl: `https://picsum.photos/seed/fashionista/400/300`, rating: 4.2, ownerId: 'owner-002'
+          imageUrl: `https://picsum.photos/seed/fashionista/400/300`, rating: 4.2, ownerId: 'owner-002', products: [], dailyOffers: [], promotions: []
         },
         {
           id: "store-3", name: "FreshGrocer", description: "Quality groceries and fresh produce.", category: "groceries",
-          imageUrl: `https://picsum.photos/seed/freshgrocer/400/300`, rating: 4.8, openingHours: "7 AM - 9 PM", address: "100 Grocery Lane", ownerId: 'owner-003'
+          imageUrl: `https://picsum.photos/seed/freshgrocer/400/300`, rating: 4.8, openingHours: "7 AM - 9 PM", address: "100 Grocery Lane", ownerId: 'owner-003', products: [], dailyOffers: [], promotions: []
         },
         {
           id: "store-4", name: "The Book Nook", description: "Discover your next favorite read.", category: "books",
-          imageUrl: `https://picsum.photos/seed/booknook/400/300`, rating: 4.6, ownerId: 'owner-004'
+          imageUrl: `https://picsum.photos/seed/booknook/400/300`, rating: 4.6, ownerId: 'owner-004', products: [], dailyOffers: [], promotions: []
         },
         {
           id: "store-5", name: "Cozy Home", description: "Everything for your home.", category: "home goods",
-          imageUrl: `https://picsum.photos/seed/cozyhome/400/300`, rating: 4.3, ownerId: 'owner-005'
+          imageUrl: `https://picsum.photos/seed/cozyhome/400/300`, rating: 4.3, ownerId: 'owner-005', products: [], dailyOffers: [], promotions: []
         },
         {
           id: "store-6", name: "Toy Galaxy", description: "Fun and educational toys.", category: "toys",
-          imageUrl: `https://picsum.photos/seed/toygalaxy/400/300`, rating: 4.0, ownerId: 'owner-006'
+          imageUrl: `https://picsum.photos/seed/toygalaxy/400/300`, rating: 4.0, ownerId: 'owner-006', products: [], dailyOffers: [], promotions: []
         },
         {
           id: "store-7", name: "Gadget Hub", description: "Cutting-edge tech.", category: "electronics",
-          imageUrl: `https://picsum.photos/seed/gadgethub/400/300`, rating: 4.7, ownerId: 'owner-001' // Reused owner
+          imageUrl: `https://picsum.photos/seed/gadgethub/400/300`, rating: 4.7, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: [] // Reused owner
         },
         {
           id: "store-8", name: "Style Threads", description: "Affordable and stylish clothing.", category: "clothing",
-          imageUrl: `https://picsum.photos/seed/stylethreads/400/300`, rating: 3.9, ownerId: 'owner-007'
+          imageUrl: `https://picsum.photos/seed/stylethreads/400/300`, rating: 3.9, ownerId: 'owner-007', products: [], dailyOffers: [], promotions: []
         },
         {
             id: "store-9", name: "The Daily Grind", description: "Artisan coffee, pastries, and light bites.", category: "coffee shops",
-            imageUrl: `https://picsum.photos/seed/dailygrind/400/300`, rating: 4.9, openingHours: "6 AM - 6 PM", address: "25 Coffee Bean Blvd", ownerId: 'owner-008'
+            imageUrl: `https://picsum.photos/seed/dailygrind/400/300`, rating: 4.9, openingHours: "6 AM - 6 PM", address: "25 Coffee Bean Blvd", ownerId: 'owner-008', products: [], dailyOffers: [], promotions: []
         },
         {
             id: "store-10", name: "Mama Mia Pizzeria", description: "Authentic Italian pizza and pasta dishes.", category: "restaurants",
-            imageUrl: `https://picsum.photos/seed/mamamia/400/300`, rating: 4.5, openingHours: "11 AM - 10 PM", address: "50 Pizza Plaza", ownerId: 'owner-009'
+            imageUrl: `https://picsum.photos/seed/mamamia/400/300`, rating: 4.5, openingHours: "11 AM - 10 PM", address: "50 Pizza Plaza", ownerId: 'owner-009', products: [], dailyOffers: [], promotions: []
         },
         {
             id: "store-11", name: "GreenBasket Organics", description: "Certified organic fruits, vegetables, and pantry staples.", category: "groceries",
-            imageUrl: `https://picsum.photos/seed/greenbasket/400/300`, rating: 4.7, openingHours: "8 AM - 8 PM", address: "75 Organic Way", ownerId: 'owner-010'
+            imageUrl: `https://picsum.photos/seed/greenbasket/400/300`, rating: 4.7, openingHours: "8 AM - 8 PM", address: "75 Organic Way", ownerId: 'owner-010', products: [], dailyOffers: [], promotions: []
         },
          { // Example inactive store
           id: "store-12", name: "Vintage Finds", description: "Closed for renovation.", category: "other",
-          imageUrl: `https://picsum.photos/seed/vintagefinds/400/300`, rating: 4.1, ownerId: 'owner-011', isActive: false
+          imageUrl: `https://picsum.photos/seed/vintagefinds/400/300`, rating: 4.1, ownerId: 'owner-011', isActive: false, products: [], dailyOffers: [], promotions: []
         },
       ].map(s => ({ // Add default active status and creation date
           ...s,
@@ -232,14 +254,16 @@ function generateMockProductsStore(storeId: string, category: StoreCategory, cou
         }
         const range = priceRanges[category];
         const price = parseFloat((Math.random() * (range.max - range.min) + range.min).toFixed(2));
+        const productCategory = baseName.toLowerCase().replace(/\s+/g, '-');
 
         const product: Product = {
-            id: `${storeId}-prod-${i}`,
+            id: `${storeId}-prod-${i}-${productCategory}`, // Make ID more unique including category
             name: name,
             description: `A ${name.toLowerCase()}. ${category === 'restaurants' ? 'Delicious and freshly prepared.' : category === 'groceries' ? 'High-quality ingredient.' : 'Perfect for your needs.' }`,
             price: price,
             imageUrl: `https://picsum.photos/seed/${storeId}-${name.replace(/\s+/g, '-')}-${i}/300/200`,
-            category: baseName.toLowerCase().replace(/\s+/g, '-'),
+            category: productCategory, // Use generated product category
+            storeId: storeId, // Ensure storeId is always set here
             ...(category === 'restaurants' && { ingredients: ['Flour', 'Tomato', 'Cheese'] }),
             ...(category === 'clothing' && { size: ['S', 'M', 'L', 'XL'][Math.floor(Math.random() * 4)] }),
             ...(category === 'coffee shops' && { size: ['Small', 'Medium', 'Large'][Math.floor(Math.random() * 3)] }),
@@ -302,6 +326,61 @@ function generateMockDailyOffers(stores: Store[], products: Product[]): DailyOff
     });
     return offers;
 }
+
+function generateMockPromotions(stores: Store[], products: Product[]): Promotion[] {
+    const promotions: Promotion[] = [];
+    const scopes: PromotionScope[] = ['all_products', 'specific_products', 'specific_categories'];
+    const discountTypes: DiscountType[] = ['percentage', 'fixed_amount'];
+
+    stores.forEach(store => {
+        if (!store.isActive || Math.random() < 0.3) return; // Skip inactive or some active stores randomly
+
+        const numPromotions = Math.floor(Math.random() * 3); // 0-2 promotions per store
+        const storeProducts = products.filter(p => p.storeId === store.id);
+        const storeCategories = Array.from(new Set(storeProducts.map(p => p.category)));
+
+        for (let i = 0; i < numPromotions; i++) {
+            const scope = scopes[Math.floor(Math.random() * scopes.length)];
+            const discountType = discountTypes[Math.floor(Math.random() * discountTypes.length)];
+            let discountValue: number;
+            let applicableIds: string[] | undefined;
+
+            if (discountType === 'percentage') {
+                discountValue = [5, 10, 15, 20, 25][Math.floor(Math.random() * 5)]; // 5-25%
+            } else {
+                discountValue = [1, 2, 5, 10][Math.floor(Math.random() * 4)]; // $1, $2, $5, $10
+            }
+
+            if (scope === 'specific_products' && storeProducts.length > 0) {
+                const numApplicable = Math.min(storeProducts.length, Math.floor(Math.random() * 3) + 1);
+                applicableIds = [...storeProducts].sort(() => 0.5 - Math.random()).slice(0, numApplicable).map(p => p.id);
+            } else if (scope === 'specific_categories' && storeCategories.length > 0) {
+                const numApplicable = Math.min(storeCategories.length, Math.floor(Math.random() * 2) + 1);
+                applicableIds = [...storeCategories].sort(() => 0.5 - Math.random()).slice(0, numApplicable);
+            }
+
+            const startDate = Math.random() > 0.3 ? new Date(Date.now() - Math.random() * 14 * 86400000) : undefined; // Optional start date within last 2 weeks
+            const endDate = startDate && Math.random() > 0.2 ? new Date(startDate.getTime() + (7 + Math.random() * 21) * 86400000) : undefined; // Optional end date 1-4 weeks after start
+
+            promotions.push({
+                id: `promo-${store.id}-${i}`,
+                storeId: store.id,
+                name: `${discountType === 'percentage' ? `${discountValue}% Off` : `${formatCurrency(discountValue)} Off`} ${scope === 'all_products' ? 'Everything' : scope === 'specific_categories' ? (applicableIds ? applicableIds.join(', ') : 'Selected Items') : 'Selected Products'}`,
+                description: `Limited time offer on ${scope === 'all_products' ? 'all items' : 'select items'}!`,
+                discountType: discountType,
+                discountValue: discountValue,
+                scope: scope,
+                applicableIds: applicableIds,
+                startDate: startDate,
+                endDate: endDate,
+                promoCode: Math.random() > 0.7 ? `SAVE${discountValue}${Math.floor(Math.random() * 100)}` : undefined, // Optional promo code
+                isActive: Math.random() > 0.1, // ~90% active
+            });
+        }
+    });
+    return promotions;
+}
+
 
 function generateMockUserProfiles(): UserProfile[] {
     const users: UserProfile[] = [];
@@ -397,19 +476,19 @@ function generateMockSubscriptions(userId: string, offers: DailyOffer[], stores:
     // (Keep the existing generateMockSubscriptions logic)
     const subscriptions: Subscription[] = [];
     const numSubscriptions = Math.floor(Math.random() * 3); // 0-2 subscriptions per user
+    const userOffers = offers.filter(o => Math.random() > 0.5); // Randomly select some available offers
 
-    for (let i = 0; i < numSubscriptions; i++) {
-        const offer = offers[Math.floor(Math.random() * offers.length)];
-        if (!offer) continue;
+    for (let i = 0; i < numSubscriptions && i < userOffers.length; i++) {
+        const offer = userOffers[i];
         const store = stores.find(s => s.id === offer.storeId);
-        if (!store) continue;
+        if (!store || !offer.isActive) continue; // Ensure offer and store exist and offer is active
 
         const startDate = new Date(Date.now() - (Math.random() * 30 * 86400000)); // Start date within last 30 days
         const statusOptions: Subscription['status'][] = ['active', 'paused', 'cancelled'];
         const status = statusOptions[Math.floor(Math.random() * statusOptions.length)];
 
         subscriptions.push({
-            id: `sub-${userId}-${i}`,
+            id: `sub-${userId}-${offer.id.slice(-4)}`, // Make ID slightly more unique
             userId: userId,
             offerId: offer.id,
             storeId: offer.storeId,
@@ -417,7 +496,7 @@ function generateMockSubscriptions(userId: string, offers: DailyOffer[], stores:
             offerName: offer.name,
             startDate: startDate,
             status: status,
-            nextDeliveryDate: status === 'active' ? new Date(Date.now() + (offer.frequency === 'daily' ? 1 : 7) * 86400000 * Math.random()) : undefined,
+            nextDeliveryDate: status === 'active' ? new Date(Date.now() + (offer.frequency === 'daily' ? 1 : 7) * 86400000 * (Math.random() * 0.5 + 0.5)) : undefined, // Next delivery within 0.5-1 cycle
         });
     }
     return subscriptions;
@@ -442,12 +521,23 @@ async function initializeMockData() {
     }
     if (!mockProducts) {
         mockProducts = generateAllMockProducts(mockStores);
+         // Link products back to stores
+        mockStores.forEach(store => {
+            store.products = mockProducts!.filter(product => product.storeId === store.id);
+        });
     }
     if (!mockDailyOffers) {
         mockDailyOffers = generateMockDailyOffers(mockStores, mockProducts);
         // Link offers back to stores
         mockStores.forEach(store => {
             store.dailyOffers = mockDailyOffers!.filter(offer => offer.storeId === store.id);
+        });
+    }
+    if (!mockPromotions) {
+        mockPromotions = generateMockPromotions(mockStores, mockProducts);
+        // Link promotions back to stores
+        mockStores.forEach(store => {
+            store.promotions = mockPromotions!.filter(promo => promo.storeId === store.id);
         });
     }
     if (!mockOrders) {
@@ -473,7 +563,7 @@ export async function getStores(): Promise<Store[]> {
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log("Stores fetched:", mockStores!.length);
-      resolve([...mockStores!]);
+      resolve([...mockStores!].map(s => ({...s}))); // Return copies
     }, 200); // Faster delay
   });
 }
@@ -488,29 +578,30 @@ export async function getStoreById(storeId: string): Promise<Store | null> {
         return Promise.resolve(null);
      }
 
-     const storeProducts = mockProducts!.filter(p => p.storeId === storeId);
-     const storeOffers = mockDailyOffers!.filter(o => o.storeId === storeId);
+     // Ensure products, offers, and promotions are attached
+     const storeWithDetails = {
+         ...store,
+         products: mockProducts!.filter(p => p.storeId === storeId),
+         dailyOffers: mockDailyOffers!.filter(o => o.storeId === storeId),
+         promotions: mockPromotions!.filter(promo => promo.storeId === storeId)
+     };
 
      return new Promise((resolve) => {
         setTimeout(() => {
-            const storeWithDetails = {
-                ...store,
-                products: storeProducts,
-                dailyOffers: storeOffers
-            };
             console.log("Store details fetched:", storeWithDetails.name);
-             resolve(storeWithDetails);
+             resolve({...storeWithDetails}); // Return a copy
         }, 100); // Faster delay
      });
 }
 
-export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'isActive' | 'createdAt' | 'ownerId'>, ownerId: string): Promise<Store> {
+export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'promotions' | 'isActive' | 'createdAt' | 'ownerId'>, ownerId: string): Promise<Store> {
   console.log("Creating store:", storeData);
   await initializeMockData();
   const newStore: Store = {
     id: uuidv4(),
     products: [],
     dailyOffers: [],
+    promotions: [],
     ...storeData,
     ownerId: ownerId,
     isActive: false, // New stores start inactive/pending approval by admin
@@ -520,7 +611,7 @@ export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'da
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log("Store created (pending approval):", newStore.name);
-      resolve(newStore);
+      resolve({...newStore}); // Return a copy
     }, 150);
   });
 }
@@ -549,7 +640,7 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
     return new Promise((resolve) => {
         setTimeout(() => {
             console.log("Products fetched:", filteredProducts.length);
-            resolve(filteredProducts);
+            resolve(filteredProducts.map(p => ({...p}))); // Return copies
         }, 150); // Faster delay
     });
 }
@@ -561,41 +652,43 @@ interface GetProductsOptions {
 }
 
 
-export async function createProduct(productData: Omit<Product, 'id'>): Promise<Product> {
+export async function createProduct(productData: Omit<Product, 'id' | 'sales'>): Promise<Product> {
     console.log("Creating product:", productData);
     await initializeMockData();
     const newProduct: Product = {
-        id: uuidv4(),
+        id: `${productData.storeId}-prod-${uuidv4().substring(0, 6)}-${productData.category}`, // More unique ID
         sales: 0,
         ...productData,
     };
     mockProducts!.push(newProduct);
+    // Also add to the store's product list in mockStores
     const storeIndex = mockStores!.findIndex(s => s.id === newProduct.storeId);
     if (storeIndex > -1) {
-        mockStores![storeIndex].products?.push(newProduct);
+        mockStores![storeIndex].products.push(newProduct);
     }
     return new Promise((resolve) => {
         setTimeout(() => {
             console.log("Product created:", newProduct.name);
-            resolve(newProduct);
+            resolve({...newProduct}); // Return a copy
         }, 100);
     });
 }
+
 
 // DAILY OFFERS & SUBSCRIPTIONS (Keep existing functions, adjust delays if needed)
 export async function getStoreDailyOffers(storeId: string): Promise<DailyOffer[]> {
     await initializeMockData();
     const offers = mockDailyOffers!.filter(o => o.storeId === storeId && o.isActive);
-    return Promise.resolve(offers); // Faster response
+    return Promise.resolve(offers.map(o => ({...o}))); // Faster response, return copies
 }
 
 export async function createDailyOffer(offerData: Omit<DailyOffer, 'id'>): Promise<DailyOffer> {
     await initializeMockData();
-    const newOffer: DailyOffer = { id: uuidv4(), ...offerData };
+    const newOffer: DailyOffer = { id: `offer-${offerData.storeId}-${uuidv4().substring(0, 6)}`, ...offerData };
     mockDailyOffers!.push(newOffer);
     const storeIndex = mockStores!.findIndex(s => s.id === newOffer.storeId);
-    if (storeIndex > -1) mockStores![storeIndex].dailyOffers?.push(newOffer);
-    return Promise.resolve(newOffer);
+    if (storeIndex > -1) mockStores![storeIndex].dailyOffers.push(newOffer);
+    return Promise.resolve({...newOffer}); // Return copy
 }
 
 export async function createSubscription(userId: string, offerId: string): Promise<Subscription> {
@@ -604,18 +697,18 @@ export async function createSubscription(userId: string, offerId: string): Promi
     const store = mockStores!.find(s => s.id === offer?.storeId);
     if (!offer || !store || !offer.isActive) throw new Error("Offer not available.");
     const newSubscription: Subscription = {
-        id: uuidv4(), userId, offerId, storeId: store.id, storeName: store.name,
+        id: `sub-${userId}-${offerId.slice(-4)}`, userId, offerId, storeId: store.id, storeName: store.name,
         offerName: offer.name, startDate: new Date(), status: 'active',
         nextDeliveryDate: new Date(Date.now() + (offer.frequency === 'daily' ? 1 : 7) * 86400000)
     };
     mockSubscriptions!.push(newSubscription);
-    return Promise.resolve(newSubscription);
+    return Promise.resolve({...newSubscription}); // Return copy
 }
 
 export async function getUserSubscriptions(userId: string): Promise<Subscription[]> {
     await initializeMockData();
     const userSubs = mockSubscriptions!.filter(sub => sub.userId === userId);
-    return Promise.resolve(userSubs);
+    return Promise.resolve(userSubs.map(s => ({...s}))); // Return copies
 }
 
 export async function updateSubscriptionStatus(subscriptionId: string, status: 'active' | 'paused' | 'cancelled'): Promise<Subscription | null> {
@@ -627,10 +720,44 @@ export async function updateSubscriptionStatus(subscriptionId: string, status: '
         mockSubscriptions![subIndex].nextDeliveryDate = (status === 'active' && offer)
             ? new Date(Date.now() + (offer.frequency === 'daily' ? 1 : 7) * 86400000)
             : undefined;
-        return Promise.resolve(mockSubscriptions![subIndex]);
+        return Promise.resolve({...mockSubscriptions![subIndex]}); // Return copy
     }
     return Promise.resolve(null);
 }
+
+// PROMOTIONS
+export async function createPromotion(promotionData: Omit<Promotion, 'id'>): Promise<Promotion> {
+    console.log("Creating promotion:", promotionData);
+    await initializeMockData();
+    const newPromotion: Promotion = {
+        id: `promo-${promotionData.storeId}-${uuidv4().substring(0, 6)}`,
+        ...promotionData,
+    };
+    mockPromotions!.push(newPromotion);
+    // Also add to the store's promotion list in mockStores
+    const storeIndex = mockStores!.findIndex(s => s.id === newPromotion.storeId);
+    if (storeIndex > -1) {
+        mockStores![storeIndex].promotions.push(newPromotion);
+    }
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            console.log("Promotion created:", newPromotion.name);
+            resolve({...newPromotion}); // Return a copy
+        }, 100);
+    });
+}
+
+export async function deletePromotion(promotionId: string): Promise<void> {
+    console.log(`MOCK: Deleting promotion ${promotionId}`);
+    await initializeMockData();
+    await new Promise(resolve => setTimeout(resolve, 300));
+    mockPromotions = mockPromotions?.filter(p => p.id !== promotionId) ?? null;
+    // Also remove from the store's promotion list
+    mockStores?.forEach(store => {
+        store.promotions = store.promotions.filter(p => p.id !== promotionId);
+    });
+}
+
 
 // ORDERS
 // Mock function to get user orders (can keep as is or modify)
@@ -641,7 +768,7 @@ export async function getUserOrders(userId: string): Promise<Order[]> {
      return new Promise((resolve) => {
         setTimeout(() => {
              console.log(`Orders fetched for user ${userId}:`, userOrders.length);
-             resolve(userOrders.sort((a,b) => b.orderDate.getTime() - a.orderDate.getTime()));
+             resolve(userOrders.sort((a,b) => b.orderDate.getTime() - a.orderDate.getTime()).map(o => ({...o}))); // Return copies
         }, 200); // Faster delay
      });
 }
@@ -653,7 +780,7 @@ export async function getAllOrders(): Promise<Order[]> {
     return new Promise((resolve) => {
         setTimeout(() => {
             console.log("All orders fetched:", mockOrders!.length);
-            resolve([...mockOrders!].sort((a,b) => b.orderDate.getTime() - a.orderDate.getTime()));
+            resolve([...mockOrders!].sort((a,b) => b.orderDate.getTime() - a.orderDate.getTime()).map(o => ({...o}))); // Return copies
         }, 300); // Slightly longer delay for all orders
     });
 }
@@ -668,7 +795,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
         setTimeout(() => {
             if (profile) {
                 console.log("User profile fetched:", profile.name);
-                resolve(profile);
+                resolve({...profile}); // Return copy
             } else {
                  console.log("User profile not found");
                 resolve(null);
@@ -684,7 +811,7 @@ export async function getAllUserProfiles(): Promise<UserProfile[]> {
     return new Promise((resolve) => {
         setTimeout(() => {
             console.log("All user profiles fetched:", mockUserProfiles!.length);
-            resolve([...mockUserProfiles!]);
+            resolve([...mockUserProfiles!].map(p => ({...p}))); // Return copies
         }, 250);
     });
 }
@@ -693,28 +820,76 @@ export async function getAllUserProfiles(): Promise<UserProfile[]> {
 // --- Mock Delete Functions (Placeholder) ---
 export async function deleteStore(storeId: string): Promise<void> {
   console.log(`MOCK: Deleting store ${storeId}`);
+  await initializeMockData();
   await new Promise(resolve => setTimeout(resolve, 400));
    // Remove from mock data (won't persist)
    mockStores = mockStores?.filter(s => s.id !== storeId) ?? null;
    mockProducts = mockProducts?.filter(p => p.storeId !== storeId) ?? null;
    mockDailyOffers = mockDailyOffers?.filter(o => o.storeId !== storeId) ?? null;
+   mockPromotions = mockPromotions?.filter(promo => promo.storeId !== storeId) ?? null;
    mockOrders = mockOrders?.filter(o => o.storeId !== storeId) ?? null;
    mockSubscriptions = mockSubscriptions?.filter(s => s.storeId !== storeId) ?? null;
 }
 
 export async function deleteProduct(productId: string): Promise<void> {
   console.log(`MOCK: Deleting product ${productId}`);
+   await initializeMockData();
   await new Promise(resolve => setTimeout(resolve, 300));
    // Remove from mock data
+   const productToDelete = mockProducts?.find(p => p.id === productId);
    mockProducts = mockProducts?.filter(p => p.id !== productId) ?? null;
+    // Also remove from the store's product list
+    if (productToDelete && productToDelete.storeId) {
+        const storeIndex = mockStores!.findIndex(s => s.id === productToDelete.storeId);
+        if (storeIndex > -1) {
+            mockStores![storeIndex].products = mockStores![storeIndex].products.filter(p => p.id !== productId);
+        }
+    }
     // TODO: Also remove from daily offers? This might be complex.
+    mockDailyOffers?.forEach(offer => {
+        offer.items = offer.items.filter(item => item.productId !== productId);
+    });
+    // Filter out offers that might now be empty
+    mockDailyOffers = mockDailyOffers?.filter(offer => offer.items.length > 0) ?? null;
+     // Also remove from promotions if scope is specific_products
+    mockPromotions?.forEach(promo => {
+        if (promo.scope === 'specific_products' && promo.applicableIds) {
+            promo.applicableIds = promo.applicableIds.filter(id => id !== productId);
+        }
+    });
+    // Optionally remove promotions that no longer apply to any products
+    // mockPromotions = mockPromotions?.filter(promo => !(promo.scope === 'specific_products' && promo.applicableIds?.length === 0)) ?? null;
+
+
 }
 
 export async function deleteDailyOffer(offerId: string): Promise<void> {
   console.log(`MOCK: Deleting offer ${offerId}`);
+   await initializeMockData();
   await new Promise(resolve => setTimeout(resolve, 300));
    // Remove from mock data
+   const offerToDelete = mockDailyOffers?.find(o => o.id === offerId);
    mockDailyOffers = mockDailyOffers?.filter(o => o.id !== offerId) ?? null;
+   // Also remove from the store's offer list
+   if (offerToDelete && offerToDelete.storeId) {
+        const storeIndex = mockStores!.findIndex(s => s.id === offerToDelete.storeId);
+        if (storeIndex > -1) {
+            mockStores![storeIndex].dailyOffers = mockStores![storeIndex].dailyOffers.filter(o => o.id !== offerId);
+        }
+    }
    // TODO: Cancel related subscriptions?
-   mockSubscriptions = mockSubscriptions?.filter(s => s.offerId !== offerId) ?? null;
+   mockSubscriptions?.forEach(sub => {
+       if (sub.offerId === offerId) {
+           sub.status = 'cancelled';
+       }
+   });
+   // mockSubscriptions = mockSubscriptions?.filter(s => s.offerId !== offerId) ?? null; // Don't delete, just cancel
 }
+
+// Helper to format currency (Keep this if used elsewhere, or ensure it's available via lib/utils)
+const formatCurrency = (amount: number | undefined | null) => {
+  if (amount === undefined || amount === null) {
+    return 'N/A';
+  }
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+};
