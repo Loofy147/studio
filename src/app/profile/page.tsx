@@ -2,27 +2,39 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"; // Added CardFooter
-import { getUserProfile, UserProfile, Order, getUserOrders } from "@/services/store"; // Assuming profile/order functions are in store service
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, updateSubscriptionStatus, DailyOffer } from "@/services/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye } from 'lucide-react'; // Added Eye icon
-import { format } from 'date-fns'; // For date formatting
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
-import Link from "next/link"; // Import Link
-import { cn } from "@/lib/utils"; // Import cn
-import React from 'react'; // Import React for forwardRef etc.
+import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat } from 'lucide-react'; // Added subscription icons
+import { format } from 'date-fns';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import React from 'react';
+import { useToast } from "@/hooks/use-toast"; // Import useToast
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog" // Import Alert Dialog
 
 // Helper to format currency
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 };
 
-// Map status to icon and variant for the table
+// Map status to icon and variant for the order table
 const orderStatusDetails: Record<Order['status'], { icon: React.ElementType; variant: BadgeProps['variant']; color: string }> = {
     'Pending': { icon: Hourglass, variant: 'outline', color: 'text-yellow-600 dark:text-yellow-400' },
     'Processing': { icon: Settings, variant: 'outline', color: 'text-blue-600 dark:text-blue-400' },
@@ -30,6 +42,14 @@ const orderStatusDetails: Record<Order['status'], { icon: React.ElementType; var
     'Delivered': { icon: PackageCheck, variant: 'default', color: 'text-green-600 dark:text-green-400' }, // Use default for styling below
     'Cancelled': { icon: XCircle, variant: 'destructive', color: 'text-red-600 dark:text-red-400' }
 };
+
+// Map status to icon and variant for the subscription table
+const subscriptionStatusDetails: Record<Subscription['status'], { icon: React.ElementType; variant: BadgeProps['variant']; color: string; label: string }> = {
+    'active': { icon: Play, variant: 'default', color: 'text-green-600 dark:text-green-400', label: 'Active' },
+    'paused': { icon: Pause, variant: 'secondary', color: 'text-yellow-600 dark:text-yellow-400', label: 'Paused' },
+    'cancelled': { icon: XCircle, variant: 'destructive', color: 'text-red-600 dark:text-red-400', label: 'Cancelled' }
+};
+
 
 // Define BadgeProps type locally if not exported from Badge component
 import { type VariantProps } from "class-variance-authority"
@@ -42,32 +62,35 @@ export interface BadgeProps
 export default function ProfilePage() {
   // In a real app, you'd get the userId from authentication context
   const userId = "user123"; // Hardcoded for demonstration
+  const { toast } = useToast();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+  const [isLoadingSubs, setIsLoadingSubs] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingSubId, setUpdatingSubId] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true; // Flag to prevent state updates on unmounted component
 
     const fetchProfileData = async () => {
       setIsLoadingProfile(true);
-      setError(null);
+      setError(null); // Reset primary error on new fetch attempt
       try {
-        // Simulate loading
-        // await new Promise(resolve => setTimeout(resolve, 800));
         const profileData = await getUserProfile(userId);
         if (isMounted) {
             setProfile(profileData);
              if (!profileData) {
-                setError("Could not load profile.");
+                 // Set error only if profile specifically failed
+                 setError(prev => prev ? `${prev} Failed to load profile.` : "Failed to load profile.");
              }
         }
       } catch (err) {
         console.error("Failed to fetch profile:", err);
-         if (isMounted) setError("Could not load profile information.");
+         if (isMounted) setError(prev => prev ? `${prev} Failed to load profile information.` : "Failed to load profile information.");
       } finally {
          if (isMounted) setIsLoadingProfile(false);
       }
@@ -75,58 +98,97 @@ export default function ProfilePage() {
 
     const fetchOrders = async () => {
         setIsLoadingOrders(true);
-        // Keep profile error state separate if desired
-        // setError(null); // Reset order-specific error if needed
         try {
-             // Simulate loading
-            // await new Promise(resolve => setTimeout(resolve, 1200));
             const orderData = await getUserOrders(userId);
              if (isMounted) {
-                // Get only the last 5 orders for the summary table
                 setOrders(orderData.sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime()).slice(0, 5));
              }
         } catch (err) {
             console.error("Failed to fetch orders:", err);
-            // Append or set specific order error
              if (isMounted) setError(prev => prev ? `${prev} Failed to load recent orders.` : "Failed to load recent orders.");
         } finally {
              if (isMounted) setIsLoadingOrders(false);
         }
     }
 
+    const fetchSubscriptions = async () => {
+        setIsLoadingSubs(true);
+         try {
+            const subData = await getUserSubscriptions(userId);
+             if (isMounted) {
+                setSubscriptions(subData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()));
+             }
+         } catch (err) {
+            console.error("Failed to fetch subscriptions:", err);
+             if (isMounted) setError(prev => prev ? `${prev} Failed to load subscriptions.` : "Failed to load subscriptions.");
+         } finally {
+             if (isMounted) setIsLoadingSubs(false);
+         }
+    }
+
     fetchProfileData();
     fetchOrders();
+    fetchSubscriptions();
 
     return () => {
         isMounted = false; // Cleanup function to set flag false when component unmounts
     }
   }, [userId]);
 
+  const handleUpdateSubscription = async (subId: string, newStatus: Subscription['status']) => {
+        setUpdatingSubId(subId);
+        try {
+             const updatedSub = await updateSubscriptionStatus(subId, newStatus);
+             if (updatedSub) {
+                setSubscriptions(prevSubs =>
+                    prevSubs.map(sub => (sub.id === subId ? updatedSub : sub))
+                );
+                 toast({
+                    title: `Subscription ${newStatus}`,
+                    description: `Your subscription has been successfully ${newStatus}.`,
+                    variant: newStatus === 'cancelled' ? 'destructive' : 'default',
+                 });
+             } else {
+                 throw new Error("Subscription not found or update failed.");
+             }
+        } catch (err) {
+            console.error(`Failed to ${newStatus} subscription:`, err);
+            toast({
+                title: "Update Failed",
+                description: `Could not ${newStatus} the subscription. Please try again.`,
+                variant: "destructive",
+            });
+        } finally {
+            setUpdatingSubId(null);
+        }
+    };
+
+
   const ProfileInfoSkeleton = () => (
      <Card>
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6">
-             <Skeleton className="h-24 w-24 rounded-full" /> {/* Larger skeleton */}
+             <Skeleton className="h-24 w-24 rounded-full" />
              <div className="space-y-2 flex-grow">
                 <Skeleton className="h-7 w-48" />
                 <Skeleton className="h-5 w-64" />
              </div>
             <div className="flex gap-2 self-start sm:self-center">
-                <Skeleton className="h-9 w-28" /> {/* Adjusted width */}
-                <Skeleton className="h-9 w-28" /> {/* Adjusted width */}
+                <Skeleton className="h-9 w-28" />
+                <Skeleton className="h-9 w-28" />
             </div>
         </CardHeader>
         <CardContent className="space-y-6 p-6 pt-0">
             <Separator />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"> {/* Increased gap */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                  <div className="flex items-start gap-3">
-                     <Skeleton className="h-5 w-5 rounded mt-1 text-primary" /> {/* Placeholder icon color */}
+                     <Skeleton className="h-5 w-5 rounded mt-1" />
                      <div className="space-y-1.5">
                          <Skeleton className="h-4 w-20" />
                          <Skeleton className="h-4 w-40" />
                      </div>
                  </div>
                  <div className="flex items-start gap-3">
-                     <Skeleton className="h-5 w-5 rounded mt-1 text-primary" /> {/* Placeholder icon color */}
+                     <Skeleton className="h-5 w-5 rounded mt-1" />
                      <div className="space-y-1.5">
                         <Skeleton className="h-4 w-16" />
                         <Skeleton className="h-4 w-32" />
@@ -135,7 +197,7 @@ export default function ProfilePage() {
             </div>
              <Separator />
              <div className="flex items-center gap-3">
-                 <Skeleton className="h-6 w-6 rounded text-primary" /> {/* Placeholder icon color */}
+                 <Skeleton className="h-6 w-6 rounded" />
                  <div className="space-y-1">
                     <Skeleton className="h-4 w-28" />
                     <Skeleton className="h-6 w-20" />
@@ -147,7 +209,7 @@ export default function ProfilePage() {
 
    const OrderHistorySkeleton = () => (
     <Card>
-        <CardHeader className="flex flex-row justify-between items-center p-4"> {/* Adjusted padding */}
+        <CardHeader className="flex flex-row justify-between items-center p-4">
             <div className="space-y-1">
                 <Skeleton className="h-7 w-40" />
                 <Skeleton className="h-4 w-56" />
@@ -158,23 +220,23 @@ export default function ProfilePage() {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[100px] pl-4"><Skeleton className="h-4 w-16" /></TableHead> {/* Added padding */}
+                        <TableHead className="w-[100px] pl-4"><Skeleton className="h-4 w-16" /></TableHead>
                         <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                         <TableHead><Skeleton className="h-4 w-32" /></TableHead>
                         <TableHead className="hidden md:table-cell text-right"><Skeleton className="h-4 w-20" /></TableHead>
                         <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-16" /></TableHead> {/* Added padding */}
+                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-16" /></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {Array.from({ length: 3 }).map((_, i) => (
-                        <TableRow key={i} className="hover:bg-muted/20"> {/* Lighter hover */}
-                            <TableCell className="pl-4"><Skeleton className="h-4 w-16" /></TableCell> {/* Added padding */}
+                        <TableRow key={i} className="hover:bg-muted/20">
+                            <TableCell className="pl-4"><Skeleton className="h-4 w-16" /></TableCell>
                             <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                             <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                              <TableCell className="hidden md:table-cell text-right"><Skeleton className="h-4 w-20" /></TableCell>
                             <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                            <TableCell className="text-right pr-4"><Skeleton className="h-4 w-16" /></TableCell> {/* Added padding */}
+                            <TableCell className="text-right pr-4"><Skeleton className="h-4 w-16" /></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -183,14 +245,58 @@ export default function ProfilePage() {
     </Card>
    )
 
+   const SubscriptionsSkeleton = () => (
+     <Card>
+        <CardHeader className="flex flex-row justify-between items-center p-4">
+            <div className="space-y-1">
+                <Skeleton className="h-7 w-44" />
+                <Skeleton className="h-4 w-60" />
+            </div>
+        </CardHeader>
+        <CardContent className="p-0">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="pl-4"><Skeleton className="h-4 w-32" /></TableHead>
+                        <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                        <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-28" /></TableHead>
+                        <TableHead><Skeleton className="h-4 w-20" /></TableHead>
+                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-28" /></TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                     {Array.from({ length: 2 }).map((_, i) => (
+                        <TableRow key={i} className="hover:bg-muted/20">
+                            <TableCell className="pl-4"><Skeleton className="h-4 w-32" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-28" /></TableCell>
+                             <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                            <TableCell className="text-right pr-4 space-x-1">
+                                <Skeleton className="h-8 w-8 inline-block" />
+                                <Skeleton className="h-8 w-8 inline-block" />
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </CardContent>
+     </Card>
+   )
+
+
+  // Separate error messages for clarity
+  const profileError = error?.includes("profile") ? error.replace(/Failed to load (recent orders|subscriptions)\./g, '').trim() : null;
+  const orderError = error?.includes("orders") ? "Failed to load recent orders." : null;
+  const subError = error?.includes("subscriptions") ? "Failed to load subscriptions." : null;
+
+
   return (
-    <div className="space-y-10">
+    <div className="space-y-12"> {/* Increased spacing */}
         {/* Profile Header */}
-       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6"> {/* Added border */}
+       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6">
             <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                <User className="h-8 w-8 text-primary" /> Your Profile {/* Added color */}
+                <User className="h-8 w-8 text-primary" /> Your Profile
             </h1>
-            {/* Placeholder Buttons */}
             <div className="flex gap-2">
                 <Button variant="outline" size="sm">
                     <Settings className="mr-2 h-4 w-4" /> Account Settings
@@ -201,28 +307,28 @@ export default function ProfilePage() {
             </div>
        </div>
 
-
-      {error && !profile && !isLoadingProfile && ( // Show error only if profile failed and isn't loading
+       {profileError && !isLoadingProfile && ( // Show profile-specific error
            <Alert variant="destructive">
                 <XCircle className="h-4 w-4" />
                 <AlertTitle>Error Loading Profile</AlertTitle>
-                <AlertDescription>{error.replace('Failed to load recent orders.', '').trim()}</AlertDescription>
+                <AlertDescription>{profileError}</AlertDescription>
            </Alert>
-      )}
+       )}
+
 
        {/* Profile Information Section */}
       {isLoadingProfile ? <ProfileInfoSkeleton /> : profile ? (
         <Card className="shadow-sm hover:shadow-md transition-shadow duration-200 border">
           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6">
-             <Avatar className="h-24 w-24 border-2 border-primary/30"> {/* Larger avatar with border */}
-                <AvatarImage src={`https://avatar.vercel.sh/${profile.email}?size=96`} alt={profile.name} /> {/* Increased size */}
-                <AvatarFallback className="text-3xl bg-muted"> {/* Larger fallback text */}
+             <Avatar className="h-24 w-24 border-2 border-primary/30">
+                <AvatarImage src={`https://avatar.vercel.sh/${profile.email}?size=96`} alt={profile.name} />
+                <AvatarFallback className="text-3xl bg-muted">
                     {profile.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
              </Avatar>
             <div className="flex-grow mt-2 sm:mt-0">
                 <CardTitle className="text-2xl font-semibold">{profile.name}</CardTitle>
-                <CardDescription className="flex items-center gap-1.5 text-base mt-1 text-muted-foreground"> {/* Adjusted color */}
+                <CardDescription className="flex items-center gap-1.5 text-base mt-1 text-muted-foreground">
                     <Mail className="h-4 w-4"/>{profile.email}
                 </CardDescription>
             </div>
@@ -230,7 +336,7 @@ export default function ProfilePage() {
                 <Edit className="mr-2 h-4 w-4" /> Edit Profile
              </Button>
           </CardHeader>
-          <CardContent className="space-y-6 p-6 pt-2"> {/* Adjusted padding */}
+          <CardContent className="space-y-6 p-6 pt-2">
              <Separator />
              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-sm">
                  {profile.address && (
@@ -252,8 +358,8 @@ export default function ProfilePage() {
                     </div>
                  )}
             </div>
-            {profile.address || profile.phone ? <Separator /> : null} {/* Separator only if details exist */}
-            <div className="flex items-center gap-3 bg-primary/5 rounded-md p-4 border border-primary/10"> {/* Highlighted loyalty */}
+            {(profile.address || profile.phone) && <Separator />}
+            <div className="flex items-center gap-3 bg-primary/5 rounded-md p-4 border border-primary/10">
                  <Award className="h-7 w-7 text-primary shrink-0" />
                  <div>
                      <span className="font-medium block text-foreground">Loyalty Points</span>
@@ -263,42 +369,166 @@ export default function ProfilePage() {
             </div>
           </CardContent>
         </Card>
-      ) : !error && !isLoadingProfile ? ( // Only show if not loading and no error message already shown
+      ) : !profileError && !isLoadingProfile ? ( // Only show if not loading and no error message already shown
          <Card><CardContent className="p-6 text-muted-foreground text-center">Could not load profile information.</CardContent></Card>
       ): null}
 
+        <Separator />
+
+       {/* Subscriptions Section */}
+        <div className="space-y-4">
+            <h2 className="text-2xl font-semibold flex items-center gap-2">
+                <CalendarClock className="h-6 w-6 text-primary" /> My Subscriptions
+            </h2>
+
+             {subError && !isLoadingSubs && ( // Show subscription-specific error
+                 <Alert variant="destructive">
+                     <XCircle className="h-4 w-4" />
+                     <AlertTitle>Error Loading Subscriptions</AlertTitle>
+                     <AlertDescription>{subError}</AlertDescription>
+                 </Alert>
+             )}
+
+            {isLoadingSubs ? <SubscriptionsSkeleton /> : subscriptions.length > 0 ? (
+                <Card className="shadow-sm overflow-hidden border">
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="pl-4">Offer</TableHead>
+                                    <TableHead>Store</TableHead>
+                                    <TableHead className="hidden md:table-cell">Next Delivery</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-right pr-4">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {subscriptions.map((sub) => {
+                                    const details = subscriptionStatusDetails[sub.status];
+                                    const StatusIcon = details.icon;
+                                    const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
+                                    const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
+                                    const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
+                                    const isUpdating = updatingSubId === sub.id;
+
+                                    return (
+                                        <TableRow key={sub.id} className="hover:bg-muted/20 transition-colors duration-150">
+                                            <TableCell className="font-medium pl-4">{sub.offerName}</TableCell>
+                                            <TableCell>
+                                                <Link href={`/store/${sub.storeId}`} className="hover:underline text-primary">
+                                                    {sub.storeName}
+                                                </Link>
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell">
+                                                {sub.status === 'active' && sub.nextDeliveryDate ? format(sub.nextDeliveryDate, 'MMM d, yyyy') : '-'}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={details.variant === 'default' ? 'secondary' : details.variant}
+                                                    className={cn(
+                                                        'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit',
+                                                        details.color,
+                                                         details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
+                                                         sub.status === 'active' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
+                                                    )}
+                                                >
+                                                    <StatusIcon className="h-3 w-3" />
+                                                    <span>{details.label}</span>
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right pr-4 space-x-1">
+                                                 {sub.status === 'active' && (
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleUpdateSubscription(sub.id, 'paused')} disabled={isUpdating} title="Pause Subscription">
+                                                        {isUpdating ? <Repeat className="h-4 w-4 animate-spin"/> : <Pause className="h-4 w-4 text-yellow-600"/>}
+                                                    </Button>
+                                                 )}
+                                                 {sub.status === 'paused' && (
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleUpdateSubscription(sub.id, 'active')} disabled={isUpdating} title="Resume Subscription">
+                                                         {isUpdating ? <Repeat className="h-4 w-4 animate-spin"/> : <Play className="h-4 w-4 text-green-600"/>}
+                                                    </Button>
+                                                 )}
+                                                 {sub.status !== 'cancelled' && (
+                                                     <AlertDialog>
+                                                         <AlertDialogTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" disabled={isUpdating} title="Cancel Subscription">
+                                                                <Trash2 className="h-4 w-4"/>
+                                                            </Button>
+                                                         </AlertDialogTrigger>
+                                                         <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This will permanently cancel your subscription to "{sub.offerName}". This action cannot be undone.
+                                                            </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                            <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={() => handleUpdateSubscription(sub.id, 'cancelled')}
+                                                                className={buttonVariants({ variant: "destructive" })}
+                                                                disabled={isUpdating}
+                                                            >
+                                                                 {isUpdating ? 'Cancelling...' : 'Yes, Cancel'}
+                                                            </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                     </AlertDialog>
+                                                 )}
+                                                  {sub.status === 'cancelled' && (
+                                                        <span className="text-xs text-muted-foreground italic mr-2">Cancelled</span>
+                                                  )}
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+             ) : !subError && !isLoadingSubs ? (
+                 <Card>
+                    <CardContent className="p-10 text-center text-muted-foreground">
+                        <CalendarClock className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
+                        <p className="text-lg font-medium">No active subscriptions found.</p>
+                        <p className="text-sm mt-2">Explore stores offering daily or weekly deliveries!</p>
+                    </CardContent>
+                 </Card>
+             ) : null}
+        </div>
+
+      <Separator />
 
       {/* Order History Section */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <h2 className="text-2xl font-semibold flex items-center gap-2">
-                <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History {/* Added color */}
+                <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
             </h2>
             <Link href="/orders" passHref>
-                <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button> {/* Removed padding */}
+                 <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
             </Link>
         </div>
 
-        {error && orders.length === 0 && !isLoadingOrders && ( // Show order-specific error if orders failed
+        {orderError && !isLoadingOrders && ( // Show order-specific error
              <Alert variant="destructive">
                  <XCircle className="h-4 w-4" />
                  <AlertTitle>Error Loading Orders</AlertTitle>
-                 <AlertDescription>{error.replace('Could not load profile information.', '').trim()}</AlertDescription>
+                 <AlertDescription>{orderError}</AlertDescription>
              </Alert>
         )}
 
         {isLoadingOrders ? <OrderHistorySkeleton /> : orders.length > 0 ? (
-            <Card className="shadow-sm overflow-hidden border"> {/* Added border */}
+            <Card className="shadow-sm overflow-hidden border">
                 <CardContent className="p-0">
                     <Table>
                     <TableHeader>
                         <TableRow>
-                        <TableHead className="w-[100px] pl-4">Order ID</TableHead> {/* Added padding */}
+                        <TableHead className="w-[100px] pl-4">Order ID</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Store</TableHead>
                         <TableHead className="hidden md:table-cell text-right">Total</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="text-right pr-4">Actions</TableHead> {/* Added padding */}
+                        <TableHead className="text-right pr-4">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -309,8 +539,8 @@ export default function ProfilePage() {
                             const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
                             const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
                             return (
-                            <TableRow key={order.id} className="hover:bg-muted/20 transition-colors duration-150"> {/* Subtle hover */}
-                                <TableCell className="font-mono text-xs pl-4">#{order.id.substring(order.id.length - 6)}</TableCell> {/* Added padding */}
+                            <TableRow key={order.id} className="hover:bg-muted/20 transition-colors duration-150">
+                                <TableCell className="font-mono text-xs pl-4">#{order.id.substring(order.id.length - 6)}</TableCell>
                                 <TableCell>{format(order.orderDate, 'MMM d, yyyy')}</TableCell>
                                 <TableCell>
                                     <Link href={`/store/${order.storeId}`} className="hover:underline font-medium text-primary">
@@ -320,23 +550,24 @@ export default function ProfilePage() {
                                 <TableCell className="hidden md:table-cell text-right font-medium">{formatCurrency(order.totalAmount)}</TableCell>
                                 <TableCell>
                                     <Badge
-                                        variant={details.variant === 'default' ? 'secondary' : details.variant} // Use secondary for delivered base
+                                        variant={details.variant === 'default' ? 'secondary' : details.variant}
                                         className={cn(
-                                            'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit', // Use flex and w-fit
+                                            'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit',
                                             details.color,
                                             details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
-                                            order.status === 'Delivered' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400' // Specific style for 'Delivered'
+                                            order.status === 'Delivered' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
                                         )}
                                     >
                                         <StatusIcon className="h-3 w-3" />
                                         <span>{order.status}</span>
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="text-right pr-4"> {/* Added padding */}
+                                <TableCell className="text-right pr-4">
                                     {/* Link to specific order section on /orders page */}
-                                    <Link href={`/orders#order-${order.id}`} passHref>
-                                         <Button asChild variant="ghost" size="sm" className="h-8 px-2"><a> {/* Smaller button */}
+                                    <Link href={`/orders#order-${order.id}`} passHref legacyBehavior>
+                                         <Button asChild variant="ghost" size="icon" className="h-8 w-8"><a> {/* Adjusted size */}
                                             <Eye className="h-4 w-4"/>
+                                            <span className="sr-only">View Order</span>
                                          </a></Button>
                                     </Link>
                                 </TableCell>
@@ -347,7 +578,7 @@ export default function ProfilePage() {
                     </Table>
                 </CardContent>
             </Card>
-        ) : !error && !isLoadingOrders ? ( // Only show if not loading and no error shown
+        ) : !orderError && !isLoadingOrders ? ( // Only show if not loading and no error shown
             <Card>
                 <CardContent className="p-10 text-center text-muted-foreground">
                     <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
