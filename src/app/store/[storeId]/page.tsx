@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { getStoreById, Store, Product, DailyOffer, createSubscription, dailyOfferEligibleCategories } from "@/services/store"; // Updated service import
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { ArrowLeft, ShoppingCart, Star, Plus, Filter, Tag, Clock, MapPin, CalendarClock, Repeat, CheckCircle, XCircle } from 'lucide-react'; // Added XCircle
+import { ArrowLeft, ShoppingCart, Star, Plus, Filter, Tag, Clock, MapPin, CalendarClock, Repeat, CheckCircle, XCircle, Store as StoreIcon, Bell } from 'lucide-react'; // Added XCircle, StoreIcon, Bell
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast"; // Import useToast
 import { Separator } from "@/components/ui/separator"; // Import Separator
@@ -58,6 +58,8 @@ export default function StorePage() {
         // await new Promise(resolve => setTimeout(resolve, 500));
         const storeDetails = await getStoreById(storeId);
         if (storeDetails) {
+            // Only show active stores by default, but allow viewing if directly linked?
+            // For now, let's show it but indicate status clearly.
            setStore(storeDetails);
         } else {
             setError("Store not found.");
@@ -89,11 +91,23 @@ export default function StorePage() {
 
    // Memoize active daily offers
    const activeDailyOffers = useMemo(() => {
+       // Only show offers if the store is active AND open
+       if (!store?.isActive || !store.isOpen) return [];
       return store?.dailyOffers?.filter(offer => offer.isActive) || [];
-   }, [store?.dailyOffers]);
+   }, [store?.dailyOffers, store?.isActive, store?.isOpen]);
 
 
    const handleAddToCart = (product: Product) => {
+     if (!store?.isOpen) {
+         toast({
+             title: "Store Closed",
+             description: `${store.name} is currently closed. You can place a pre-order.`,
+             variant: "default"
+         });
+         // Implement pre-order logic here if needed
+         console.log(`Attempted to add ${product.name} from closed store ${store.name}. Pre-order?`);
+         return;
+     }
      console.log(`Adding ${product.name} to cart (Store: ${store?.name})`);
      // In a real app, add to cart state/context
      toast({
@@ -109,7 +123,12 @@ export default function StorePage() {
    };
 
    const handleSubscribe = async (offer: DailyOffer) => {
-        if (!store || isSubscribing) return;
+        if (!store || isSubscribing || !store.isOpen) {
+             if (!store?.isOpen) {
+                 toast({ title: "Store Closed", description: `${store?.name} is currently closed and cannot accept new subscriptions.`});
+             }
+            return;
+        }
         setIsSubscribing(offer.id);
         console.log(`Subscribing to ${offer.name} from ${store.name}`);
         // Assume userId is available (e.g., from auth context)
@@ -148,7 +167,10 @@ export default function StorePage() {
       transition={{ duration: 0.2, delay: delay * 0.04 }}
       className="h-full"
     >
-        <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border hover:border-[hsl(var(--store-accent))] group bg-card">
+        <Card className={cn(
+             "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border hover:border-[hsl(var(--store-accent))] group bg-card",
+             !store?.isOpen && "opacity-60" // Dim closed store products
+             )}>
             <CardHeader className="p-0">
                 <div className="relative w-full h-40 overflow-hidden">
                     <Image
@@ -176,11 +198,23 @@ export default function StorePage() {
             <CardFooter className="p-3 pt-1 mt-auto">
                 <Button
                     size="sm"
-                    className="w-full group/button bg-[hsl(var(--store-accent))] text-[hsl(var(--store-accent-foreground))] hover:bg-[hsl(var(--store-accent))] hover:opacity-90"
+                    className={cn(
+                        "w-full group/button bg-[hsl(var(--store-accent))] text-[hsl(var(--store-accent-foreground))] hover:bg-[hsl(var(--store-accent))] hover:opacity-90",
+                         !store?.isOpen && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed" // Style for closed store button
+                    )}
                     onClick={() => handleAddToCart(product)}
                     style={{ '--store-accent': 'hsl(var(--store-accent))' } as React.CSSProperties}
+                    disabled={!store?.isOpen} // Disable button if store is closed
                     >
-                    <Plus className="mr-1 h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" /> Add to Cart
+                     {store?.isOpen ? (
+                         <>
+                            <Plus className="mr-1 h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" /> Add to Cart
+                         </>
+                     ) : (
+                          <>
+                             <Bell className="mr-1 h-4 w-4"/> Pre-order
+                          </>
+                     )}
                 </Button>
             </CardFooter>
         </Card>
@@ -227,9 +261,12 @@ export default function StorePage() {
                  <Button
                     size="sm"
                     variant="default" // Consider a different variant for subscriptions
-                    className="w-full group/button bg-amber-500 hover:bg-amber-600 text-white"
+                    className={cn(
+                        "w-full group/button bg-amber-500 hover:bg-amber-600 text-white",
+                        !store?.isOpen && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
+                    )}
                     onClick={() => handleSubscribe(offer)}
-                    disabled={isSubscribing === offer.id}
+                    disabled={isSubscribing === offer.id || !store?.isOpen}
                     >
                      {isSubscribing === offer.id ? (
                         <Repeat className="mr-1 h-4 w-4 animate-spin" />
@@ -390,8 +427,6 @@ export default function StorePage() {
             <CardHeader className="p-0 relative">
                  {/* Gradient or Image Banner */}
                  <div className="w-full h-48 md:h-56 bg-gradient-to-br from-[hsl(var(--store-accent))] to-primary/70 relative">
-                     {/* Optional pattern */}
-                      {/* <div className="absolute inset-0 opacity-10 bg-[url('/patterns/subtle-dots.svg')] bg-repeat"></div> */}
                      {/* Store Image/Logo */}
                      <div className="absolute inset-0 flex items-center justify-center p-4">
                          <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden shadow-xl border-4 border-background bg-background z-10 flex items-center justify-center">
@@ -406,9 +441,28 @@ export default function StorePage() {
                              />
                          </div>
                     </div>
+                    {/* Store Status Overlay/Badge */}
+                     {!store.isOpen && (
+                        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-20">
+                           <StoreIcon className="h-12 w-12 text-white/70 mb-2"/>
+                           <Badge variant="destructive" className="text-lg px-4 py-1 font-semibold">
+                                Currently Closed
+                           </Badge>
+                           <p className="text-white/80 text-sm mt-2">Pre-orders may be available.</p>
+                        </div>
+                     )}
+                     {!store.isActive && ( // Admin disabled overlay
+                         <div className="absolute inset-0 bg-red-900/80 flex flex-col items-center justify-center z-20">
+                            <XCircle className="h-12 w-12 text-white/90 mb-2"/>
+                            <Badge variant="destructive" className="text-lg px-4 py-1 font-semibold bg-white text-red-700">
+                                 Store Disabled
+                            </Badge>
+                            <p className="text-white/90 text-sm mt-2">This store is temporarily unavailable.</p>
+                         </div>
+                     )}
                  </div>
             </CardHeader>
-            <CardContent className="pt-16 text-center -mt-14 relative z-0 pb-6 space-y-2"> {/* Adjust padding for overlap */}
+            <CardContent className={cn("pt-16 text-center -mt-14 relative z-0 pb-6 space-y-2", (!store.isOpen || !store.isActive) && "opacity-70")}> {/* Adjust padding for overlap, reduce opacity if closed/inactive */}
                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{store.name}</h1>
                  <Badge
                      variant="outline" // Use outline for category
@@ -442,18 +496,21 @@ export default function StorePage() {
        </motion.div>
 
        {/* Daily Offers Section (if applicable) */}
-       {dailyOfferEligibleCategories.includes(store.category) && activeDailyOffers.length > 0 && (
+       {dailyOfferEligibleCategories.includes(store.category) && store.dailyOffers.length > 0 && store.isActive && ( // Only show section if offers exist and store is active
           <section className="pt-0"> {/* Removed top padding */}
             <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
                <CalendarClock className="text-amber-500"/> Daily & Weekly Offers
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                  <AnimatePresence>
-                    {activeDailyOffers.map((offer, index) => (
+                    {activeDailyOffers.map((offer, index) => ( // Render only active offers
                         <DailyOfferCard key={offer.id} offer={offer} delay={index} />
                     ))}
                 </AnimatePresence>
             </div>
+             {activeDailyOffers.length === 0 && (
+                 <p className="text-muted-foreground italic text-center py-4 border border-dashed rounded-md">No active subscription offers currently available.</p>
+             )}
              <Separator className="mt-10 border-[hsl(var(--store-accent))] opacity-30"/>
           </section>
        )}
@@ -520,3 +577,4 @@ export default function StorePage() {
     </div>
   );
 }
+

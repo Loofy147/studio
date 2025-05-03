@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Store, Product, DailyOffer, Promotion, getStoreById, createProduct, createDailyOffer, dailyOfferEligibleCategories, deleteProduct, deleteDailyOffer, createPromotion, deletePromotion } from '@/services/store'; // Import Promotion, createPromotion, deletePromotion
+import { Store, Product, DailyOffer, Promotion, getStoreById, createProduct, createDailyOffer, dailyOfferEligibleCategories, deleteProduct, deleteDailyOffer, createPromotion, deletePromotion, toggleStoreOpenStatus } from '@/services/store'; // Import Promotion, createPromotion, deletePromotion, toggleStoreOpenStatus
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductForm } from "@/components/ProductForm";
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, PlusCircle, Edit, Trash2, Package, CalendarClock, XCircle, Building, Tag, Percent, Ticket } from 'lucide-react'; // Added Percent, Ticket icons
+import { ArrowLeft, PlusCircle, Edit, Trash2, Package, CalendarClock, XCircle, Building, Tag, Percent, Ticket, Power, PowerOff, Loader2 } from 'lucide-react'; // Added Percent, Ticket, Power, PowerOff, Loader2 icons
 import Image from 'next/image';
 import { formatCurrency, cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
@@ -47,6 +47,7 @@ export default function StoreManagePage() {
   const params = useParams<RouteParams>();
   const storeId = params?.storeId;
   const { toast } = useToast();
+  const userId = "user123"; // Hardcoded owner ID for demo
 
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -57,6 +58,7 @@ export default function StoreManagePage() {
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [showNewOfferForm, setShowNewOfferForm] = useState(false);
   const [showNewPromotionForm, setShowNewPromotionForm] = useState(false); // State for promotion form
+  const [isTogglingOpenStatus, setIsTogglingOpenStatus] = useState(false);
 
   useEffect(() => {
     if (!storeId) {
@@ -69,14 +71,17 @@ export default function StoreManagePage() {
       setIsLoading(true);
       setError(null);
       try {
+        // TODO: Add check to ensure the current user (userId) owns this store
         const storeData = await getStoreById(storeId);
-        if (storeData) {
+        if (storeData /* && storeData.ownerId === userId */) { // Uncomment owner check when auth is added
           setStore(storeData);
           setProducts(storeData.products || []);
           setDailyOffers(storeData.dailyOffers || []);
           setPromotions(storeData.promotions || []); // Set promotions state
+        } else if (!storeData) {
+          setError("Store not found.");
         } else {
-          setError("Store not found or you don't have permission to manage it.");
+            setError("You do not have permission to manage this store."); // Error if owner doesn't match
         }
       } catch (err) {
         console.error("Failed to fetch store data:", err);
@@ -87,7 +92,35 @@ export default function StoreManagePage() {
     };
 
     fetchStoreData();
-  }, [storeId]);
+  }, [storeId, userId]); // Add userId dependency if owner check is implemented
+
+  const handleToggleStoreStatus = async () => {
+      if (!store) return;
+      setIsTogglingOpenStatus(true);
+      try {
+          const updatedStore = await toggleStoreOpenStatus(store.id, userId); // Assuming userId is ownerId
+          if (updatedStore) {
+              setStore(updatedStore); // Update local state
+              toast({
+                  title: `Store ${updatedStore.isOpen ? 'Opened' : 'Closed'}`,
+                  description: `${updatedStore.name} is now ${updatedStore.isOpen ? 'accepting orders' : 'temporarily closed'}.`,
+                  variant: updatedStore.isOpen ? "default" : "destructive",
+              });
+          } else {
+               throw new Error("Failed to update store status.");
+          }
+      } catch (err) {
+           console.error("Failed to toggle store status:", err);
+           toast({
+                title: "Update Failed",
+                description: "Could not change the store's open status. Please try again.",
+                variant: "destructive",
+            });
+      } finally {
+          setIsTogglingOpenStatus(false);
+      }
+  };
+
 
   const handleProductCreated = (newProduct: Product) => {
     setProducts(prevProducts => [...prevProducts, newProduct]);
@@ -263,192 +296,330 @@ export default function StoreManagePage() {
   return (
     <div className="container mx-auto py-10 space-y-10">
        {/* Header */}
-        <div>
+        <div className="space-y-3">
              <Link href="/stores" passHref legacyBehavior>
-                <Button variant="ghost" size="sm" className="mb-2 text-muted-foreground hover:text-foreground">
+                <Button variant="ghost" size="sm" className="mb-1 text-muted-foreground hover:text-foreground">
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Your Stores
                 </Button>
             </Link>
-            <h1 className="text-3xl font-bold tracking-tight">Manage Store: {store.name}</h1>
-            <p className="text-muted-foreground">Add, edit, or remove products, offers, and promotions for your storefront.</p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Manage Store: {store.name}</h1>
+                    <p className="text-muted-foreground max-w-2xl">Add products, create offers, manage promotions, and control your store's availability.</p>
+                </div>
+                 {/* Open/Close Store Button */}
+                 <Button
+                    size="lg"
+                    variant={store.isOpen ? "destructive" : "default"}
+                    onClick={handleToggleStoreStatus}
+                    disabled={isTogglingOpenStatus || !store.isActive}
+                    className="w-full sm:w-auto text-base px-6 py-3"
+                    title={!store.isActive ? "Store must be approved by admin first" : ""}
+                  >
+                    {isTogglingOpenStatus ? (
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : store.isOpen ? (
+                         <PowerOff className="mr-2 h-5 w-5" />
+                    ) : (
+                         <Power className="mr-2 h-5 w-5" />
+                    )}
+                    {isTogglingOpenStatus ? "Updating..." : store.isOpen ? "Close Store Temporarily" : "Open Store for Orders"}
+                </Button>
+             </div>
+              {!store.isActive && (
+                 <Alert variant="destructive" className="mt-4">
+                    <XCircle className="h-4 w-4" />
+                    <AlertTitle>Store Not Active</AlertTitle>
+                    <AlertDescription>
+                        This store is currently disabled by the platform administrator and cannot be opened.
+                    </AlertDescription>
+                 </Alert>
+             )}
+              {!store.isOpen && store.isActive && (
+                 <Alert variant="default" className="mt-4 border-yellow-500 bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300">
+                     <PowerOff className="h-4 w-4 text-yellow-600 dark:text-yellow-400"/>
+                    <AlertTitle>Store Closed</AlertTitle>
+                    <AlertDescription>
+                        Your store is currently closed to new orders. Customers can browse but cannot purchase or subscribe. Open the store to start accepting orders again. Pre-orders might still be possible if configured.
+                    </AlertDescription>
+                 </Alert>
+             )}
         </div>
 
-        {/* Product Management Section */}
-        <Card className="border shadow-sm">
-            <CardHeader className="flex flex-row justify-between items-center">
-                <div>
-                    <CardTitle className="flex items-center gap-2"><Package className="h-5 w-5 text-primary"/>Products</CardTitle>
-                    <CardDescription>Manage the items available in your store.</CardDescription>
-                </div>
-                <Button size="sm" onClick={() => setShowNewProductForm(!showNewProductForm)} variant={showNewProductForm ? 'secondary' : 'default'}>
-                    <PlusCircle className="mr-2 h-4 w-4" /> {showNewProductForm ? 'Cancel' : 'Add Product'}
-                </Button>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                 {showNewProductForm && (
-                    <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
-                        <h3 className="text-lg font-medium mb-4">New Product Details</h3>
-                      <ProductForm
-                        onProductCreated={handleProductCreated}
-                        storeId={store.id}
-                        storeCategory={store.category}
-                      />
-                    </Card>
-                  )}
+         {/* Disable content sections if store is closed */}
+         <div className={cn(!store.isOpen && store.isActive && "opacity-60 pointer-events-none")}>
 
-                  {/* Product List Grouped by Category */}
-                 {products.length > 0 ? (
-                    <Accordion type="multiple" defaultValue={productCategories.slice(0, 1)} className="w-full">
-                       {productCategories.map((category) => (
-                        <AccordionItem value={category} key={category}>
-                            <AccordionTrigger className="text-lg font-medium capitalize hover:no-underline px-1">
-                                {category} ({productsByCategory[category].length})
-                            </AccordionTrigger>
-                            <AccordionContent className="pt-0 pb-0">
-                                <div className="border rounded-md overflow-hidden mt-2 mb-4">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="w-[60px] sm:w-[80px]">Image</TableHead>
-                                                <TableHead>Name</TableHead>
-                                                {/* <TableHead className="hidden sm:table-cell">Category</TableHead> */}
-                                                <TableHead className="hidden md:table-cell">Description</TableHead>
-                                                <TableHead className="text-right">Price</TableHead>
-                                                <TableHead className="text-right pr-4">Actions</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {productsByCategory[category].map((product) => (
-                                                <TableRow key={product.id} className="hover:bg-muted/50">
-                                                    <TableCell>
-                                                        <Image
-                                                            src={product.imageUrl || `https://picsum.photos/seed/${product.id}/100/100`}
-                                                            alt={product.name}
-                                                            width={40}
-                                                            height={40}
-                                                            className="rounded-sm object-cover bg-muted"
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell className="font-medium">{product.name}</TableCell>
-                                                    {/* <TableCell className="capitalize text-muted-foreground hidden sm:table-cell">{product.category}</TableCell> */}
-                                                     <TableCell className="text-xs text-muted-foreground hidden md:table-cell max-w-[250px] truncate">{product.description}</TableCell>
-                                                    <TableCell className="text-right">{formatCurrency(product.price)}</TableCell>
-                                                    <TableCell className="text-right space-x-1 pr-4">
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Product (Not Implemented)">
-                                                            <Edit className="h-4 w-4 opacity-50" />
-                                                        </Button>
-                                                        <AlertDialog>
-                                                            <AlertDialogTrigger asChild>
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Product">
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </Button>
-                                                            </AlertDialogTrigger>
-                                                            <AlertDialogContent>
-                                                                <AlertDialogHeader>
-                                                                <AlertDialogTitle>Delete Product?</AlertDialogTitle>
-                                                                <AlertDialogDescription>
-                                                                    Are you sure you want to delete "{product.name}"? This action cannot be undone.
-                                                                </AlertDialogDescription>
-                                                                </AlertDialogHeader>
-                                                                <AlertDialogFooter>
-                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction
-                                                                    onClick={() => handleDeleteProduct(product.id, product.name)}
-                                                                    className={buttonVariants({ variant: "destructive" })}
-                                                                    >
-                                                                    Yes, Delete
-                                                                </AlertDialogAction>
-                                                                </AlertDialogFooter>
-                                                            </AlertDialogContent>
-                                                        </AlertDialog>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                       ))}
-                    </Accordion>
-                 ) : !showNewProductForm && (
-                    <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
-                        <Package className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
-                        <p>No products added yet.</p>
-                        <p className="text-sm">Click "Add Product" to get started.</p>
-                    </div>
-                 )}
-            </CardContent>
-        </Card>
-
-        {/* Daily Offers Management Section (Conditional) */}
-        {isEligibleForOffers && (
+            {/* Product Management Section */}
             <Card className="border shadow-sm">
                 <CardHeader className="flex flex-row justify-between items-center">
-                     <div>
-                        <CardTitle className="flex items-center gap-2"><CalendarClock className="h-5 w-5 text-amber-500"/>Daily/Weekly Offers</CardTitle>
-                        <CardDescription>Manage subscription offers for recurring deliveries.</CardDescription>
+                    <div>
+                        <CardTitle className="flex items-center gap-2"><Package className="h-5 w-5 text-primary"/>Products</CardTitle>
+                        <CardDescription>Manage the items available in your store.</CardDescription>
                     </div>
-                     <Button size="sm" onClick={() => setShowNewOfferForm(!showNewOfferForm)} variant={showNewOfferForm ? 'secondary' : 'default'}>
-                       <PlusCircle className="mr-2 h-4 w-4" /> {showNewOfferForm ? 'Cancel' : 'Add Offer'}
+                    <Button size="sm" onClick={() => setShowNewProductForm(!showNewProductForm)} variant={showNewProductForm ? 'secondary' : 'default'} disabled={!store.isOpen && store.isActive}>
+                        <PlusCircle className="mr-2 h-4 w-4" /> {showNewProductForm ? 'Cancel' : 'Add Product'}
                     </Button>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                     {showNewOfferForm && (
-                         <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
-                            <h3 className="text-lg font-medium mb-4">New Subscription Offer</h3>
-                            <DailyOfferForm
-                                onOfferCreated={handleOfferCreated}
-                                storeId={store.id}
-                                availableProducts={products} // Pass products to select from
+                    {showNewProductForm && (
+                        <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
+                            <h3 className="text-lg font-medium mb-4">New Product Details</h3>
+                        <ProductForm
+                            onProductCreated={handleProductCreated}
+                            storeId={store.id}
+                            storeCategory={store.category}
+                        />
+                        </Card>
+                    )}
+
+                    {/* Product List Grouped by Category */}
+                    {products.length > 0 ? (
+                        <Accordion type="multiple" defaultValue={productCategories.slice(0, 1)} className="w-full">
+                        {productCategories.map((category) => (
+                            <AccordionItem value={category} key={category}>
+                                <AccordionTrigger className="text-lg font-medium capitalize hover:no-underline px-1">
+                                    {category} ({productsByCategory[category].length})
+                                </AccordionTrigger>
+                                <AccordionContent className="pt-0 pb-0">
+                                    <div className="border rounded-md overflow-hidden mt-2 mb-4">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[60px] sm:w-[80px]">Image</TableHead>
+                                                    <TableHead>Name</TableHead>
+                                                    {/* <TableHead className="hidden sm:table-cell">Category</TableHead> */}
+                                                    <TableHead className="hidden md:table-cell">Description</TableHead>
+                                                    <TableHead className="text-right">Price</TableHead>
+                                                    <TableHead className="text-right pr-4">Actions</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {productsByCategory[category].map((product) => (
+                                                    <TableRow key={product.id} className="hover:bg-muted/50">
+                                                        <TableCell>
+                                                            <Image
+                                                                src={product.imageUrl || `https://picsum.photos/seed/${product.id}/100/100`}
+                                                                alt={product.name}
+                                                                width={40}
+                                                                height={40}
+                                                                className="rounded-sm object-cover bg-muted"
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell className="font-medium">{product.name}</TableCell>
+                                                        {/* <TableCell className="capitalize text-muted-foreground hidden sm:table-cell">{product.category}</TableCell> */}
+                                                        <TableCell className="text-xs text-muted-foreground hidden md:table-cell max-w-[250px] truncate">{product.description}</TableCell>
+                                                        <TableCell className="text-right">{formatCurrency(product.price)}</TableCell>
+                                                        <TableCell className="text-right space-x-1 pr-4">
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Product (Not Implemented)" disabled={!store.isOpen && store.isActive}>
+                                                                <Edit className="h-4 w-4 opacity-50" />
+                                                            </Button>
+                                                            <AlertDialog>
+                                                                <AlertDialogTrigger asChild>
+                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Product" disabled={!store.isOpen && store.isActive}>
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                    </Button>
+                                                                </AlertDialogTrigger>
+                                                                <AlertDialogContent>
+                                                                    <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Delete Product?</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        Are you sure you want to delete "{product.name}"? This action cannot be undone.
+                                                                    </AlertDialogDescription>
+                                                                    </AlertDialogHeader>
+                                                                    <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                    <AlertDialogAction
+                                                                        onClick={() => handleDeleteProduct(product.id, product.name)}
+                                                                        className={buttonVariants({ variant: "destructive" })}
+                                                                        >
+                                                                        Yes, Delete
+                                                                    </AlertDialogAction>
+                                                                    </AlertDialogFooter>
+                                                                </AlertDialogContent>
+                                                            </AlertDialog>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                        </Accordion>
+                    ) : !showNewProductForm && (
+                        <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
+                            <Package className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
+                            <p>No products added yet.</p>
+                            <p className="text-sm">Click "Add Product" to get started.</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Daily Offers Management Section (Conditional) */}
+            {isEligibleForOffers && (
+                <Card className="border shadow-sm">
+                    <CardHeader className="flex flex-row justify-between items-center">
+                        <div>
+                            <CardTitle className="flex items-center gap-2"><CalendarClock className="h-5 w-5 text-amber-500"/>Daily/Weekly Offers</CardTitle>
+                            <CardDescription>Manage subscription offers for recurring deliveries.</CardDescription>
+                        </div>
+                        <Button size="sm" onClick={() => setShowNewOfferForm(!showNewOfferForm)} variant={showNewOfferForm ? 'secondary' : 'default'} disabled={!store.isOpen && store.isActive}>
+                        <PlusCircle className="mr-2 h-4 w-4" /> {showNewOfferForm ? 'Cancel' : 'Add Offer'}
+                        </Button>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {showNewOfferForm && (
+                            <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
+                                <h3 className="text-lg font-medium mb-4">New Subscription Offer</h3>
+                                <DailyOfferForm
+                                    onOfferCreated={handleOfferCreated}
+                                    storeId={store.id}
+                                    availableProducts={products} // Pass products to select from
+                                />
+                            </Card>
+                        )}
+                        {dailyOffers.length > 0 ? (
+                            <div className="border rounded-md overflow-hidden">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead className="hidden sm:table-cell">Frequency</TableHead>
+                                            <TableHead className="text-right">Price</TableHead>
+                                            <TableHead className="hidden md:table-cell">Status</TableHead>
+                                            <TableHead className="text-right pr-4">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {dailyOffers.map((offer) => (
+                                            <TableRow key={offer.id} className="hover:bg-muted/50">
+                                                <TableCell className="font-medium">{offer.name}</TableCell>
+                                                <TableCell className="capitalize hidden sm:table-cell">{offer.frequency}</TableCell>
+                                                <TableCell className="text-right">{formatCurrency(offer.price)}</TableCell>
+                                                <TableCell className="hidden md:table-cell">
+                                                    <Badge variant={offer.isActive ? "secondary" : "outline"} className={cn(offer.isActive ? "text-green-600 border-green-400/50 bg-green-500/10" : "text-muted-foreground")}>
+                                                        {offer.isActive ? "Active" : "Inactive"}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right space-x-1 pr-4">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Offer (Not Implemented)" disabled={!store.isOpen && store.isActive}>
+                                                        <Edit className="h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Offer" disabled={!store.isOpen && store.isActive}>
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                            <AlertDialogTitle>Delete Offer?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Are you sure you want to delete the offer "{offer.name}"? This will not affect existing subscriptions, but users can no longer subscribe.
+                                                            </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={() => handleDeleteOffer(offer.id, offer.name)}
+                                                                className={buttonVariants({ variant: "destructive" })}
+                                                                >
+                                                                Yes, Delete
+                                                            </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        ) : !showNewOfferForm && (
+                            <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
+                                <CalendarClock className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
+                                <p>No daily or weekly offers created yet.</p>
+                                <p className="text-sm">Click "Add Offer" to create subscription options.</p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Promotions Management Section */}
+            <Card className="border shadow-sm">
+                <CardHeader className="flex flex-row justify-between items-center">
+                    <div>
+                        <CardTitle className="flex items-center gap-2"><Ticket className="h-5 w-5 text-purple-500"/>Promotions</CardTitle>
+                        <CardDescription>Manage discounts and special promotions for your store.</CardDescription>
+                    </div>
+                    <Button size="sm" onClick={() => setShowNewPromotionForm(!showNewPromotionForm)} variant={showNewPromotionForm ? 'secondary' : 'default'} disabled={!store.isOpen && store.isActive}>
+                        <PlusCircle className="mr-2 h-4 w-4" /> {showNewPromotionForm ? 'Cancel' : 'Add Promotion'}
+                    </Button>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    {showNewPromotionForm && (
+                        <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
+                            <h3 className="text-lg font-medium mb-4">New Promotion Details</h3>
+                            <PromotionForm
+                            onPromotionCreated={handlePromotionCreated}
+                            storeId={store.id}
+                            availableProducts={products}
+                            availableCategories={productCategories.filter(c => c !== 'uncategorized')} // Pass available categories
                             />
-                         </Card>
-                     )}
-                    {dailyOffers.length > 0 ? (
-                         <div className="border rounded-md overflow-hidden">
+                        </Card>
+                    )}
+                    {promotions.length > 0 ? (
+                        <div className="border rounded-md overflow-hidden">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Name</TableHead>
-                                        <TableHead className="hidden sm:table-cell">Frequency</TableHead>
-                                        <TableHead className="text-right">Price</TableHead>
+                                        <TableHead>Type</TableHead>
+                                        <TableHead>Value</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Scope</TableHead>
                                         <TableHead className="hidden md:table-cell">Status</TableHead>
                                         <TableHead className="text-right pr-4">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {dailyOffers.map((offer) => (
-                                        <TableRow key={offer.id} className="hover:bg-muted/50">
-                                            <TableCell className="font-medium">{offer.name}</TableCell>
-                                            <TableCell className="capitalize hidden sm:table-cell">{offer.frequency}</TableCell>
-                                            <TableCell className="text-right">{formatCurrency(offer.price)}</TableCell>
-                                             <TableCell className="hidden md:table-cell">
-                                                 <Badge variant={offer.isActive ? "secondary" : "outline"} className={cn(offer.isActive ? "text-green-600 border-green-400/50 bg-green-500/10" : "text-muted-foreground")}>
-                                                    {offer.isActive ? "Active" : "Inactive"}
-                                                 </Badge>
-                                             </TableCell>
+                                    {promotions.map((promo) => (
+                                        <TableRow key={promo.id} className="hover:bg-muted/50">
+                                            <TableCell className="font-medium">{promo.name}</TableCell>
+                                            <TableCell className="capitalize">{promo.discountType.replace('_', ' ')}</TableCell>
+                                            <TableCell>
+                                                {promo.discountType === 'percentage' ? `${promo.discountValue}%` : formatCurrency(promo.discountValue)}
+                                            </TableCell>
+                                            <TableCell className="capitalize hidden sm:table-cell">{promo.scope.replace('_', ' ')}</TableCell>
+                                            <TableCell className="hidden md:table-cell">
+                                                <Badge variant={promo.isActive ? "secondary" : "outline"} className={cn(promo.isActive ? "text-green-600 border-green-400/50 bg-green-500/10" : "text-muted-foreground")}>
+                                                    {promo.isActive ? "Active" : "Inactive"}
+                                                </Badge>
+                                            </TableCell>
                                             <TableCell className="text-right space-x-1 pr-4">
-                                                 <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Offer (Not Implemented)">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Promotion (Not Implemented)" disabled={!store.isOpen && store.isActive}>
                                                     <Edit className="h-4 w-4 opacity-50" />
                                                 </Button>
-                                                 <AlertDialog>
+                                                <AlertDialog>
                                                     <AlertDialogTrigger asChild>
-                                                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Offer">
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Promotion" disabled={!store.isOpen && store.isActive}>
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </AlertDialogTrigger>
                                                     <AlertDialogContent>
                                                         <AlertDialogHeader>
-                                                        <AlertDialogTitle>Delete Offer?</AlertDialogTitle>
+                                                        <AlertDialogTitle>Delete Promotion?</AlertDialogTitle>
                                                         <AlertDialogDescription>
-                                                            Are you sure you want to delete the offer "{offer.name}"? This will not affect existing subscriptions, but users can no longer subscribe.
+                                                            Are you sure you want to delete the promotion "{promo.name}"? This action cannot be undone.
                                                         </AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>
                                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                         <AlertDialogAction
-                                                             onClick={() => handleDeleteOffer(offer.id, offer.name)}
-                                                              className={buttonVariants({ variant: "destructive" })}
+                                                            onClick={() => handleDeletePromotion(promo.id, promo.name)}
+                                                            className={buttonVariants({ variant: "destructive" })}
                                                             >
                                                             Yes, Delete
                                                         </AlertDialogAction>
@@ -461,110 +632,16 @@ export default function StoreManagePage() {
                                 </TableBody>
                             </Table>
                         </div>
-                    ) : !showNewOfferForm && (
-                         <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
-                            <CalendarClock className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
-                            <p>No daily or weekly offers created yet.</p>
-                             <p className="text-sm">Click "Add Offer" to create subscription options.</p>
+                    ) : !showNewPromotionForm && (
+                        <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
+                            <Ticket className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
+                            <p>No promotions created yet.</p>
+                            <p className="text-sm">Click "Add Promotion" to create discounts.</p>
                         </div>
                     )}
                 </CardContent>
             </Card>
-        )}
-
-        {/* Promotions Management Section */}
-        <Card className="border shadow-sm">
-            <CardHeader className="flex flex-row justify-between items-center">
-                <div>
-                    <CardTitle className="flex items-center gap-2"><Ticket className="h-5 w-5 text-purple-500"/>Promotions</CardTitle>
-                    <CardDescription>Manage discounts and special promotions for your store.</CardDescription>
-                </div>
-                <Button size="sm" onClick={() => setShowNewPromotionForm(!showNewPromotionForm)} variant={showNewPromotionForm ? 'secondary' : 'default'}>
-                    <PlusCircle className="mr-2 h-4 w-4" /> {showNewPromotionForm ? 'Cancel' : 'Add Promotion'}
-                </Button>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                 {showNewPromotionForm && (
-                    <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
-                        <h3 className="text-lg font-medium mb-4">New Promotion Details</h3>
-                        <PromotionForm
-                           onPromotionCreated={handlePromotionCreated}
-                           storeId={store.id}
-                           availableProducts={products}
-                           availableCategories={productCategories.filter(c => c !== 'uncategorized')} // Pass available categories
-                        />
-                    </Card>
-                  )}
-                {promotions.length > 0 ? (
-                    <div className="border rounded-md overflow-hidden">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Type</TableHead>
-                                    <TableHead>Value</TableHead>
-                                    <TableHead className="hidden sm:table-cell">Scope</TableHead>
-                                    <TableHead className="hidden md:table-cell">Status</TableHead>
-                                    <TableHead className="text-right pr-4">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {promotions.map((promo) => (
-                                    <TableRow key={promo.id} className="hover:bg-muted/50">
-                                        <TableCell className="font-medium">{promo.name}</TableCell>
-                                        <TableCell className="capitalize">{promo.discountType.replace('_', ' ')}</TableCell>
-                                        <TableCell>
-                                            {promo.discountType === 'percentage' ? `${promo.discountValue}%` : formatCurrency(promo.discountValue)}
-                                        </TableCell>
-                                        <TableCell className="capitalize hidden sm:table-cell">{promo.scope.replace('_', ' ')}</TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                             <Badge variant={promo.isActive ? "secondary" : "outline"} className={cn(promo.isActive ? "text-green-600 border-green-400/50 bg-green-500/10" : "text-muted-foreground")}>
-                                                {promo.isActive ? "Active" : "Inactive"}
-                                             </Badge>
-                                         </TableCell>
-                                        <TableCell className="text-right space-x-1 pr-4">
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Promotion (Not Implemented)">
-                                                <Edit className="h-4 w-4 opacity-50" />
-                                            </Button>
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Promotion">
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                    <AlertDialogTitle>Delete Promotion?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        Are you sure you want to delete the promotion "{promo.name}"? This action cannot be undone.
-                                                    </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction
-                                                        onClick={() => handleDeletePromotion(promo.id, promo.name)}
-                                                        className={buttonVariants({ variant: "destructive" })}
-                                                        >
-                                                        Yes, Delete
-                                                    </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                ) : !showNewPromotionForm && (
-                    <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
-                        <Ticket className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
-                        <p>No promotions created yet.</p>
-                         <p className="text-sm">Click "Add Promotion" to create discounts.</p>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+         </div>
 
 
          {/* Add other management sections as needed (e.g., Store Settings, Orders Received) */}

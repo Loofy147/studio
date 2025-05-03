@@ -57,7 +57,8 @@ export interface Store {
   openingHours?: string; // Example for restaurants/shops
   address?: string; // Example for physical locations
   // Admin related fields (added via declaration merging later or directly)
-  isActive?: boolean; // Managed by admin
+  isActive?: boolean; // Managed by admin (overall platform approval)
+  isOpen: boolean; // Managed by store owner (temporary open/close)
   createdAt?: Date; // When the store was created/approved
 }
 
@@ -149,55 +150,56 @@ function generateMockStores(): Store[] {
      return [
         {
           id: "store-1", name: "ElectroMart", description: "Your one-stop shop for the latest electronics.", category: "electronics",
-          imageUrl: `https://picsum.photos/seed/electromart/400/300`, rating: 4.5, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: []
+          imageUrl: `https://picsum.photos/seed/electromart/400/300`, rating: 4.5, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
         {
           id: "store-2", name: "Fashionista Boutique", description: "Trendy clothing and accessories.", category: "clothing",
-          imageUrl: `https://picsum.photos/seed/fashionista/400/300`, rating: 4.2, ownerId: 'owner-002', products: [], dailyOffers: [], promotions: []
+          imageUrl: `https://picsum.photos/seed/fashionista/400/300`, rating: 4.2, ownerId: 'owner-002', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
         {
           id: "store-3", name: "FreshGrocer", description: "Quality groceries and fresh produce.", category: "groceries",
-          imageUrl: `https://picsum.photos/seed/freshgrocer/400/300`, rating: 4.8, openingHours: "7 AM - 9 PM", address: "100 Grocery Lane", ownerId: 'owner-003', products: [], dailyOffers: [], promotions: []
+          imageUrl: `https://picsum.photos/seed/freshgrocer/400/300`, rating: 4.8, openingHours: "7 AM - 9 PM", address: "100 Grocery Lane", ownerId: 'owner-003', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
         {
           id: "store-4", name: "The Book Nook", description: "Discover your next favorite read.", category: "books",
-          imageUrl: `https://picsum.photos/seed/booknook/400/300`, rating: 4.6, ownerId: 'owner-004', products: [], dailyOffers: [], promotions: []
+          imageUrl: `https://picsum.photos/seed/booknook/400/300`, rating: 4.6, ownerId: 'owner-004', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
         {
           id: "store-5", name: "Cozy Home", description: "Everything for your home.", category: "home goods",
-          imageUrl: `https://picsum.photos/seed/cozyhome/400/300`, rating: 4.3, ownerId: 'owner-005', products: [], dailyOffers: [], promotions: []
+          imageUrl: `https://picsum.photos/seed/cozyhome/400/300`, rating: 4.3, ownerId: 'owner-005', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
         {
           id: "store-6", name: "Toy Galaxy", description: "Fun and educational toys.", category: "toys",
-          imageUrl: `https://picsum.photos/seed/toygalaxy/400/300`, rating: 4.0, ownerId: 'owner-006', products: [], dailyOffers: [], promotions: []
+          imageUrl: `https://picsum.photos/seed/toygalaxy/400/300`, rating: 4.0, ownerId: 'owner-006', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
         {
           id: "store-7", name: "Gadget Hub", description: "Cutting-edge tech.", category: "electronics",
-          imageUrl: `https://picsum.photos/seed/gadgethub/400/300`, rating: 4.7, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: [] // Reused owner
+          imageUrl: `https://picsum.photos/seed/gadgethub/400/300`, rating: 4.7, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: [], isOpen: true // Reused owner
         },
         {
           id: "store-8", name: "Style Threads", description: "Affordable and stylish clothing.", category: "clothing",
-          imageUrl: `https://picsum.photos/seed/stylethreads/400/300`, rating: 3.9, ownerId: 'owner-007', products: [], dailyOffers: [], promotions: []
+          imageUrl: `https://picsum.photos/seed/stylethreads/400/300`, rating: 3.9, ownerId: 'owner-007', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
         {
             id: "store-9", name: "The Daily Grind", description: "Artisan coffee, pastries, and light bites.", category: "coffee shops",
-            imageUrl: `https://picsum.photos/seed/dailygrind/400/300`, rating: 4.9, openingHours: "6 AM - 6 PM", address: "25 Coffee Bean Blvd", ownerId: 'owner-008', products: [], dailyOffers: [], promotions: []
+            imageUrl: `https://picsum.photos/seed/dailygrind/400/300`, rating: 4.9, openingHours: "6 AM - 6 PM", address: "25 Coffee Bean Blvd", ownerId: 'owner-008', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
         {
             id: "store-10", name: "Mama Mia Pizzeria", description: "Authentic Italian pizza and pasta dishes.", category: "restaurants",
-            imageUrl: `https://picsum.photos/seed/mamamia/400/300`, rating: 4.5, openingHours: "11 AM - 10 PM", address: "50 Pizza Plaza", ownerId: 'owner-009', products: [], dailyOffers: [], promotions: []
+            imageUrl: `https://picsum.photos/seed/mamamia/400/300`, rating: 4.5, openingHours: "11 AM - 10 PM", address: "50 Pizza Plaza", ownerId: 'owner-009', products: [], dailyOffers: [], promotions: [], isOpen: false // Example closed store
         },
         {
             id: "store-11", name: "GreenBasket Organics", description: "Certified organic fruits, vegetables, and pantry staples.", category: "groceries",
-            imageUrl: `https://picsum.photos/seed/greenbasket/400/300`, rating: 4.7, openingHours: "8 AM - 8 PM", address: "75 Organic Way", ownerId: 'owner-010', products: [], dailyOffers: [], promotions: []
+            imageUrl: `https://picsum.photos/seed/greenbasket/400/300`, rating: 4.7, openingHours: "8 AM - 8 PM", address: "75 Organic Way", ownerId: 'owner-010', products: [], dailyOffers: [], promotions: [], isOpen: true
         },
-         { // Example inactive store
+         { // Example inactive store (admin disabled)
           id: "store-12", name: "Vintage Finds", description: "Closed for renovation.", category: "other",
-          imageUrl: `https://picsum.photos/seed/vintagefinds/400/300`, rating: 4.1, ownerId: 'owner-011', isActive: false, products: [], dailyOffers: [], promotions: []
+          imageUrl: `https://picsum.photos/seed/vintagefinds/400/300`, rating: 4.1, ownerId: 'owner-011', isActive: false, products: [], dailyOffers: [], promotions: [], isOpen: false
         },
       ].map(s => ({ // Add default active status and creation date
           ...s,
           isActive: s.isActive === undefined ? true : s.isActive,
+          isOpen: s.isOpen === undefined ? true : s.isOpen, // Ensure isOpen defaults to true if not specified
           createdAt: s.createdAt ?? new Date(Date.now() - Math.random() * 90 * 86400000) // Within last 3 months
       }));
 }
@@ -205,7 +207,8 @@ function generateMockStores(): Store[] {
 function generateAllMockProducts(stores: Store[]): Product[] {
     let allProducts: Product[] = [];
     stores.forEach(store => {
-        if (!store.isActive) return; // Don't generate products for inactive stores
+        // Generate products even for inactive stores for admin view, but maybe not for closed stores?
+        // Let's generate for all stores for now, display logic handles closed state.
         let count = 10 + Math.floor(Math.random() * 15);
         if (store.category === 'groceries') count = 30 + Math.floor(Math.random() * 40);
         if (store.category === 'restaurants') count = 15 + Math.floor(Math.random() * 20);
@@ -471,14 +474,17 @@ function generateMockUserProfiles(): UserProfile[] {
 function generateMockOrders(users: UserProfile[], stores: Store[], products: Product[]): Order[] {
     const orders: Order[] = [];
     const statuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
-    const activeStores = stores.filter(s => s.isActive);
+    const activeStores = stores.filter(s => s.isActive && s.isOpen); // Only allow orders for active AND open stores
+    const closedStores = stores.filter(s => s.isActive && !s.isOpen); // For potential pre-orders
     const customers = users.filter(u => u.role === 'customer' && u.status === 'active' && u.addresses.length > 0);
 
     if (customers.length === 0 || activeStores.length === 0) return [];
 
     for (let i = 0; i < 50; i++) { // Generate 50 mock orders
         const customer = customers[Math.floor(Math.random() * customers.length)];
-        const store = activeStores[Math.floor(Math.random() * activeStores.length)];
+        // Select from active stores mostly, but sometimes closed ones for pre-order examples
+        const targetStores = Math.random() < 0.1 && closedStores.length > 0 ? closedStores : activeStores;
+        const store = targetStores[Math.floor(Math.random() * targetStores.length)];
         const storeProducts = products.filter(p => p.storeId === store.id);
         if (storeProducts.length === 0) continue;
 
@@ -504,8 +510,8 @@ function generateMockOrders(users: UserProfile[], stores: Store[], products: Pro
         }
          if (orderItems.length === 0) continue; // Skip if no items could be added
 
-
-        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        // If store is closed, order is automatically pending
+        const status = !store.isOpen ? 'Pending' : statuses[Math.floor(Math.random() * statuses.length)];
         const orderDate = new Date(Date.now() - Math.random() * 60 * 86400000); // Within last 60 days
         // Select a random address from the user's profile for the order
         const deliveryAddressObj = customer.addresses[Math.floor(Math.random() * customer.addresses.length)];
@@ -619,11 +625,25 @@ export async function getStores(): Promise<Store[]> {
   await initializeMockData();
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log("Stores fetched:", mockStores!.length);
-      resolve([...mockStores!].map(s => ({...s}))); // Return copies
+      const activeStores = mockStores!.filter(s => s.isActive); // Only return admin-approved stores to frontend
+      console.log("Stores fetched (active):", activeStores.length);
+      resolve([...activeStores].map(s => ({...s}))); // Return copies
     }, 200); // Faster delay
   });
 }
+
+// Get all stores for admin (includes inactive)
+export async function getAllStoresForAdmin(): Promise<Store[]> {
+  console.log("Fetching all stores (Admin)...");
+  await initializeMockData();
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("All stores fetched:", mockStores!.length);
+      resolve([...mockStores!].map(s => ({...s}))); // Return copies
+    }, 200);
+  });
+}
+
 
 export async function getStoreById(storeId: string): Promise<Store | null> {
      console.log(`Fetching store by ID: ${storeId}`);
@@ -651,7 +671,7 @@ export async function getStoreById(storeId: string): Promise<Store | null> {
      });
 }
 
-export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'promotions' | 'isActive' | 'createdAt' | 'ownerId'>, ownerId: string): Promise<Store> {
+export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'promotions' | 'isActive' | 'isOpen' | 'createdAt' | 'ownerId'>, ownerId: string): Promise<Store> {
   console.log("Creating store:", storeData);
   await initializeMockData();
   const newStore: Store = {
@@ -662,6 +682,7 @@ export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'da
     ...storeData,
     ownerId: ownerId,
     isActive: false, // New stores start inactive/pending approval by admin
+    isOpen: false, // New stores start closed until explicitly opened by owner
     createdAt: new Date(),
   };
   mockStores!.push(newStore);
@@ -673,11 +694,44 @@ export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'da
   });
 }
 
+// Function for store owner to open/close their store
+export async function toggleStoreOpenStatus(storeId: string, ownerId: string): Promise<Store | null> {
+    console.log(`Toggling open status for store ${storeId} by owner ${ownerId}`);
+    await initializeMockData();
+    const storeIndex = mockStores!.findIndex(s => s.id === storeId && s.ownerId === ownerId);
+    if (storeIndex === -1) {
+        console.error(`Store ${storeId} not found or owner mismatch.`);
+        return null; // Or throw error
+    }
+    if (!mockStores![storeIndex].isActive) {
+        console.warn(`Store ${storeId} is not active (admin approved). Cannot toggle open status.`);
+        return mockStores![storeIndex]; // Return current state without change
+    }
+
+    mockStores![storeIndex].isOpen = !mockStores![storeIndex].isOpen;
+    console.log(`Store ${storeId} is now ${mockStores![storeIndex].isOpen ? 'Open' : 'Closed'}`);
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({...mockStores![storeIndex]}); // Return updated store copy
+        }, 100);
+    });
+}
+
+
 // PRODUCTS
 export async function getProducts(options: GetProductsOptions = {}): Promise<Product[]> {
     console.log("Fetching products with options:", options);
     await initializeMockData();
     let filteredProducts = [...mockProducts!];
+
+     // Filter by store status unless specifically requested otherwise (e.g., for admin)
+    if (!options.includeInactiveStores) {
+        const activeStoreIds = new Set(mockStores!.filter(s => s.isActive && s.isOpen).map(s => s.id));
+        filteredProducts = filteredProducts.filter(p => activeStoreIds.has(p.storeId));
+    }
+
+
     if (options.storeId) {
         filteredProducts = filteredProducts.filter(p => p.storeId === options.storeId);
     }
@@ -706,6 +760,7 @@ interface GetProductsOptions {
     sortBy?: 'sales' | 'rating' | 'price_asc' | 'price_desc';
     category?: string;
     storeId?: string;
+    includeInactiveStores?: boolean; // Added option for admin views
 }
 
 
@@ -735,6 +790,11 @@ export async function createProduct(productData: Omit<Product, 'id' | 'sales'>):
 // DAILY OFFERS & SUBSCRIPTIONS (Keep existing functions, adjust delays if needed)
 export async function getStoreDailyOffers(storeId: string): Promise<DailyOffer[]> {
     await initializeMockData();
+    const store = mockStores!.find(s => s.id === storeId);
+    // Only return offers if the store is active AND open
+    if (!store || !store.isActive || !store.isOpen) {
+        return Promise.resolve([]);
+    }
     const offers = mockDailyOffers!.filter(o => o.storeId === storeId && o.isActive);
     return Promise.resolve(offers.map(o => ({...o}))); // Faster response, return copies
 }
@@ -752,7 +812,8 @@ export async function createSubscription(userId: string, offerId: string): Promi
     await initializeMockData();
     const offer = mockDailyOffers!.find(o => o.id === offerId);
     const store = mockStores!.find(s => s.id === offer?.storeId);
-    if (!offer || !store || !offer.isActive) throw new Error("Offer not available.");
+    // Ensure store is active and open for new subscriptions
+    if (!offer || !store || !offer.isActive || !store.isActive || !store.isOpen) throw new Error("Offer not available for subscription at this time.");
     const newSubscription: Subscription = {
         id: `sub-${userId}-${offerId.slice(-4)}`, userId, offerId, storeId: store.id, storeName: store.name,
         offerName: offer.name, startDate: new Date(), status: 'active',
