@@ -2,14 +2,14 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserProfile, getUserProfile } from '@/services/store'; // Assuming UserProfile type and fetch function
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Loader2, Mail, Lock, Phone } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Mail, Lock, Phone, User } from 'lucide-react'; // Import User icon
 import Link from 'next/link';
 
 // Mock update functions (replace with actual API calls)
@@ -147,7 +147,7 @@ export default function AccountSettingsPage() {
          return (
             <div className="container mx-auto py-10 text-center">
                 <p className="text-muted-foreground">Could not load profile data.</p>
-                  <Link href="/profile" passHref>
+                  <Link href="/profile" passHref legacyBehavior>
                      <Button variant="outline" className="mt-4">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Profile
                     </Button>
@@ -251,4 +251,3 @@ export default function AccountSettingsPage() {
         </div>
     );
 }
-
