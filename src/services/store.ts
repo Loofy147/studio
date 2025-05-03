@@ -1,5 +1,7 @@
 
-export type StoreCategory = 'electronics' | 'clothing' | 'groceries' | 'books' | 'home goods' | 'toys';
+import { v4 as uuidv4 } from 'uuid';
+
+export type StoreCategory = 'electronics' | 'clothing' | 'groceries' | 'books' | 'home goods' | 'toys' | 'other';
 
 export interface Product {
   id: string;
@@ -21,6 +23,7 @@ export interface Store {
   imageUrl?: string; // Optional banner image for the store
   products?: Product[]; // Products might be loaded separately or on demand
   rating?: number; // Optional average rating
+  ownerId?: string; // Link to the user who owns the store
 }
 
 // Mock data store (simulating a database)
@@ -122,7 +125,8 @@ function generateMockProductsStore(storeId: string, category: StoreCategory, cou
         groceries: ["Apple", "Banana", "Milk", "Bread", "Eggs", "Cheese", "Yogurt", "Chicken", "Rice", "Pasta", "Tomatoes"],
         books: ["Novel", "Biography", "Cookbook", "History", "Sci-Fi", "Mystery", "Poetry", "Fantasy", "Self-Help"],
         'home goods': ["Lamp", "Cushion", "Vase", "Frame", "Towel", "Cutlery", "Mug", "Plate", "Candle"],
-        toys: ["Action Figure", "Blocks", "Board Game", "Doll", "Puzzle", "Car", "Plush Toy", "Art Set"]
+        toys: ["Action Figure", "Blocks", "Board Game", "Doll", "Puzzle", "Car", "Plush Toy", "Art Set"],
+        other: ["Generic Product"]
     };
     const adjectives = ["Premium", "Classic", "Modern", "Vintage", "Organic", "Wireless", "Smart", "Cozy", "Durable", "Ergonomic", "Handmade", "Deluxe"];
 
@@ -226,6 +230,47 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
             console.log("Products fetched:", filteredProducts.length);
             resolve(filteredProducts);
         }, 200); // Simulate delay
+    });
+}
+
+// Function to create a new store
+export async function createStore(storeData: Omit<Store, 'id'>, ownerId: string): Promise<Store> {
+  console.log("Creating store:", storeData);
+  await initializeMockData();
+
+  const newStore: Store = {
+    id: uuidv4(), // Generate a unique ID
+    ...storeData,
+    ownerId: ownerId,
+  };
+
+  mockStores!.push(newStore); // Add to mock store
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("Store created:", newStore.name);
+      resolve(newStore);
+    }, 200);
+  });
+}
+
+// Function to create a new product
+export async function createProduct(productData: Omit<Product, 'id'>): Promise<Product> {
+    console.log("Creating product:", productData);
+    await initializeMockData();
+
+    const newProduct: Product = {
+        id: uuidv4(), // Generate a unique ID
+        ...productData,
+    };
+
+    mockProducts!.push(newProduct);
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            console.log("Product created:", newProduct.name);
+            resolve(newProduct);
+        }, 200);
     });
 }
 
