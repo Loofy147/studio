@@ -35,6 +35,9 @@ export interface Store {
   // Add store-specific details if needed
   openingHours?: string; // Example for restaurants/shops
   address?: string; // Example for physical locations
+  // Admin related fields (added via declaration merging later or directly)
+  isActive?: boolean; // Managed by admin
+  createdAt?: Date; // When the store was created/approved
 }
 
 // Interface for Daily Subscription Offers
@@ -65,90 +68,126 @@ export interface Subscription {
     nextDeliveryDate?: Date;
 }
 
+// Interface and function for user profile (placeholder)
+export interface UserProfile {
+    id: string;
+    name: string;
+    email: string;
+    address?: string;
+    phone?: string;
+    loyaltyPoints: number;
+    // Admin related fields (added via declaration merging later or directly)
+    role?: 'customer' | 'store_owner' | 'driver' | 'admin' | string; // User role
+    status?: 'active' | 'disabled' | 'pending' | string; // User account status
+    joinedAt?: Date; // When the user joined
+}
 
-// Mock data store (simulating a database)
+export interface Order {
+    id: string;
+    userId: string; // Link to user profile
+    storeId: string;
+    storeName: string; // Denormalized for easy display
+    items: { productId: string; name: string; quantity: number; price: number }[];
+    totalAmount: number;
+    orderDate: Date;
+    status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+    trackingNumber?: string;
+    deliveryAddress: string;
+    // Add driver ID if assigned
+    driverId?: string;
+}
+
+
+// --- Mock Data Store ---
 let mockStores: Store[] | null = null;
 let mockProducts: Product[] | null = null;
 let mockDailyOffers: DailyOffer[] | null = null;
 let mockSubscriptions: Subscription[] | null = null;
+let mockUserProfiles: UserProfile[] | null = null; // Add mock users store
+let mockOrders: Order[] | null = null; // Add mock orders store
 
+
+// --- Mock Data Generation ---
 
 function generateMockStores(): Store[] {
      return [
-        // Existing stores...
         {
           id: "store-1", name: "ElectroMart", description: "Your one-stop shop for the latest electronics.", category: "electronics",
-          imageUrl: `https://picsum.photos/seed/electromart/400/300`, rating: 4.5,
+          imageUrl: `https://picsum.photos/seed/electromart/400/300`, rating: 4.5, ownerId: 'owner-001'
         },
         {
           id: "store-2", name: "Fashionista Boutique", description: "Trendy clothing and accessories.", category: "clothing",
-          imageUrl: `https://picsum.photos/seed/fashionista/400/300`, rating: 4.2,
+          imageUrl: `https://picsum.photos/seed/fashionista/400/300`, rating: 4.2, ownerId: 'owner-002'
         },
         {
           id: "store-3", name: "FreshGrocer", description: "Quality groceries and fresh produce.", category: "groceries",
-          imageUrl: `https://picsum.photos/seed/freshgrocer/400/300`, rating: 4.8, openingHours: "7 AM - 9 PM", address: "100 Grocery Lane"
+          imageUrl: `https://picsum.photos/seed/freshgrocer/400/300`, rating: 4.8, openingHours: "7 AM - 9 PM", address: "100 Grocery Lane", ownerId: 'owner-003'
         },
         {
           id: "store-4", name: "The Book Nook", description: "Discover your next favorite read.", category: "books",
-          imageUrl: `https://picsum.photos/seed/booknook/400/300`, rating: 4.6,
+          imageUrl: `https://picsum.photos/seed/booknook/400/300`, rating: 4.6, ownerId: 'owner-004'
         },
         {
           id: "store-5", name: "Cozy Home", description: "Everything for your home.", category: "home goods",
-          imageUrl: `https://picsum.photos/seed/cozyhome/400/300`, rating: 4.3,
+          imageUrl: `https://picsum.photos/seed/cozyhome/400/300`, rating: 4.3, ownerId: 'owner-005'
         },
         {
           id: "store-6", name: "Toy Galaxy", description: "Fun and educational toys.", category: "toys",
-          imageUrl: `https://picsum.photos/seed/toygalaxy/400/300`, rating: 4.0,
+          imageUrl: `https://picsum.photos/seed/toygalaxy/400/300`, rating: 4.0, ownerId: 'owner-006'
         },
         {
           id: "store-7", name: "Gadget Hub", description: "Cutting-edge tech.", category: "electronics",
-          imageUrl: `https://picsum.photos/seed/gadgethub/400/300`, rating: 4.7,
+          imageUrl: `https://picsum.photos/seed/gadgethub/400/300`, rating: 4.7, ownerId: 'owner-001' // Reused owner
         },
         {
           id: "store-8", name: "Style Threads", description: "Affordable and stylish clothing.", category: "clothing",
-          imageUrl: `https://picsum.photos/seed/stylethreads/400/300`, rating: 3.9,
+          imageUrl: `https://picsum.photos/seed/stylethreads/400/300`, rating: 3.9, ownerId: 'owner-007'
         },
-        // New stores with relevant categories
         {
             id: "store-9", name: "The Daily Grind", description: "Artisan coffee, pastries, and light bites.", category: "coffee shops",
-            imageUrl: `https://picsum.photos/seed/dailygrind/400/300`, rating: 4.9, openingHours: "6 AM - 6 PM", address: "25 Coffee Bean Blvd"
+            imageUrl: `https://picsum.photos/seed/dailygrind/400/300`, rating: 4.9, openingHours: "6 AM - 6 PM", address: "25 Coffee Bean Blvd", ownerId: 'owner-008'
         },
         {
             id: "store-10", name: "Mama Mia Pizzeria", description: "Authentic Italian pizza and pasta dishes.", category: "restaurants",
-            imageUrl: `https://picsum.photos/seed/mamamia/400/300`, rating: 4.5, openingHours: "11 AM - 10 PM", address: "50 Pizza Plaza"
+            imageUrl: `https://picsum.photos/seed/mamamia/400/300`, rating: 4.5, openingHours: "11 AM - 10 PM", address: "50 Pizza Plaza", ownerId: 'owner-009'
         },
         {
             id: "store-11", name: "GreenBasket Organics", description: "Certified organic fruits, vegetables, and pantry staples.", category: "groceries",
-            imageUrl: `https://picsum.photos/seed/greenbasket/400/300`, rating: 4.7, openingHours: "8 AM - 8 PM", address: "75 Organic Way"
-        }
-      ];
+            imageUrl: `https://picsum.photos/seed/greenbasket/400/300`, rating: 4.7, openingHours: "8 AM - 8 PM", address: "75 Organic Way", ownerId: 'owner-010'
+        },
+         { // Example inactive store
+          id: "store-12", name: "Vintage Finds", description: "Closed for renovation.", category: "other",
+          imageUrl: `https://picsum.photos/seed/vintagefinds/400/300`, rating: 4.1, ownerId: 'owner-011', isActive: false
+        },
+      ].map(s => ({ // Add default active status and creation date
+          ...s,
+          isActive: s.isActive === undefined ? true : s.isActive,
+          createdAt: s.createdAt ?? new Date(Date.now() - Math.random() * 90 * 86400000) // Within last 3 months
+      }));
 }
 
-
-// Helper to generate mock products for ALL stores initially
 function generateAllMockProducts(stores: Store[]): Product[] {
     let allProducts: Product[] = [];
     stores.forEach(store => {
-        // Generate a realistic number of products based on category
-        let count = 10 + Math.floor(Math.random() * 15); // Default: 10-24
-        if (store.category === 'groceries') count = 30 + Math.floor(Math.random() * 40); // Groceries: 30-70
-        if (store.category === 'restaurants') count = 15 + Math.floor(Math.random() * 20); // Restaurants: 15-35
-        if (store.category === 'coffee shops') count = 10 + Math.floor(Math.random() * 10); // Coffee: 10-20
+        if (!store.isActive) return; // Don't generate products for inactive stores
+        let count = 10 + Math.floor(Math.random() * 15);
+        if (store.category === 'groceries') count = 30 + Math.floor(Math.random() * 40);
+        if (store.category === 'restaurants') count = 15 + Math.floor(Math.random() * 20);
+        if (store.category === 'coffee shops') count = 10 + Math.floor(Math.random() * 10);
 
          const storeProducts = generateMockProductsStore(store.id, store.category, count);
-         // Add store info to each product
          storeProducts.forEach(p => {
              p.storeId = store.id;
              p.storeName = store.name;
-             p.sales = Math.floor(Math.random() * 500); // Assign random sales count
+             p.sales = Math.floor(Math.random() * 500);
          });
          allProducts = allProducts.concat(storeProducts);
     });
     return allProducts;
 }
 
-// Helper to generate mock products for a specific store/category
 function generateMockProductsStore(storeId: string, category: StoreCategory, count: number): Product[] {
+    // (Keep the existing generateMockProductsStore logic as it is good)
     const products: Product[] = [];
     const baseNames: Record<StoreCategory, string[]> = {
         electronics: ["Laptop", "Smartphone", "Headphones", "Monitor", "Keyboard", "Mouse", "Charger", "Tablet", "Smartwatch", "Camera"],
@@ -201,43 +240,52 @@ function generateMockProductsStore(storeId: string, category: StoreCategory, cou
             price: price,
             imageUrl: `https://picsum.photos/seed/${storeId}-${name.replace(/\s+/g, '-')}-${i}/300/200`,
             category: baseName.toLowerCase().replace(/\s+/g, '-'),
-            // Add specific fields based on category
-            ...(category === 'restaurants' && { ingredients: ['Flour', 'Tomato', 'Cheese'] }), // Example
-            ...(category === 'clothing' && { size: ['S', 'M', 'L'][Math.floor(Math.random() * 3)] }), // Example
-            ...(category === 'coffee shops' && { size: ['Small', 'Medium', 'Large'][Math.floor(Math.random() * 3)] }), // Example
+            ...(category === 'restaurants' && { ingredients: ['Flour', 'Tomato', 'Cheese'] }),
+            ...(category === 'clothing' && { size: ['S', 'M', 'L', 'XL'][Math.floor(Math.random() * 4)] }),
+            ...(category === 'coffee shops' && { size: ['Small', 'Medium', 'Large'][Math.floor(Math.random() * 3)] }),
         };
         products.push(product);
     }
     return products;
 }
 
-// Helper to generate mock daily offers for eligible stores
 function generateMockDailyOffers(stores: Store[], products: Product[]): DailyOffer[] {
     const offers: DailyOffer[] = [];
-    const eligibleStores = stores.filter(s => dailyOfferEligibleCategories.includes(s.category));
+    const eligibleStores = stores.filter(s => dailyOfferEligibleCategories.includes(s.category) && s.isActive);
 
     eligibleStores.forEach(store => {
         const storeProducts = products.filter(p => p.storeId === store.id);
-        if (storeProducts.length < 3) return; // Need some products to make an offer
+        if (storeProducts.length < 2) return;
 
-        // Create 1-2 offers per eligible store
-        for (let i = 0; i < Math.floor(Math.random() * 2) + 1; i++) {
-             const isWeekly = Math.random() > 0.7; // ~30% chance of weekly offer
+        for (let i = 0; i < Math.floor(Math.random() * 3) + 1; i++) { // 1-3 offers
+             const isWeekly = Math.random() > 0.7;
              const offerType = store.category === 'restaurants' ? 'Meal Deal' : store.category === 'groceries' ? 'Produce Box' : 'Coffee Combo';
-             const offerName = `${isWeekly ? 'Weekly' : 'Daily'} ${offerType} ${i+1}`;
-             const numItems = Math.floor(Math.random() * 3) + 1; // 1-3 items per offer
+             const offerName = `${isWeekly ? 'Weekly' : 'Daily'} ${offerType} #${i+1}`;
+             const numItems = Math.floor(Math.random() * 3) + 1;
              const offerItems: DailyOffer['items'] = [];
              let offerPrice = 0;
+             const usedProductIds = new Set<string>(); // Ensure unique products per offer
 
-             for (let j=0; j<numItems; j++) {
-                const product = storeProducts[Math.floor(Math.random() * storeProducts.length)];
-                 const quantity = Math.floor(Math.random() * 2) + 1; // 1-2 quantity per item
-                 offerItems.push({ productId: product.id, quantity: quantity });
-                 offerPrice += product.price * quantity;
+             for (let j=0; j<numItems && offerItems.length < storeProducts.length; j++) {
+                let product: Product | undefined;
+                let attempts = 0;
+                 // Try to pick an unused product
+                 do {
+                    product = storeProducts[Math.floor(Math.random() * storeProducts.length)];
+                    attempts++;
+                 } while (product && usedProductIds.has(product.id) && attempts < storeProducts.length * 2);
+
+                if (product && !usedProductIds.has(product.id)) {
+                     const quantity = Math.floor(Math.random() * 2) + 1;
+                     offerItems.push({ productId: product.id, quantity: quantity });
+                     offerPrice += product.price * quantity;
+                     usedProductIds.add(product.id);
+                 }
              }
 
-             // Discount the offer price slightly
-            offerPrice *= (0.8 + Math.random() * 0.15); // 80-95% of original price
+             if (offerItems.length === 0) continue; // Skip if no items could be added
+
+            offerPrice *= (0.8 + Math.random() * 0.15);
 
             offers.push({
                 id: `offer-${store.id}-${i}`,
@@ -247,7 +295,7 @@ function generateMockDailyOffers(stores: Store[], products: Product[]): DailyOff
                 items: offerItems,
                 price: parseFloat(offerPrice.toFixed(2)),
                 frequency: isWeekly ? 'weekly' : 'daily',
-                isActive: Math.random() > 0.2, // ~80% active
+                isActive: Math.random() > 0.15, // ~85% active
                 imageUrl: `https://picsum.photos/seed/offer-${store.id}-${i}/300/200`
             });
         }
@@ -255,8 +303,98 @@ function generateMockDailyOffers(stores: Store[], products: Product[]): DailyOff
     return offers;
 }
 
-// Helper to generate mock subscriptions for a user
+function generateMockUserProfiles(): UserProfile[] {
+    const users: UserProfile[] = [];
+    const roles: UserProfile['role'][] = ['customer', 'store_owner', 'driver', 'admin'];
+    const statuses: UserProfile['status'][] = ['active', 'disabled', 'pending'];
+    const names = ["Alex Ryder", "Beth Green", "Carlos Villa", "Diana Prince", "Ethan Hunt", "Fiona Glenanne", "George Smiley", "Harriet Vane"];
+
+    // Add some specific users
+    users.push({ id: "user123", name: "Alex Ryder", email: "alex.ryder@example.com", loyaltyPoints: 285, role: 'customer', status: 'active', joinedAt: new Date(Date.now() - 150 * 86400000) });
+    users.push({ id: "owner-001", name: "Eleanor Vance", email: "eleanor@electromart.com", loyaltyPoints: 50, role: 'store_owner', status: 'active', joinedAt: new Date(Date.now() - 300 * 86400000) });
+    users.push({ id: "driver-001", name: "Driver Dan", email: "dan.driver@dispatch.com", loyaltyPoints: 15, role: 'driver', status: 'active', joinedAt: new Date(Date.now() - 90 * 86400000) });
+    users.push({ id: "admin-001", name: "Admin User", email: "admin@swiftdispatch.example", loyaltyPoints: 0, role: 'admin', status: 'active', joinedAt: new Date(Date.now() - 500 * 86400000) });
+
+    // Add more random users
+    for (let i = 0; i < 20; i++) {
+        const id = `user-${uuidv4().substring(0, 6)}`;
+        const name = names[Math.floor(Math.random() * names.length)];
+        const role = roles[Math.floor(Math.random() * (roles.length -1 ))]; // Exclude admin for random
+        users.push({
+            id: id,
+            name: name,
+            email: `${name.split(' ')[0].toLowerCase()}.${id.slice(-3)}@example.com`,
+            loyaltyPoints: Math.floor(Math.random() * 1000),
+            role: role,
+            status: statuses[Math.floor(Math.random() * statuses.length)],
+            joinedAt: new Date(Date.now() - Math.random() * 500 * 86400000),
+            address: `${100 + i} Main St`,
+            phone: `555-1${i.toString().padStart(2,'0')}-1234`
+        });
+    }
+
+    return users;
+}
+
+function generateMockOrders(users: UserProfile[], stores: Store[], products: Product[]): Order[] {
+    const orders: Order[] = [];
+    const statuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+    const activeStores = stores.filter(s => s.isActive);
+    const customers = users.filter(u => u.role === 'customer' && u.status === 'active');
+
+    if (customers.length === 0 || activeStores.length === 0) return [];
+
+    for (let i = 0; i < 50; i++) { // Generate 50 mock orders
+        const customer = customers[Math.floor(Math.random() * customers.length)];
+        const store = activeStores[Math.floor(Math.random() * activeStores.length)];
+        const storeProducts = products.filter(p => p.storeId === store.id);
+        if (storeProducts.length === 0) continue;
+
+        const numItems = Math.floor(Math.random() * 4) + 1; // 1-4 items per order
+        const orderItems: Order['items'] = [];
+        let totalAmount = 0;
+        const usedProductIds = new Set<string>();
+
+        for (let j = 0; j < numItems && orderItems.length < storeProducts.length; j++) {
+             let product: Product | undefined;
+             let attempts = 0;
+             do {
+                product = storeProducts[Math.floor(Math.random() * storeProducts.length)];
+                attempts++;
+             } while (product && usedProductIds.has(product.id) && attempts < storeProducts.length * 2)
+
+             if (product && !usedProductIds.has(product.id)) {
+                 const quantity = Math.floor(Math.random() * 3) + 1;
+                 orderItems.push({ productId: product.id, name: product.name, quantity: quantity, price: product.price });
+                 totalAmount += product.price * quantity;
+                 usedProductIds.add(product.id);
+             }
+        }
+         if (orderItems.length === 0) continue; // Skip if no items could be added
+
+
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const orderDate = new Date(Date.now() - Math.random() * 60 * 86400000); // Within last 60 days
+
+        orders.push({
+            id: `order-${uuidv4().substring(0, 8)}`,
+            userId: customer.id,
+            storeId: store.id,
+            storeName: store.name,
+            items: orderItems,
+            totalAmount: parseFloat(totalAmount.toFixed(2)),
+            orderDate: orderDate,
+            status: status,
+            trackingNumber: status === 'Shipped' || status === 'Delivered' ? `TRK${uuidv4().substring(0, 10).toUpperCase()}` : undefined,
+            deliveryAddress: customer.address || '123 Default Address, Anytown',
+            driverId: (status === 'Shipped' || status === 'Delivered') && Math.random() > 0.3 ? `driver-${uuidv4().substring(0, 8)}` : undefined // Assign driver sometimes
+        });
+    }
+    return orders;
+}
+
 function generateMockSubscriptions(userId: string, offers: DailyOffer[], stores: Store[]): Subscription[] {
+    // (Keep the existing generateMockSubscriptions logic)
     const subscriptions: Subscription[] = [];
     const numSubscriptions = Math.floor(Math.random() * 3); // 0-2 subscriptions per user
 
@@ -286,52 +424,60 @@ function generateMockSubscriptions(userId: string, offers: DailyOffer[], stores:
 }
 
 
-// Initialize mock data on first call
+// --- Initialization ---
+
 async function initializeMockData() {
-    // Initialize stores if not already done
+    if (!mockUserProfiles) {
+        mockUserProfiles = generateMockUserProfiles();
+    }
     if (!mockStores) {
         mockStores = generateMockStores();
+        // Assign owners from mock users if possible
+        mockStores.forEach(store => {
+            if (!store.ownerId) {
+                const potentialOwner = mockUserProfiles.find(u => u.role === 'store_owner' && Math.random() > 0.5); // Assign randomly
+                 if (potentialOwner) store.ownerId = potentialOwner.id;
+            }
+        })
     }
-    // Initialize products if not already done, depends on stores
     if (!mockProducts) {
-        if (!mockStores) mockStores = generateMockStores(); // Ensure stores exist
         mockProducts = generateAllMockProducts(mockStores);
     }
-    // Initialize daily offers if not already done, depends on stores and products
     if (!mockDailyOffers) {
-        if (!mockStores) mockStores = generateMockStores();
-        if (!mockProducts) mockProducts = generateAllMockProducts(mockStores);
         mockDailyOffers = generateMockDailyOffers(mockStores, mockProducts);
         // Link offers back to stores
         mockStores.forEach(store => {
             store.dailyOffers = mockDailyOffers!.filter(offer => offer.storeId === store.id);
         });
     }
-    // Initialize subscriptions (can be done per user request, but mock some initially for demo)
+    if (!mockOrders) {
+         mockOrders = generateMockOrders(mockUserProfiles, mockStores, mockProducts);
+    }
     if (!mockSubscriptions) {
-        if (!mockDailyOffers) { // Ensure offers exist first
-            if (!mockStores) mockStores = generateMockStores();
-            if (!mockProducts) mockProducts = generateAllMockProducts(mockStores);
-            mockDailyOffers = generateMockDailyOffers(mockStores, mockProducts);
-        }
-        mockSubscriptions = generateMockSubscriptions("user123", mockDailyOffers, mockStores!); // Mock for default user
+        // Generate subs for multiple users
+        mockSubscriptions = [];
+        const customers = mockUserProfiles.filter(u => u.role === 'customer');
+        customers.slice(0, 5).forEach(c => { // Generate for first 5 customers
+            mockSubscriptions = mockSubscriptions!.concat(generateMockSubscriptions(c.id, mockDailyOffers, mockStores!));
+        });
     }
 }
 
 
-// Mock function to simulate fetching stores
+// --- Service Functions ---
+
+// STORES
 export async function getStores(): Promise<Store[]> {
   console.log("Fetching stores...");
   await initializeMockData();
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log("Stores fetched:", mockStores!.length);
-      resolve([...mockStores!]); // Return a copy
-    }, 300); // Simulate network delay
+      resolve([...mockStores!]);
+    }, 200); // Faster delay
   });
 }
 
-// Mock function to simulate fetching a single store's details (including products and offers)
 export async function getStoreById(storeId: string): Promise<Store | null> {
      console.log(`Fetching store by ID: ${storeId}`);
      await initializeMockData();
@@ -339,10 +485,9 @@ export async function getStoreById(storeId: string): Promise<Store | null> {
 
      if (!store) {
         console.log("Store not found");
-        return null;
+        return Promise.resolve(null);
      }
 
-     // Find products and offers for this store from the global lists
      const storeProducts = mockProducts!.filter(p => p.storeId === storeId);
      const storeOffers = mockDailyOffers!.filter(o => o.storeId === storeId);
 
@@ -351,38 +496,46 @@ export async function getStoreById(storeId: string): Promise<Store | null> {
             const storeWithDetails = {
                 ...store,
                 products: storeProducts,
-                dailyOffers: storeOffers // Ensure offers are included
+                dailyOffers: storeOffers
             };
-            console.log("Store details fetched:", storeWithDetails.name, "Products:", storeProducts.length, "Offers:", storeOffers.length);
+            console.log("Store details fetched:", storeWithDetails.name);
              resolve(storeWithDetails);
-        }, 150); // Shorter delay
+        }, 100); // Faster delay
      });
 }
 
-// Mock function to get products (e.g., best sellers across all stores)
-interface GetProductsOptions {
-    limit?: number;
-    sortBy?: 'sales' | 'rating' | 'price_asc' | 'price_desc'; // Add more sorting options
-    category?: string; // Filter by product category (e.g., 'laptops', 'shirts')
-    storeId?: string; // Filter by store ID
+export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'isActive' | 'createdAt'>, ownerId: string): Promise<Store> {
+  console.log("Creating store:", storeData);
+  await initializeMockData();
+  const newStore: Store = {
+    id: uuidv4(),
+    products: [],
+    dailyOffers: [],
+    ...storeData,
+    ownerId: ownerId,
+    isActive: false, // New stores start inactive/pending approval by admin
+    createdAt: new Date(),
+  };
+  mockStores!.push(newStore);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("Store created (pending approval):", newStore.name);
+      resolve(newStore);
+    }, 150);
+  });
 }
+
+// PRODUCTS
 export async function getProducts(options: GetProductsOptions = {}): Promise<Product[]> {
     console.log("Fetching products with options:", options);
     await initializeMockData();
-
-    let filteredProducts = [...mockProducts!]; // Start with a copy
-
-    // Apply store filtering first
+    let filteredProducts = [...mockProducts!];
     if (options.storeId) {
         filteredProducts = filteredProducts.filter(p => p.storeId === options.storeId);
     }
-
-    // Apply category filtering
-    if (options.category && options.category !== 'all') { // Assuming 'all' means no category filter
+    if (options.category && options.category !== 'all') {
         filteredProducts = filteredProducts.filter(p => p.category === options.category);
     }
-
-    // Apply sorting
     if (options.sortBy === 'sales') {
         filteredProducts.sort((a, b) => (b.sales ?? 0) - (a.sales ?? 0));
     } else if (options.sortBy === 'price_asc') {
@@ -390,279 +543,179 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<Pro
     } else if (options.sortBy === 'price_desc') {
         filteredProducts.sort((a, b) => b.price - a.price);
     }
-     // Add rating sort if needed
-
-    // Apply limit
     if (options.limit) {
         filteredProducts = filteredProducts.slice(0, options.limit);
     }
-
     return new Promise((resolve) => {
         setTimeout(() => {
             console.log("Products fetched:", filteredProducts.length);
             resolve(filteredProducts);
-        }, 200); // Simulate delay
+        }, 150); // Faster delay
     });
 }
-
-// Function to create a new store
-export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers'>, ownerId: string): Promise<Store> {
-  console.log("Creating store:", storeData);
-  await initializeMockData();
-
-  const newStore: Store = {
-    id: uuidv4(), // Generate a unique ID
-    products: [], // Initialize with empty arrays
-    dailyOffers: [],
-    ...storeData,
-    ownerId: ownerId,
-  };
-
-  mockStores!.push(newStore); // Add to mock store
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log("Store created:", newStore.name);
-      resolve(newStore);
-    }, 200);
-  });
+interface GetProductsOptions {
+    limit?: number;
+    sortBy?: 'sales' | 'rating' | 'price_asc' | 'price_desc';
+    category?: string;
+    storeId?: string;
 }
 
-// Function to create a new product
+
 export async function createProduct(productData: Omit<Product, 'id'>): Promise<Product> {
     console.log("Creating product:", productData);
     await initializeMockData();
-
     const newProduct: Product = {
-        id: uuidv4(), // Generate a unique ID
-        sales: 0, // Initialize sales
+        id: uuidv4(),
+        sales: 0,
         ...productData,
     };
-
     mockProducts!.push(newProduct);
-
-    // Update the store's product list if storeId is present
     const storeIndex = mockStores!.findIndex(s => s.id === newProduct.storeId);
     if (storeIndex > -1) {
         mockStores![storeIndex].products?.push(newProduct);
     }
-
-
     return new Promise((resolve) => {
         setTimeout(() => {
             console.log("Product created:", newProduct.name);
             resolve(newProduct);
-        }, 200);
+        }, 100);
     });
 }
 
-// --- Daily Offer and Subscription Functions ---
-
-// Function to get daily offers for a specific store
+// DAILY OFFERS & SUBSCRIPTIONS (Keep existing functions, adjust delays if needed)
 export async function getStoreDailyOffers(storeId: string): Promise<DailyOffer[]> {
-    console.log(`Fetching daily offers for store: ${storeId}`);
     await initializeMockData();
     const offers = mockDailyOffers!.filter(o => o.storeId === storeId && o.isActive);
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log(`Offers fetched for store ${storeId}:`, offers.length);
-            resolve(offers);
-        }, 150);
-    });
+    return Promise.resolve(offers); // Faster response
 }
 
-// Function to create a new daily offer (for store owners)
 export async function createDailyOffer(offerData: Omit<DailyOffer, 'id'>): Promise<DailyOffer> {
-    console.log("Creating daily offer:", offerData);
     await initializeMockData();
-    const newOffer: DailyOffer = {
-        id: uuidv4(),
-        ...offerData,
-    };
+    const newOffer: DailyOffer = { id: uuidv4(), ...offerData };
     mockDailyOffers!.push(newOffer);
-     // Update the store's offer list
     const storeIndex = mockStores!.findIndex(s => s.id === newOffer.storeId);
-    if (storeIndex > -1) {
-        mockStores![storeIndex].dailyOffers?.push(newOffer);
-    }
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log("Daily offer created:", newOffer.name);
-            resolve(newOffer);
-        }, 200);
-    });
+    if (storeIndex > -1) mockStores![storeIndex].dailyOffers?.push(newOffer);
+    return Promise.resolve(newOffer);
 }
 
-// Function for a user to subscribe to an offer
 export async function createSubscription(userId: string, offerId: string): Promise<Subscription> {
-    console.log(`User ${userId} subscribing to offer ${offerId}`);
     await initializeMockData();
-
     const offer = mockDailyOffers!.find(o => o.id === offerId);
     const store = mockStores!.find(s => s.id === offer?.storeId);
-
-    if (!offer || !store || !offer.isActive) {
-        throw new Error("Offer not available for subscription.");
-    }
-
+    if (!offer || !store || !offer.isActive) throw new Error("Offer not available.");
     const newSubscription: Subscription = {
-        id: uuidv4(),
-        userId: userId,
-        offerId: offer.id,
-        storeId: store.id,
-        storeName: store.name,
-        offerName: offer.name,
-        startDate: new Date(),
-        status: 'active',
+        id: uuidv4(), userId, offerId, storeId: store.id, storeName: store.name,
+        offerName: offer.name, startDate: new Date(), status: 'active',
         nextDeliveryDate: new Date(Date.now() + (offer.frequency === 'daily' ? 1 : 7) * 86400000)
     };
-
     mockSubscriptions!.push(newSubscription);
-
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log("Subscription created:", newSubscription.id);
-            resolve(newSubscription);
-        }, 250);
-    });
+    return Promise.resolve(newSubscription);
 }
 
-// Function to get a user's subscriptions
 export async function getUserSubscriptions(userId: string): Promise<Subscription[]> {
-    console.log(`Fetching subscriptions for user: ${userId}`);
     await initializeMockData();
     const userSubs = mockSubscriptions!.filter(sub => sub.userId === userId);
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log(`Subscriptions fetched for user ${userId}:`, userSubs.length);
-            resolve(userSubs);
-        }, 300);
-    });
+    return Promise.resolve(userSubs);
 }
 
-// Function to update subscription status (pause, cancel)
 export async function updateSubscriptionStatus(subscriptionId: string, status: 'active' | 'paused' | 'cancelled'): Promise<Subscription | null> {
-    console.log(`Updating subscription ${subscriptionId} to status ${status}`);
     await initializeMockData();
     const subIndex = mockSubscriptions!.findIndex(sub => sub.id === subscriptionId);
     if (subIndex > -1) {
         mockSubscriptions![subIndex].status = status;
-        // Clear next delivery date if not active
-        if (status !== 'active') {
-            mockSubscriptions![subIndex].nextDeliveryDate = undefined;
-        } else {
-            // Optional: Recalculate next delivery if reactivating
-             const offer = mockDailyOffers!.find(o => o.id === mockSubscriptions![subIndex].offerId);
-             if(offer) mockSubscriptions![subIndex].nextDeliveryDate = new Date(Date.now() + (offer.frequency === 'daily' ? 1 : 7) * 86400000);
-        }
-         return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log("Subscription status updated");
-                resolve(mockSubscriptions![subIndex]);
-            }, 100);
-         });
+        const offer = mockDailyOffers!.find(o => o.id === mockSubscriptions![subIndex].offerId);
+        mockSubscriptions![subIndex].nextDeliveryDate = (status === 'active' && offer)
+            ? new Date(Date.now() + (offer.frequency === 'daily' ? 1 : 7) * 86400000)
+            : undefined;
+        return Promise.resolve(mockSubscriptions![subIndex]);
     }
     return Promise.resolve(null);
 }
 
-// --- End Offer/Subscription Functions ---
-
-
-// Interface and function for user orders (placeholder)
-export interface Order {
-    id: string;
-    userId: string; // Link to user profile
-    storeId: string;
-    storeName: string; // Denormalized for easy display
-    items: { productId: string; name: string; quantity: number; price: number }[];
-    totalAmount: number;
-    orderDate: Date;
-    status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
-    trackingNumber?: string;
-    deliveryAddress: string;
-}
-
-// Mock function to get user orders
+// ORDERS
+// Mock function to get user orders (can keep as is or modify)
 export async function getUserOrders(userId: string): Promise<Order[]> {
      console.log(`Fetching orders for user: ${userId}`);
-     await initializeMockData(); // Ensure data is loaded
+     await initializeMockData();
+     const userOrders = mockOrders!.filter(o => o.userId === userId);
      return new Promise((resolve) => {
         setTimeout(() => {
-            // In a real app, fetch from database based on userId
-            // Let's generate some orders based on available products/stores if none exist
-            const fakeOrders: Order[] = [
-                 {
-                    id: 'order-123', userId: userId, storeId: 'store-1', storeName: 'ElectroMart',
-                    items: [{ productId: 'store-1-prod-1', name: 'Premium Laptop', quantity: 1, price: 1200 }],
-                    totalAmount: 1200, orderDate: new Date(Date.now() - 86400000 * 2), // 2 days ago
-                    status: 'Shipped', trackingNumber: 'TRK123456789', deliveryAddress: '1 Main St, Anytown'
-                },
-                {
-                    id: 'order-456', userId: userId, storeId: 'store-3', storeName: 'FreshGrocer',
-                    items: [
-                        { productId: 'store-3-prod-1', name: 'Organic Apple', quantity: 5, price: 0.8 },
-                        { productId: 'store-3-prod-3', name: 'Classic Milk', quantity: 1, price: 3.5 },
-                    ],
-                    totalAmount: 7.5, orderDate: new Date(Date.now() - 86400000 * 1), // 1 day ago
-                    status: 'Processing', deliveryAddress: '1 Main St, Anytown'
-                },
-                 {
-                    id: 'order-789', userId: userId, storeId: 'store-2', storeName: 'Fashionista Boutique',
-                    items: [{ productId: 'store-2-prod-2', name: 'Modern Jeans', quantity: 1, price: 55 }],
-                    totalAmount: 55, orderDate: new Date(Date.now() - 86400000 * 5), // 5 days ago
-                    status: 'Delivered', deliveryAddress: '1 Main St, Anytown'
-                },
-                 { // Order from a restaurant
-                    id: 'order-101', userId: userId, storeId: 'store-10', storeName: 'Mama Mia Pizzeria',
-                    items: [
-                        { productId: 'store-10-prod-1', name: 'Gourmet Margherita Pizza', quantity: 1, price: 15.50 },
-                        { productId: 'store-10-prod-3', name: 'Classic Caesar Salad', quantity: 1, price: 8.00 }
-                    ],
-                    totalAmount: 23.50, orderDate: new Date(Date.now() - 86400000 * 0.5), // 12 hours ago
-                    status: 'Pending', deliveryAddress: '1 Main St, Anytown'
-                 },
-            ];
-             console.log(`Orders fetched for user ${userId}:`, fakeOrders.length);
-             resolve(fakeOrders);
-        }, 800);
+             console.log(`Orders fetched for user ${userId}:`, userOrders.length);
+             resolve(userOrders.sort((a,b) => b.orderDate.getTime() - a.orderDate.getTime()));
+        }, 200); // Faster delay
      });
 }
 
-
-// Interface and function for user profile (placeholder)
-export interface UserProfile {
-    id: string;
-    name: string;
-    email: string;
-    address?: string;
-    phone?: string;
-    loyaltyPoints: number;
-    // Consider adding user's subscriptions here or fetching separately
-    // subscriptions?: Subscription[];
+// Mock function to get all orders (for admin)
+export async function getAllOrders(): Promise<Order[]> {
+    console.log("Fetching all orders...");
+    await initializeMockData();
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            console.log("All orders fetched:", mockOrders!.length);
+            resolve([...mockOrders!].sort((a,b) => b.orderDate.getTime() - a.orderDate.getTime()));
+        }, 300); // Slightly longer delay for all orders
+    });
 }
 
+// USER PROFILES
 // Mock function to get user profile
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
     console.log(`Fetching profile for user: ${userId}`);
-    await initializeMockData(); // Ensure data is loaded
+    await initializeMockData();
+    const profile = mockUserProfiles!.find(p => p.id === userId);
     return new Promise((resolve) => {
         setTimeout(() => {
-            // In a real app, fetch from database based on userId
-            if (userId === "user123") { // Simulate finding a user
-                 const profile: UserProfile = {
-                    id: userId,
-                    name: "Alex Ryder", // Changed name
-                    email: "alex.ryder@example.com", // Changed email
-                    address: "123 Market St, Suite 400, Metropia, USA 54321", // Changed address
-                    phone: "555-987-6543", // Changed phone
-                    loyaltyPoints: 285, // Changed points
-                };
+            if (profile) {
                 console.log("User profile fetched:", profile.name);
                 resolve(profile);
             } else {
                  console.log("User profile not found");
-                resolve(null); // User not found
+                resolve(null);
             }
-        }, 600);
+        }, 100); // Faster delay
     });
 }
+
+// Mock function to get all user profiles (for admin)
+export async function getAllUserProfiles(): Promise<UserProfile[]> {
+    console.log("Fetching all user profiles...");
+    await initializeMockData();
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            console.log("All user profiles fetched:", mockUserProfiles!.length);
+            resolve([...mockUserProfiles!]);
+        }, 250);
+    });
+}
+
+
+// --- Mock Delete Functions (Placeholder) ---
+export async function deleteStore(storeId: string): Promise<void> {
+  console.log(`MOCK: Deleting store ${storeId}`);
+  await new Promise(resolve => setTimeout(resolve, 400));
+   // Remove from mock data (won't persist)
+   mockStores = mockStores?.filter(s => s.id !== storeId) ?? null;
+   mockProducts = mockProducts?.filter(p => p.storeId !== storeId) ?? null;
+   mockDailyOffers = mockDailyOffers?.filter(o => o.storeId !== storeId) ?? null;
+   mockOrders = mockOrders?.filter(o => o.storeId !== storeId) ?? null;
+   mockSubscriptions = mockSubscriptions?.filter(s => s.storeId !== storeId) ?? null;
+}
+
+export async function deleteProduct(productId: string): Promise<void> {
+  console.log(`MOCK: Deleting product ${productId}`);
+  await new Promise(resolve => setTimeout(resolve, 300));
+   // Remove from mock data
+   mockProducts = mockProducts?.filter(p => p.id !== productId) ?? null;
+    // TODO: Also remove from daily offers? This might be complex.
+}
+
+export async function deleteDailyOffer(offerId: string): Promise<void> {
+  console.log(`MOCK: Deleting offer ${offerId}`);
+  await new Promise(resolve => setTimeout(resolve, 300));
+   // Remove from mock data
+   mockDailyOffers = mockDailyOffers?.filter(o => o.id !== offerId) ?? null;
+   // TODO: Cancel related subscriptions?
+   mockSubscriptions = mockSubscriptions?.filter(s => s.offerId !== offerId) ?? null;
+}
+```

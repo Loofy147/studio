@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { getStoreById, Store, Product, DailyOffer, createSubscription, dailyOfferEligibleCategories } from "@/services/store"; // Updated service import
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { ArrowLeft, ShoppingCart, Star, Plus, Filter, Tag, Clock, MapPin, CalendarClock, Repeat, CheckCircle } from 'lucide-react'; // Added new icons
+import { ArrowLeft, ShoppingCart, Star, Plus, Filter, Tag, Clock, MapPin, CalendarClock, Repeat, CheckCircle, XCircle } from 'lucide-react'; // Added XCircle
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast"; // Import useToast
 import { Separator } from "@/components/ui/separator"; // Import Separator
@@ -26,8 +26,8 @@ const formatCurrency = (amount: number) => {
 // Helper to generate theme class based on store category
 const getThemeClass = (category: Store['category'] | undefined): string => {
    if (!category) return '';
-   // Replace spaces for CSS class compatibility
-   const formattedCategory = category.replace(/\s+/g, '.');
+   // Replace spaces with hyphens for CSS class compatibility
+   const formattedCategory = category.replace(/\s+/g, '-');
    return `theme-category-${formattedCategory}`;
 }
 
@@ -283,7 +283,7 @@ export default function StorePage() {
 
   if (isLoading) {
     return (
-        <div className="space-y-8 animate-pulse">
+        <div className="container mx-auto px-4 py-10 space-y-8 animate-pulse"> {/* Added container and padding */}
             {/* Loading state structure */}
              <div className="flex items-center mb-6">
                 <Skeleton className="h-8 w-32" /> {/* Back button */}
@@ -307,7 +307,8 @@ export default function StorePage() {
             <Separator className="my-8"/>
 
              {/* Offer Skeleton section (if applicable) */}
-            {storeId && dailyOfferEligibleCategories.includes('groceries') && ( // Simple check, improve this logic
+            {/* A simple check like this isn't ideal for loading state, but okay for now */}
+             {dailyOfferEligibleCategories.includes('groceries') && (
                 <>
                      <Skeleton className="h-8 w-1/3 mb-4 bg-muted/50" />
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -332,7 +333,7 @@ export default function StorePage() {
 
   if (error) {
      return (
-       <div className="flex flex-col items-center justify-center h-[60vh]">
+       <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center h-[60vh]"> {/* Added container */}
            <Alert variant="destructive" className="max-w-md w-full">
                 <XCircle className="h-4 w-4" />
                 <AlertTitle>Oops! Something went wrong.</AlertTitle>
@@ -353,7 +354,7 @@ export default function StorePage() {
 
   if (!store) {
      return (
-        <div className="flex flex-col items-center justify-center h-[60vh]">
+        <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center h-[60vh]"> {/* Added container */}
            <Card className="w-full max-w-md">
                <CardContent className="p-10 text-center text-muted-foreground">
                    <Tag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
@@ -371,7 +372,7 @@ export default function StorePage() {
    }
 
   return (
-    <div className={cn("space-y-10", themeClass)}> {/* Increased spacing */}
+     <div className={cn("container mx-auto px-4 py-10 space-y-10", themeClass)}> {/* Added container and padding */}
       {/* Back Button */}
         <Link href="/" passHref legacyBehavior>
             <Button variant="ghost" size="sm" className="mb-0 text-muted-foreground hover:text-foreground">
