@@ -5,10 +5,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building } from 'lucide-react'; // Added Building icon
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+// Assume a cart state/hook exists (replace with actual implementation)
+// import { useCart } from '@/hooks/useCart';
 
 export function Header() {
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,7 +18,18 @@ export function Header() {
    const isAdminRoute = pathname.startsWith('/admin');
 
    // TODO: Replace with actual cart count from state management
-   const cartItemCount = 3; // Placeholder cart count
+   // const { cartItemCount } = useCart(); // Example usage
+    const [cartItemCount, setCartItemCount] = useState(3); // Placeholder cart count
+
+    // Example effect to update count (remove if using actual cart hook)
+    useEffect(() => {
+        // Simulate cart changes
+        const interval = setInterval(() => {
+            //setCartItemCount(prev => (prev + 1) % 6); // Cycle count 0-5
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
 
    // Define different nav items based on route context
    const customerNavItems = [
@@ -140,15 +153,17 @@ export function Header() {
          <div className="flex items-center justify-end space-x-2 md:space-x-3 ml-auto">
             {/* Cart Button - Placeholder (Only for customer view) */}
              {!isAdminRoute && (
-                 <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-accent/50">
-                    <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
-                    {cartItemCount > 0 && (
-                        <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] rounded-full">
-                            {cartItemCount}
-                        </Badge>
-                    )}
-                    <span className="sr-only">Shopping Cart</span>
-                 </Button>
+                <Link href="/cart" passHref>
+                     <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-accent/50">
+                        <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
+                        {cartItemCount > 0 && (
+                            <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] rounded-full">
+                                {cartItemCount}
+                            </Badge>
+                        )}
+                        <span className="sr-only">Shopping Cart</span>
+                     </Button>
+                 </Link>
              )}
 
              {/* Login/Profile Button - Placeholder */}

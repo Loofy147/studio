@@ -3,14 +3,14 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, updateSubscriptionStatus, DailyOffer } from "@/services/store";
+import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, updateSubscriptionStatus, DailyOffer, DeliveryAddress, addUserAddress, updateUserAddress, deleteUserAddress } from "@/services/store"; // Import address functions
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat } from 'lucide-react'; // Added subscription icons
+import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat, Home, Briefcase, Plus, Building, Lock, CreditCard, Bell } from 'lucide-react'; // Added more icons
 import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
@@ -29,6 +29,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog" // Import Alert Dialog
 import { buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"; // For edit forms
+import { Label } from "@/components/ui/label"; // For edit forms
+import { Checkbox } from "@/components/ui/checkbox"; // For default address
+import { AddressDialog } from './AddressDialog'; // Import AddressDialog component
+
 
 // Helper to format currency
 const formatCurrency = (amount: number) => {
@@ -59,6 +64,17 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
+// Define state for the address form
+interface AddressFormData {
+    id?: string; // Optional for editing
+    label: string;
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country?: string;
+    isDefault: boolean;
+}
 
 export default function ProfilePage() {
   // In a real app, you'd get the userId from authentication context
@@ -73,6 +89,10 @@ export default function ProfilePage() {
   const [isLoadingSubs, setIsLoadingSubs] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingSubId, setUpdatingSubId] = useState<string | null>(null);
+
+  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState<AddressFormData | null>(null);
+
 
   useEffect(() => {
     let isMounted = true; // Flag to prevent state updates on unmounted component
@@ -165,6 +185,54 @@ export default function ProfilePage() {
     };
 
 
+    const handleOpenAddressDialog = (address?: DeliveryAddress) => {
+        setCurrentAddress(address ? { ...address } : null);
+        setIsAddressDialogOpen(true);
+    };
+
+    const handleSaveAddress = async (addressFormData: AddressFormData) => {
+        if (!profile) return;
+        // Logic moved from AddressDialog to here
+        try {
+            let updatedProfile: UserProfile | null = null;
+            if (addressFormData.id) { // Editing existing address
+                updatedProfile = await updateUserAddress(userId, addressFormData.id, addressFormData);
+            } else { // Adding new address
+                 // Create a new object without the 'id' property if it exists
+                const { id, ...newAddressData } = addressFormData;
+                updatedProfile = await addUserAddress(userId, newAddressData as Omit<DeliveryAddress, 'id'>);
+            }
+            if (updatedProfile) {
+                setProfile(updatedProfile);
+                 toast({ title: "Address Saved", description: "Your address has been updated successfully." });
+                setIsAddressDialogOpen(false);
+            } else {
+                 throw new Error("Failed to save address.");
+            }
+        } catch (error) {
+            console.error("Error saving address:", error);
+            toast({ title: "Error Saving Address", description: "Could not save the address. Please try again.", variant: "destructive" });
+            // Rethrow or handle error so AddressDialog knows saving failed
+             throw error;
+        }
+    };
+
+     const handleDeleteAddress = async (addressId: string) => {
+        if (!profile) return;
+        try {
+            const updatedProfile = await deleteUserAddress(userId, addressId);
+            if (updatedProfile) {
+                setProfile(updatedProfile);
+                 toast({ title: "Address Deleted", description: "The address has been removed.", variant: 'destructive' });
+            } else {
+                 toast({ title: "Deletion Failed", description: "Could not delete the address. Make sure it's not your only or default address.", variant: 'destructive' });
+            }
+        } catch (error) {
+            console.error("Error deleting address:", error);
+            toast({ title: "Error Deleting Address", description: "An error occurred while deleting the address.", variant: 'destructive' });
+        }
+    };
+
   const ProfileInfoSkeleton = () => (
      <Card>
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6">
@@ -180,22 +248,17 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="space-y-6 p-6 pt-0">
             <Separator />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                 <div className="flex items-start gap-3">
-                     <Skeleton className="h-5 w-5 rounded mt-1" />
-                     <div className="space-y-1.5">
-                         <Skeleton className="h-4 w-20" />
-                         <Skeleton className="h-4 w-40" />
-                     </div>
+             {/* Address Skeleton */}
+              <div className="space-y-4">
+                 <div className="flex justify-between items-center">
+                    <Skeleton className="h-6 w-32" />
+                    <Skeleton className="h-9 w-24" />
                  </div>
-                 <div className="flex items-start gap-3">
-                     <Skeleton className="h-5 w-5 rounded mt-1" />
-                     <div className="space-y-1.5">
-                        <Skeleton className="h-4 w-16" />
-                        <Skeleton className="h-4 w-32" />
-                    </div>
+                 <div className="space-y-3">
+                     <Skeleton className="h-16 w-full" />
+                     <Skeleton className="h-16 w-full" />
                  </div>
-            </div>
+             </div>
              <Separator />
              <div className="flex items-center gap-3">
                  <Skeleton className="h-6 w-6 rounded" />
@@ -298,14 +361,10 @@ export default function ProfilePage() {
             <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
                 <User className="h-8 w-8 text-primary" /> Your Profile
             </h1>
-            <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                    <Settings className="mr-2 h-4 w-4" /> Account Settings
-                </Button>
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
-                    <LogOut className="mr-2 h-4 w-4" /> Log Out
-                </Button>
-            </div>
+             {/* Add Log Out button */}
+             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+                <LogOut className="mr-2 h-4 w-4" /> Log Out
+            </Button>
        </div>
 
        {profileError && !isLoadingProfile && ( // Show profile-specific error
@@ -332,34 +391,94 @@ export default function ProfilePage() {
                 <CardDescription className="flex items-center gap-1.5 text-base mt-1 text-muted-foreground">
                     <Mail className="h-4 w-4"/>{profile.email}
                 </CardDescription>
+                 {profile.phone && (
+                     <CardDescription className="flex items-center gap-1.5 text-sm mt-1 text-muted-foreground">
+                        <Phone className="h-4 w-4"/>{profile.phone}
+                     </CardDescription>
+                 )}
             </div>
-             <Button variant="outline" size="sm" className="self-start sm:self-center">
-                <Edit className="mr-2 h-4 w-4" /> Edit Profile
-             </Button>
+             {/* Link to Account Settings Page */}
+             <Link href="/profile/account-settings" passHref>
+                <Button variant="outline" size="sm" className="self-start sm:self-center">
+                    <Settings className="mr-2 h-4 w-4" /> Account Settings
+                </Button>
+             </Link>
           </CardHeader>
+
+          {/* Addresses */}
           <CardContent className="space-y-6 p-6 pt-2">
              <Separator />
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-sm">
-                 {profile.address && (
-                    <div className="flex items-start gap-3">
-                        <MapPin className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                        <div>
-                            <span className="font-medium block text-foreground">Address</span>
-                            <span className="text-muted-foreground">{profile.address}</span>
-                        </div>
+             <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium flex items-center gap-2"><MapPin className="h-5 w-5 text-primary"/>Delivery Addresses</h3>
+                      <Button variant="outline" size="sm" onClick={() => handleOpenAddressDialog()}>
+                          <Plus className="mr-2 h-4 w-4" /> Add Address
+                      </Button>
+                </div>
+                {profile.addresses.length > 0 ? (
+                    <div className="space-y-3">
+                        {profile.addresses.map((address) => (
+                             <div key={address.id} className="flex items-start justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/50 transition-colors">
+                                <div className="flex items-start gap-3 text-sm">
+                                    {address.label === 'Home' ? <Home className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> :
+                                     address.label === 'Work' ? <Briefcase className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> :
+                                     <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />}
+                                    <div>
+                                         <span className="font-medium block text-foreground">
+                                            {address.label} {address.isDefault && <Badge variant="secondary" className="ml-1 text-xs">Default</Badge>}
+                                         </span>
+                                        <span className="text-muted-foreground">{address.street}, {address.city}, {address.state} {address.zipCode}</span>
+                                    </div>
+                                </div>
+                                <div className="flex gap-1">
+                                     <Button variant="ghost" size="icon" className="h-7 w-7" title="Edit Address" onClick={() => handleOpenAddressDialog(address)}>
+                                         <Edit className="h-3.5 w-3.5 opacity-70"/>
+                                     </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                              variant="ghost"
+                                              size="icon"
+                                              className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                              title="Delete Address"
+                                              disabled={profile.addresses.length === 1 || address.isDefault} // Disable deleting the only or default address
+                                              >
+                                                <Trash2 className="h-3.5 w-3.5"/>
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                            <AlertDialogTitle>Delete Address?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Are you sure you want to delete the address labeled "{address.label}"?
+                                                {address.isDefault && " You must set another address as default before deleting this one."}
+                                            </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction
+                                                onClick={() => handleDeleteAddress(address.id)}
+                                                className={buttonVariants({ variant: "destructive" })}
+                                                disabled={address.isDefault} // Double disable check
+                                                >
+                                                Yes, Delete
+                                            </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+
+                                </div>
+                             </div>
+                        ))}
                     </div>
-                 )}
-                 {profile.phone && (
-                    <div className="flex items-start gap-3">
-                        <Phone className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                        <div>
-                             <span className="font-medium block text-foreground">Phone</span>
-                            <span className="text-muted-foreground">{profile.phone}</span>
-                        </div>
-                    </div>
-                 )}
-            </div>
-            {(profile.address || profile.phone) && <Separator />}
+                ) : (
+                     <p className="text-sm text-muted-foreground text-center py-4 border border-dashed rounded-md">No addresses saved yet. Click "Add Address" to add one.</p>
+                )}
+             </div>
+
+            <Separator />
+
+            {/* Loyalty Points */}
             <div className="flex items-center gap-3 bg-primary/5 rounded-md p-4 border border-primary/10">
                  <Award className="h-7 w-7 text-primary shrink-0" />
                  <div>
@@ -368,11 +487,41 @@ export default function ProfilePage() {
                      <span className="text-muted-foreground text-sm"> points earned</span>
                  </div>
             </div>
+
+            {/* Removed Account Settings Section Link - Now in header */}
+
+            {/* Store Management Link (Conditional) */}
+             {profile.role === 'store_owner' && (
+                <>
+                    <Separator />
+                     <div className="space-y-3">
+                        <h3 className="text-lg font-medium flex items-center gap-2"><Building className="h-5 w-5 text-primary"/>Store Management</h3>
+                         <p className="text-sm text-muted-foreground">Manage your stores, products, and orders.</p>
+                         <Link href="/stores" passHref>
+                            <Button variant="default">Go to Store Management</Button>
+                         </Link>
+                    </div>
+                 </>
+             )}
+
+
           </CardContent>
         </Card>
       ) : !profileError && !isLoadingProfile ? ( // Only show if not loading and no error message already shown
          <Card><CardContent className="p-6 text-muted-foreground text-center">Could not load profile information.</CardContent></Card>
       ): null}
+
+       {/* Address Dialog */}
+        {profile && (
+             <AddressDialog
+                isOpen={isAddressDialogOpen}
+                onOpenChange={setIsAddressDialogOpen}
+                addressData={currentAddress}
+                onSave={handleSaveAddress}
+                userId={userId}
+                userAddresses={profile.addresses}
+             />
+        )}
 
         <Separator />
 
@@ -505,9 +654,9 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-semibold flex items-center gap-2">
                 <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
             </h2>
-            <Button asChild variant="link" className="text-primary px-0">
-              <Link href="/orders">View All Orders</Link>
-            </Button>
+             <Link href="/orders" passHref>
+                 <Button variant="link" className="text-primary px-0">View All Orders</Button>
+             </Link>
         </div>
 
         {orderError && !isLoadingOrders && ( // Show order-specific error

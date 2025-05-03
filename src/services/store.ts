@@ -89,12 +89,26 @@ export interface Subscription {
     nextDeliveryDate?: Date;
 }
 
+// Interface for Delivery Address
+export interface DeliveryAddress {
+    id: string;
+    label: 'Home' | 'Work' | 'Friend' | string; // e.g., 'Home', 'Work', 'Mom's House'
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country?: string; // Optional
+    isDefault?: boolean;
+}
+
+
 // Interface and function for user profile (placeholder)
 export interface UserProfile {
     id: string;
     name: string;
     email: string;
-    address?: string;
+    // address?: string; // Deprecated, use addresses array
+    addresses: DeliveryAddress[]; // Use an array for multiple addresses
     phone?: string;
     loyaltyPoints: number;
     // Admin related fields (added via declaration merging later or directly)
@@ -113,7 +127,7 @@ export interface Order {
     orderDate: Date;
     status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
     trackingNumber?: string;
-    deliveryAddress: string;
+    deliveryAddress: string; // Store the full address string used for this order
     // Add driver ID if assigned
     driverId?: string;
 }
@@ -388,17 +402,56 @@ function generateMockUserProfiles(): UserProfile[] {
     const statuses: UserProfile['status'][] = ['active', 'disabled', 'pending'];
     const names = ["Alex Ryder", "Beth Green", "Carlos Villa", "Diana Prince", "Ethan Hunt", "Fiona Glenanne", "George Smiley", "Harriet Vane"];
 
-    // Add some specific users
-    users.push({ id: "user123", name: "Alex Ryder", email: "alex.ryder@example.com", loyaltyPoints: 285, role: 'customer', status: 'active', joinedAt: new Date(Date.now() - 150 * 86400000) });
-    users.push({ id: "owner-001", name: "Eleanor Vance", email: "eleanor@electromart.com", loyaltyPoints: 50, role: 'store_owner', status: 'active', joinedAt: new Date(Date.now() - 300 * 86400000) });
-    users.push({ id: "driver-001", name: "Driver Dan", email: "dan.driver@dispatch.com", loyaltyPoints: 15, role: 'driver', status: 'active', joinedAt: new Date(Date.now() - 90 * 86400000) });
-    users.push({ id: "admin-001", name: "Admin User", email: "admin@swiftdispatch.example", loyaltyPoints: 0, role: 'admin', status: 'active', joinedAt: new Date(Date.now() - 500 * 86400000) });
+    // Helper to generate mock addresses
+    const generateAddresses = (count: number, isDefaultIndex: number): DeliveryAddress[] => {
+        const addresses: DeliveryAddress[] = [];
+        const labels = ['Home', 'Work', 'Friend'];
+        for (let i = 0; i < count; i++) {
+            addresses.push({
+                id: `addr-${uuidv4().substring(0, 8)}`,
+                label: labels[i] || `Other ${i+1}`,
+                street: `${100 + i*10} ${['Main', 'Oak', 'Pine', 'Maple'][i % 4]} St`,
+                city: 'Anytown',
+                state: 'CA',
+                zipCode: `${90210 + i}`,
+                country: 'USA',
+                isDefault: i === isDefaultIndex,
+            });
+        }
+        return addresses;
+    };
 
-    // Add more random users
+
+    // Add some specific users with addresses
+    users.push({
+        id: "user123", name: "Alex Ryder", email: "alex.ryder@example.com", loyaltyPoints: 285, role: 'customer', status: 'active', joinedAt: new Date(Date.now() - 150 * 86400000),
+        addresses: generateAddresses(2, 0), // Home (default), Work
+        phone: '555-111-2222',
+    });
+    users.push({
+        id: "owner-001", name: "Eleanor Vance", email: "eleanor@electromart.com", loyaltyPoints: 50, role: 'store_owner', status: 'active', joinedAt: new Date(Date.now() - 300 * 86400000),
+        addresses: generateAddresses(1, 0), // Home (default)
+        phone: '555-333-4444',
+    });
+    users.push({
+        id: "driver-001", name: "Driver Dan", email: "dan.driver@dispatch.com", loyaltyPoints: 15, role: 'driver', status: 'active', joinedAt: new Date(Date.now() - 90 * 86400000),
+        addresses: [], // Drivers might not need delivery addresses stored this way
+        phone: '555-555-6666',
+    });
+    users.push({
+        id: "admin-001", name: "Admin User", email: "admin@swiftdispatch.example", loyaltyPoints: 0, role: 'admin', status: 'active', joinedAt: new Date(Date.now() - 500 * 86400000),
+        addresses: [],
+        phone: '555-777-8888',
+    });
+
+    // Add more random users with addresses
     for (let i = 0; i < 20; i++) {
         const id = `user-${uuidv4().substring(0, 6)}`;
         const name = names[Math.floor(Math.random() * names.length)];
         const role = roles[Math.floor(Math.random() * (roles.length -1 ))]; // Exclude admin for random
+        const numAddresses = role === 'customer' ? Math.floor(Math.random() * 3) + 1 : 1; // Customers get 1-3, others 1
+        const defaultAddressIndex = role === 'customer' ? Math.floor(Math.random() * numAddresses) : 0;
+
         users.push({
             id: id,
             name: name,
@@ -407,7 +460,7 @@ function generateMockUserProfiles(): UserProfile[] {
             role: role,
             status: statuses[Math.floor(Math.random() * statuses.length)],
             joinedAt: new Date(Date.now() - Math.random() * 500 * 86400000),
-            address: `${100 + i} Main St`,
+            addresses: generateAddresses(numAddresses, defaultAddressIndex),
             phone: `555-1${i.toString().padStart(2,'0')}-1234`
         });
     }
@@ -419,7 +472,7 @@ function generateMockOrders(users: UserProfile[], stores: Store[], products: Pro
     const orders: Order[] = [];
     const statuses: Order['status'][] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
     const activeStores = stores.filter(s => s.isActive);
-    const customers = users.filter(u => u.role === 'customer' && u.status === 'active');
+    const customers = users.filter(u => u.role === 'customer' && u.status === 'active' && u.addresses.length > 0);
 
     if (customers.length === 0 || activeStores.length === 0) return [];
 
@@ -454,6 +507,10 @@ function generateMockOrders(users: UserProfile[], stores: Store[], products: Pro
 
         const status = statuses[Math.floor(Math.random() * statuses.length)];
         const orderDate = new Date(Date.now() - Math.random() * 60 * 86400000); // Within last 60 days
+        // Select a random address from the user's profile for the order
+        const deliveryAddressObj = customer.addresses[Math.floor(Math.random() * customer.addresses.length)];
+        const deliveryAddressString = `${deliveryAddressObj.street}, ${deliveryAddressObj.city}, ${deliveryAddressObj.state} ${deliveryAddressObj.zipCode}`;
+
 
         orders.push({
             id: `order-${uuidv4().substring(0, 8)}`,
@@ -465,7 +522,7 @@ function generateMockOrders(users: UserProfile[], stores: Store[], products: Pro
             orderDate: orderDate,
             status: status,
             trackingNumber: status === 'Shipped' || status === 'Delivered' ? `TRK${uuidv4().substring(0, 10).toUpperCase()}` : undefined,
-            deliveryAddress: customer.address || '123 Default Address, Anytown',
+            deliveryAddress: deliveryAddressString, // Store the selected address string
             driverId: (status === 'Shipped' || status === 'Delivered') && Math.random() > 0.3 ? `driver-${uuidv4().substring(0, 8)}` : undefined // Assign driver sometimes
         });
     }
@@ -785,7 +842,7 @@ export async function getAllOrders(): Promise<Order[]> {
     });
 }
 
-// USER PROFILES
+// USER PROFILES & ADDRESSES
 // Mock function to get user profile
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
     console.log(`Fetching profile for user: ${userId}`);
@@ -815,6 +872,128 @@ export async function getAllUserProfiles(): Promise<UserProfile[]> {
         }, 250);
     });
 }
+
+// Mock function to add a new address for a user
+export async function addUserAddress(userId: string, addressData: Omit<DeliveryAddress, 'id'>): Promise<UserProfile | null> {
+    console.log(`Adding address for user ${userId}:`, addressData);
+    await initializeMockData();
+    const userIndex = mockUserProfiles!.findIndex(p => p.id === userId);
+    if (userIndex === -1) {
+        console.error(`User ${userId} not found`);
+        return null;
+    }
+
+    const newAddress: DeliveryAddress = {
+        id: `addr-${uuidv4().substring(0, 8)}`,
+        ...addressData,
+        isDefault: addressData.isDefault ?? false, // Default to false if not provided
+    };
+
+    // Ensure only one default address
+    if (newAddress.isDefault) {
+        mockUserProfiles![userIndex].addresses.forEach(addr => addr.isDefault = false);
+    } else if (mockUserProfiles![userIndex].addresses.length === 0) {
+        // If it's the first address, make it default
+        newAddress.isDefault = true;
+    }
+
+    mockUserProfiles![userIndex].addresses.push(newAddress);
+    console.log(`Address added for user ${userId}`);
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({...mockUserProfiles![userIndex]}); // Return updated profile copy
+        }, 150);
+    });
+}
+
+// Mock function to update an existing address for a user
+export async function updateUserAddress(userId: string, addressId: string, addressData: Partial<Omit<DeliveryAddress, 'id'>>): Promise<UserProfile | null> {
+     console.log(`Updating address ${addressId} for user ${userId}:`, addressData);
+    await initializeMockData();
+    const userIndex = mockUserProfiles!.findIndex(p => p.id === userId);
+    if (userIndex === -1) {
+        console.error(`User ${userId} not found`);
+        return null;
+    }
+    const addressIndex = mockUserProfiles![userIndex].addresses.findIndex(a => a.id === addressId);
+    if (addressIndex === -1) {
+        console.error(`Address ${addressId} not found for user ${userId}`);
+        return null;
+    }
+
+    const updatedAddress = { ...mockUserProfiles![userIndex].addresses[addressIndex], ...addressData };
+
+    // Ensure only one default address
+    if (updatedAddress.isDefault) {
+        mockUserProfiles![userIndex].addresses.forEach((addr, idx) => {
+            if (idx !== addressIndex) addr.isDefault = false;
+        });
+    } else {
+        // Check if we're unsetting the only default address
+        const defaultAddressExists = mockUserProfiles![userIndex].addresses.some((addr, idx) => idx !== addressIndex && addr.isDefault);
+        if (!defaultAddressExists && mockUserProfiles![userIndex].addresses.length > 1) {
+            // If no other default exists, keep this one default (or make the first one default)
+            console.warn(`Cannot unset the only default address for user ${userId}. Keeping ${addressId} as default.`);
+            updatedAddress.isDefault = true; // Force it back
+        }
+         else if (!defaultAddressExists && mockUserProfiles![userIndex].addresses.length <= 1) {
+             updatedAddress.isDefault = true; // If it's the only address, it must be default
+         }
+    }
+
+
+    mockUserProfiles![userIndex].addresses[addressIndex] = updatedAddress;
+    console.log(`Address ${addressId} updated for user ${userId}`);
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({...mockUserProfiles![userIndex]}); // Return updated profile copy
+        }, 150);
+    });
+}
+
+// Mock function to delete an address for a user
+export async function deleteUserAddress(userId: string, addressId: string): Promise<UserProfile | null> {
+    console.log(`Deleting address ${addressId} for user ${userId}`);
+    await initializeMockData();
+    const userIndex = mockUserProfiles!.findIndex(p => p.id === userId);
+    if (userIndex === -1) {
+        console.error(`User ${userId} not found`);
+        return null;
+    }
+    const addressToDelete = mockUserProfiles![userIndex].addresses.find(a => a.id === addressId);
+    if (!addressToDelete) {
+        console.error(`Address ${addressId} not found for user ${userId}`);
+        return null;
+    }
+
+    // Prevent deleting the only address or the default address if others exist
+    if (mockUserProfiles![userIndex].addresses.length === 1) {
+        console.error("Cannot delete the only address.");
+        return mockUserProfiles![userIndex]; // Return current profile without changes
+    }
+    if (addressToDelete.isDefault) {
+        console.error("Cannot delete the default address. Set another address as default first.");
+         // Find the first non-default address and make it default
+        const newDefaultIndex = mockUserProfiles![userIndex].addresses.findIndex(a => a.id !== addressId);
+        if (newDefaultIndex > -1) {
+            mockUserProfiles![userIndex].addresses[newDefaultIndex].isDefault = true;
+            console.log(`Set ${mockUserProfiles![userIndex].addresses[newDefaultIndex].id} as new default.`);
+        } else {
+             console.error("Error: Could not find another address to set as default.");
+             return mockUserProfiles![userIndex]; // Return current profile without changes
+        }
+    }
+
+
+    mockUserProfiles![userIndex].addresses = mockUserProfiles![userIndex].addresses.filter(a => a.id !== addressId);
+    console.log(`Address ${addressId} deleted for user ${userId}`);
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({...mockUserProfiles![userIndex]}); // Return updated profile copy
+        }, 150);
+    });
+}
+
 
 
 // --- Mock Delete Functions (Placeholder) ---
