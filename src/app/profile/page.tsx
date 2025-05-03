@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog" // Import Alert Dialog
+import { buttonVariants } from "@/components/ui/button";
 
 // Helper to format currency
 const formatCurrency = (amount: number) => {
@@ -291,7 +292,7 @@ export default function ProfilePage() {
 
 
   return (
-    <div className="space-y-12"> {/* Increased spacing */}
+    <div className="container mx-auto px-4 py-12 space-y-12"> {/* Added container and padding */}
         {/* Profile Header */}
        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6">
             <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
@@ -504,9 +505,9 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-semibold flex items-center gap-2">
                 <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
             </h2>
-            <Link href="/orders" passHref>
-                 <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
-            </Link>
+            <Button asChild variant="link" className="text-primary px-0">
+              <Link href="/orders">View All Orders</Link>
+            </Button>
         </div>
 
         {orderError && !isLoadingOrders && ( // Show order-specific error
@@ -564,12 +565,12 @@ export default function ProfilePage() {
                                 </TableCell>
                                 <TableCell className="text-right pr-4">
                                     {/* Link to specific order section on /orders page */}
-                                    <Link href={`/orders#order-${order.id}`} passHref legacyBehavior>
-                                         <Button asChild variant="ghost" size="icon" className="h-8 w-8"><a> {/* Adjusted size */}
-                                            <Eye className="h-4 w-4"/>
-                                            <span className="sr-only">View Order</span>
-                                         </a></Button>
-                                    </Link>
+                                    <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                                      <Link href={`/orders#order-${order.id}`}> {/* Adjusted size */}
+                                        <Eye className="h-4 w-4"/>
+                                        <span className="sr-only">View Order</span>
+                                      </Link>
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                             );
