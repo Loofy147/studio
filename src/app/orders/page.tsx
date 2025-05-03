@@ -2,28 +2,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"; // Added CardFooter
 import { getUserOrders, Order } from "@/services/store"; // Assuming orders function is in store service
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
-import { PackageCheck, PackageSearch, Truck, Home, CheckCircle, XCircle, Hourglass } from 'lucide-react';
+import { PackageCheck, PackageSearch, Truck, Home, CheckCircle, XCircle, Hourglass, ShoppingBag, Package } from 'lucide-react'; // Added ShoppingBag, Package
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress"; // Import Progress
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
 
 // Helper to format currency
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 };
 
-// Map status to progress value and icon
-const statusDetails: Record<Order['status'], { value: number; icon: React.ElementType; color: string; description: string }> = {
-    'Pending': { value: 10, icon: Hourglass, color: 'text-yellow-500', description: 'Order placed, awaiting confirmation.' },
-    'Processing': { value: 35, icon: PackageSearch, color: 'text-blue-500', description: 'Store is preparing your order.' },
-    'Shipped': { value: 70, icon: Truck, color: 'text-purple-500', description: 'Your order is on its way.' },
-    'Delivered': { value: 100, icon: PackageCheck, color: 'text-green-500', description: 'Your order has been delivered.' },
-    'Cancelled': { value: 0, icon: XCircle, color: 'text-red-500', description: 'The order has been cancelled.' }
+// Map status to progress value, icon, color, and variant
+const statusDetails: Record<Order['status'], { value: number; icon: React.ElementType; color: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; description: string }> = {
+    'Pending': { value: 10, icon: Hourglass, color: 'text-yellow-600 dark:text-yellow-400', variant: 'outline', description: 'Order placed, awaiting confirmation.' },
+    'Processing': { value: 35, icon: PackageSearch, color: 'text-blue-600 dark:text-blue-400', variant: 'outline', description: 'Store is preparing your order.' },
+    'Shipped': { value: 70, icon: Truck, color: 'text-purple-600 dark:text-purple-400', variant: 'secondary', description: 'Your order is on its way.' },
+    'Delivered': { value: 100, icon: PackageCheck, color: 'text-green-600 dark:text-green-400', variant: 'default', description: 'Your order has been delivered.' },
+    'Cancelled': { value: 0, icon: XCircle, color: 'text-red-600 dark:text-red-400', variant: 'destructive', description: 'The order has been cancelled.' }
 };
 
 
@@ -40,6 +41,8 @@ export default function OrdersPage() {
       setIsLoadingOrders(true);
       setError(null);
       try {
+        // Simulate slightly longer loading
+        // await new Promise(resolve => setTimeout(resolve, 1500));
         const orderData = await getUserOrders(userId);
         // Sort orders by date, newest first
         setOrders(orderData.sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime()));
@@ -55,39 +58,65 @@ export default function OrdersPage() {
   }, [userId]);
 
   const OrderCardSkeleton = () => (
-    <Card>
-        <CardHeader>
-            <div className="flex justify-between items-start">
+    <Card className="overflow-hidden">
+        <CardHeader className="bg-muted/30 p-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
                  <div>
-                     <Skeleton className="h-5 w-32 mb-1" />
-                     <Skeleton className="h-4 w-48" />
+                     <Skeleton className="h-6 w-36 mb-1.5" />
+                     <Skeleton className="h-4 w-56" />
                  </div>
-                 <Skeleton className="h-6 w-24 rounded-full" />
+                 <Skeleton className="h-7 w-28 rounded-full mt-1 sm:mt-0" />
             </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-            <Skeleton className="h-16 w-full" /> {/* Placeholder for items */}
+        <CardContent className="p-4 space-y-5">
+             <div>
+                 <Skeleton className="h-4 w-20 mb-2" /> {/* Items title */}
+                 <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                 </div>
+                 <Skeleton className="h-5 w-24 mt-3 ml-auto" /> {/* Total */}
+             </div>
              <Separator />
             <div className="space-y-2">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-3 w-full rounded-full" /> {/* Progress bar skeleton */}
+                <Skeleton className="h-4 w-32 mb-2" /> {/* Tracking Status title */}
+                <div className="flex items-center gap-2">
+                    <Skeleton className="h-5 w-5 rounded-full" />
+                    <Skeleton className="h-4 w-48" />
+                </div>
+                <Skeleton className="h-2 w-full rounded-full" /> {/* Progress bar skeleton */}
             </div>
              <Separator />
-            <div className="flex justify-between">
-                 <Skeleton className="h-9 w-24" />
-                 <Skeleton className="h-9 w-32" />
-            </div>
+             <div className="flex items-start gap-2">
+                 <Skeleton className="h-4 w-4 mt-0.5 shrink-0" />
+                 <Skeleton className="h-4 w-full" />
+             </div>
         </CardContent>
+         <CardFooter className="bg-muted/30 p-4 flex justify-end gap-2">
+            <Skeleton className="h-9 w-24" />
+            <Skeleton className="h-9 w-32" />
+         </CardFooter>
     </Card>
   );
 
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Your Orders & Tracking</h1>
-      <p className="text-muted-foreground">View the status and details of your recent orders.</p>
+       <div className="flex items-center gap-3">
+            <ShoppingBag className="h-8 w-8 text-primary"/>
+            <h1 className="text-3xl font-bold tracking-tight">Your Orders</h1>
+       </div>
+      <p className="text-muted-foreground max-w-2xl">
+          Track the status and view details of your past and current orders. Find tracking numbers and estimated delivery dates here.
+      </p>
 
-      {error && <p className="text-destructive">{error}</p>}
+      {error && (
+           <Alert variant="destructive">
+                <XCircle className="h-4 w-4" />
+                <AlertTitle>Error Loading Orders</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+           </Alert>
+      )}
 
       {isLoadingOrders ? (
         <div className="space-y-6">
@@ -99,41 +128,39 @@ export default function OrdersPage() {
             const details = statusDetails[order.status];
             const StatusIcon = details.icon;
             return (
-              <Card key={order.id} className="overflow-hidden">
-                <CardHeader className="bg-muted/50 p-4">
+              <Card key={order.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow duration-200">
+                <CardHeader className="bg-muted/30 p-4">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                      <div>
-                         <CardTitle className="text-lg">Order #{order.id.substring(order.id.length - 6)}</CardTitle>
-                         <CardDescription>
-                             Placed on {format(order.orderDate, 'MMMM d, yyyy')} from <strong>{order.storeName}</strong>
+                         <CardTitle className="text-lg font-semibold">Order #{order.id.substring(order.id.length - 6)}</CardTitle>
+                         <CardDescription className="text-sm mt-0.5">
+                             Placed on {format(order.orderDate, 'MMMM d, yyyy')} from{' '}
+                              <Link href={`/store/${order.storeId}`} className="font-medium text-primary hover:underline">
+                                {order.storeName}
+                              </Link>
                          </CardDescription>
                     </div>
                     <Badge
-                         variant={
-                             order.status === 'Delivered' ? 'default' :
-                             order.status === 'Shipped' ? 'secondary' :
-                             order.status === 'Processing' ? 'outline' :
-                             order.status === 'Cancelled' ? 'destructive' : 'secondary'
-                         }
-                         className={`capitalize text-sm px-3 py-1 ${details.color} border-${details.color?.replace('text-', '')}/50`} // Basic color mapping
+                         variant={details.variant}
+                         className={`capitalize text-xs px-3 py-1 rounded-full font-medium border ${details.color} ${details.variant !== 'destructive' ? `border-${details.color?.replace('text-', '')}/30 bg-${details.color?.replace('text-', '')}/10 dark:bg-${details.color?.replace('text-', '')}/20` : ''} `}
                      >
-                        <StatusIcon className="h-4 w-4 mr-1.5" />
+                        <StatusIcon className="h-3.5 w-3.5 mr-1.5" />
                         {order.status}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 space-y-4">
+                <CardContent className="p-4 space-y-5">
                     {/* Item Summary */}
                     <div>
-                        <h4 className="font-medium text-sm mb-1">Items:</h4>
-                         <ul className="text-sm text-muted-foreground list-disc list-inside">
+                        <h4 className="font-medium text-sm mb-2 flex items-center gap-1.5"><Package className="h-4 w-4 text-muted-foreground"/>Items</h4>
+                         <ul className="text-sm text-muted-foreground list-disc list-inside pl-2 space-y-1">
                             {order.items.map(item => (
                                 <li key={item.productId}>
-                                    {item.quantity} x {item.name} ({formatCurrency(item.price)} each)
+                                    <span className="font-medium text-foreground">{item.quantity} x {item.name}</span> ({formatCurrency(item.price)} each)
                                 </li>
                             ))}
                          </ul>
-                         <p className="text-right font-semibold mt-2">Total: {formatCurrency(order.totalAmount)}</p>
+                         <p className="text-right font-semibold text-base mt-3">Total: {formatCurrency(order.totalAmount)}</p>
                     </div>
 
                    <Separator />
@@ -142,47 +169,83 @@ export default function OrdersPage() {
                    {order.status !== 'Cancelled' && (
                      <div>
                          <h4 className="font-medium text-sm mb-2">Tracking Status:</h4>
-                         <div className="flex items-center gap-2 mb-1">
+                         <div className="flex items-center gap-2 mb-2">
                             <StatusIcon className={`h-5 w-5 ${details.color}`} />
                             <span className={`text-sm font-medium ${details.color}`}>
                                 {details.description}
                             </span>
                          </div>
-                         <Progress value={details.value} className="h-2" />
+                         <Progress value={details.value} className="h-1.5" indicatorClassName={
+                            details.status === 'Delivered' ? 'bg-green-500' :
+                            details.status === 'Shipped' ? 'bg-purple-500' :
+                            details.status === 'Processing' ? 'bg-blue-500' :
+                            details.status === 'Pending' ? 'bg-yellow-500' : ''
+                         } />
                          {order.status === 'Shipped' && order.trackingNumber && (
-                            <p className="text-xs text-muted-foreground mt-2">
-                                Tracking Number: <span className="font-medium">{order.trackingNumber}</span>
+                            <p className="text-xs text-muted-foreground mt-2.5">
+                                Tracking Number: <span className="font-medium text-foreground">{order.trackingNumber}</span>
                                 {/* Add link to carrier if available */}
+                            </p>
+                         )}
+                         {order.status === 'Delivered' && (
+                            <p className="text-xs text-green-600 dark:text-green-400 mt-2.5 flex items-center gap-1">
+                               <CheckCircle className="h-3.5 w-3.5"/> Delivered successfully.
                             </p>
                          )}
                      </div>
                    )}
+                    {order.status === 'Cancelled' && (
+                         <div className="text-sm text-destructive flex items-center gap-2">
+                             <XCircle className="h-4 w-4"/>
+                             <span>This order was cancelled.</span>
+                         </div>
+                    )}
 
                    <Separator />
 
-                   {/* Address & Actions */}
-                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm">
-                        <div className="flex items-start gap-2 text-muted-foreground">
-                            <Home className="h-4 w-4 mt-0.5 shrink-0" />
-                            <span>Delivery to: {order.deliveryAddress}</span>
+                   {/* Address */}
+                   <div className="flex items-start gap-2 text-sm">
+                        <Home className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
+                        <div>
+                            <span className="font-medium block text-foreground">Delivery Address</span>
+                            <span className="text-muted-foreground">{order.deliveryAddress}</span>
                         </div>
-                        <div className="flex gap-2 self-end sm:self-center">
-                             {/* Placeholder buttons */}
-                             <Button variant="outline" size="sm">View Details</Button>
-                            {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
-                                <Button variant="ghost" size="sm">Contact Store</Button>
-                            )}
-                         </div>
-                   </div>
+                    </div>
                 </CardContent>
+                 <CardFooter className="bg-muted/30 p-4 flex justify-end gap-2">
+                    <Button variant="outline" size="sm">View Invoice</Button>
+                    {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
+                        <Button variant="ghost" size="sm">Contact Store</Button>
+                    )}
+                     {order.status === 'Delivered' && (
+                        <Button variant="secondary" size="sm">Leave Review</Button>
+                    )}
+                 </CardFooter>
               </Card>
             );
           })}
         </div>
       ) : (
-        <p className="text-center text-muted-foreground mt-10">You haven't placed any orders yet.</p>
+        <Card>
+           <CardContent className="p-10 text-center text-muted-foreground">
+                <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
+               <p className="text-lg font-medium">You haven't placed any orders yet.</p>
+               <p className="text-sm mt-2">Start exploring stores and find something you like!</p>
+               <Link href="/" passHref legacyBehavior>
+                    <Button variant="default" className="mt-6">
+                        Browse Stores
+                    </Button>
+               </Link>
+           </CardContent>
+        </Card>
       )}
     </div>
   );
 }
 
+// Helper to add class to Progress indicator
+declare module 'react' {
+  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+    indicatorClassName?: string;
+  }
+}
