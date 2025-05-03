@@ -1,26 +1,12 @@
 
 import type {Metadata} from 'next';
-// Removed Geist font import as it wasn't being explicitly used in body className
-// import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import {Toaster} from '@/components/ui/toaster';
-
-/*
-// If you intend to use Geist fonts, uncomment these lines and add the variables to body className
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-*/
+import { Header } from '@/components/header'; // Import Header
 
 export const metadata: Metadata = {
-  title: 'SwiftDispatch - AI Delivery Management', // Updated Title
-  description: 'Manage and track deliveries efficiently with AI-powered insights.', // Updated Description
+  title: 'Marketplace - Find Everything You Need', // Updated Title
+  description: 'Browse stores, find products, and place orders easily.', // Updated Description
 };
 
 export default function RootLayout({
@@ -30,10 +16,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* If using Geist fonts, add `${geistSans.variable} ${geistMono.variable}` below */}
-      <body className={`antialiased`}>
-        {children}
+      <body className={`antialiased flex flex-col min-h-screen`}>
+        <Header /> {/* Add Header */}
+        <main className="flex-grow container mx-auto px-4 py-8"> {/* Wrap children in main */}
+          {children}
+        </main>
         <Toaster />
+        <footer className="py-4 mt-8 border-t">
+            <div className="container mx-auto text-center text-sm text-muted-foreground">
+                © {new Date().getFullYear()} Marketplace App. All rights reserved.
+            </div>
+        </footer>
       </body>
     </html>
   );

@@ -1,215 +1,155 @@
 
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { getDrivers, Driver } from "@/services/driver";
-import { MapComponent } from "@/components/map";
+import { useState, useEffect, useMemo } from "react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getStores, Store, StoreCategory } from "@/services/store"; // Updated service import
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import { predictEta, PredictEtaInput } from "@/ai/flows/predict-eta"; // Assuming this flow exists
-
-// Basic Order interface for demonstration
-interface Order {
-  id: string;
-  pickupLocation: { address: string; lat: number; lng: number };
-  dropoffLocation: { address: string; lat: number; lng: number };
-  status: string;
-  items: string[];
-}
-
-// Mock order data
-const mockOrder: Order = {
-  id: "ORD123",
-  pickupLocation: { address: "123 Main St, Anytown", lat: 34.0522, lng: -118.2437 }, // Example coords
-  dropoffLocation: { address: "456 Oak Ave, Anytown", lat: 34.0622, lng: -118.2537 }, // Example coords
-  status: "Order Placed",
-  items: ["Pizza", "Salad"],
-};
+import Image from "next/image";
+import Link from "next/link";
+import { Search, Store as StoreIcon } from 'lucide-react';
 
 export default function Home() {
-  const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
-  const [order, setOrder] = useState<Order>(mockOrder); // Use mock order
-  const [isLoadingDrivers, setIsLoadingDrivers] = useState(true);
-  const [errorLoadingDrivers, setErrorLoadingDrivers] = useState<string | null>(null);
-  const [estimatedEta, setEstimatedEta] = useState<string | null>(null);
-  const [isPredictingEta, setIsPredictingEta] = useState(false);
+  const [stores, setStores] = useState<Store[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<StoreCategory | "all">("all");
 
   useEffect(() => {
-    const fetchDrivers = async () => {
-      setIsLoadingDrivers(true);
-      setErrorLoadingDrivers(null);
+    const fetchStores = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        const driverList = await getDrivers();
-        setDrivers(driverList);
-      } catch (error) {
-        console.error("Failed to fetch drivers:", error);
-        setErrorLoadingDrivers("Failed to load drivers. Please try again later.");
+        const storeList = await getStores();
+        setStores(storeList);
+      } catch (err) {
+        console.error("Failed to fetch stores:", err);
+        setError("Could not load stores. Please try again later.");
       } finally {
-        setIsLoadingDrivers(false);
+        setIsLoading(false);
       }
     };
 
-    fetchDrivers();
+    fetchStores();
   }, []);
 
-  const handleDriverSelect = async (driver: Driver) => {
-    setSelectedDriver(driver);
-    // Simulate order status update or assignment
-    setOrder((prevOrder) => ({ ...prevOrder, status: "Driver Assigned" }));
-    setEstimatedEta(null); // Reset ETA when driver changes
-    setIsPredictingEta(true);
+  const filteredStores = useMemo(() => {
+    return stores.filter(store => {
+      const matchesSearch = store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            store.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === "all" || store.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [stores, searchTerm, selectedCategory]);
 
-    // Placeholder for calling the predictEta flow
-    try {
-       // Construct input for the ETA prediction flow
-       const etaInput: PredictEtaInput = {
-        driverLocation: driver.location,
-        pickupLocation: order.pickupLocation,
-        dropoffLocation: order.dropoffLocation,
-        // Add other relevant factors if the flow requires them
-        // e.g., trafficConditions: "moderate", weatherConditions: "sunny"
-      };
-      // Replace with actual call when Genkit is configured
-      // const etaResult = await predictEta(etaInput);
-      // setEstimatedEta(etaResult.eta);
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(stores.map(store => store.category));
+    return ["all", ...Array.from(uniqueCategories)] as (StoreCategory | "all")[];
+  }, [stores]);
 
-      // Mock prediction for now
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate AI processing time
-      const randomMinutes = Math.floor(Math.random() * (30 - 5 + 1)) + 5; // Random ETA between 5 and 30 mins
-       setEstimatedEta(`${randomMinutes} minutes`);
+  const StoreCard = ({ store }: { store: Store }) => (
+    <Card className="flex flex-col overflow-hidden h-full transform transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+      <CardHeader className="p-0">
+        <div className="relative w-full h-48">
+          <Image
+            src={store.imageUrl || `https://picsum.photos/seed/${store.id}/400/300`}
+            alt={`${store.name} banner`}
+            layout="fill"
+            objectFit="cover"
+             data-ai-hint={`${store.category} store`}
+          />
+        </div>
+         <div className="p-4">
+             <CardTitle className="text-lg">{store.name}</CardTitle>
+             <Badge variant="secondary" className="mt-1 capitalize">{store.category}</Badge>
+         </div>
+      </CardHeader>
+      <CardContent className="flex-grow p-4 pt-0">
+        <CardDescription className="text-sm line-clamp-3">{store.description}</CardDescription>
+      </CardContent>
+      <CardFooter className="p-4 pt-0">
+         <Link href={`/store/${store.id}`} passHref legacyBehavior>
+            <Button className="w-full">
+                Visit Store <StoreIcon className="ml-2 h-4 w-4" />
+            </Button>
+         </Link>
+      </CardFooter>
+    </Card>
+  );
 
-
-    } catch (error) {
-        console.error("Failed to predict ETA:", error);
-        setEstimatedEta("Unavailable");
-    } finally {
-        setIsPredictingEta(false);
-    }
-  };
+  const StoreSkeleton = () => (
+     <Card className="flex flex-col overflow-hidden">
+        <Skeleton className="h-48 w-full" />
+        <CardHeader>
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-1/4 mt-1" />
+        </CardHeader>
+        <CardContent>
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-5/6" />
+        </CardContent>
+        <CardFooter>
+            <Skeleton className="h-10 w-full" />
+        </CardFooter>
+    </Card>
+  )
 
   return (
-    <div className="container mx-auto p-4">
-       <header className="mb-6">
-         <h1 className="text-3xl font-bold">SwiftDispatch Dashboard</h1>
-         <p className="text-muted-foreground">Manage and track your deliveries.</p>
-       </header>
+    <div>
+      <h1 className="text-3xl font-bold mb-6">Explore Stores</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Column 1: Drivers & Order Info */}
-        <div className="lg:col-span-1 flex flex-col gap-6">
-          {/* Driver Listing */}
-          <Card className="flex-grow">
-            <CardHeader>
-              <CardTitle>Available Drivers</CardTitle>
-              <CardDescription>Select a driver for the delivery.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-4 max-h-96 overflow-y-auto">
-               {isLoadingDrivers ? (
-                 <div className="space-y-2">
-                   <Skeleton className="h-10 w-full" />
-                   <Skeleton className="h-10 w-full" />
-                   <Skeleton className="h-10 w-full" />
-                 </div>
-               ) : errorLoadingDrivers ? (
-                  <p className="text-destructive">{errorLoadingDrivers}</p>
-               ) : drivers.length > 0 ? (
-                 <ul className="space-y-2">
-                   {drivers.map((driver) => (
-                     <li
-                       key={driver.id}
-                       className={cn(
-                         "p-3 rounded-md hover:bg-muted cursor-pointer border transition-colors",
-                         selectedDriver?.id === driver.id ? "bg-muted border-primary" : "border-transparent"
-                       )}
-                       onClick={() => handleDriverSelect(driver)}
-                     >
-                       <div className="font-semibold">{driver.name}</div>
-                       <div className="text-sm text-muted-foreground">{driver.vehicleType} - {driver.status}</div>
-                     </li>
-                   ))}
-                 </ul>
-               ) : (
-                 <p>No available drivers found.</p>
-               )}
-            </CardContent>
-          </Card>
-
-          {/* Order Details */}
-          <Card>
-             <CardHeader>
-               <CardTitle>Current Order: {order.id}</CardTitle>
-               <CardDescription>Details for the ongoing delivery.</CardDescription>
-             </CardHeader>
-             <CardContent className="space-y-3">
-               <div>
-                  <h4 className="font-semibold text-sm mb-1">Pickup:</h4>
-                  <p className="text-sm text-muted-foreground">{order.pickupLocation.address}</p>
-               </div>
-               <div>
-                  <h4 className="font-semibold text-sm mb-1">Dropoff:</h4>
-                  <p className="text-sm text-muted-foreground">{order.dropoffLocation.address}</p>
-                </div>
-               <div>
-                  <h4 className="font-semibold text-sm mb-1">Items:</h4>
-                  <p className="text-sm text-muted-foreground">{order.items.join(', ')}</p>
-                </div>
-               <Separator />
-                <div>
-                  <h4 className="font-semibold text-sm mb-1">Status:</h4>
-                  <p className="text-sm font-medium">{order.status}</p>
-                </div>
-                {selectedDriver && (
-                 <div>
-                   <h4 className="font-semibold text-sm mb-1">Assigned Driver:</h4>
-                   <p className="text-sm text-muted-foreground">{selectedDriver.name}</p>
-                 </div>
-                )}
-                {isPredictingEta ? (
-                   <div>
-                     <h4 className="font-semibold text-sm mb-1">Estimated ETA:</h4>
-                     <Skeleton className="h-5 w-24" />
-                   </div>
-                 ) : estimatedEta && (
-                    <div>
-                     <h4 className="font-semibold text-sm mb-1">Estimated ETA:</h4>
-                     <p className="text-sm font-medium">{estimatedEta}</p>
-                   </div>
-                 )}
-             </CardContent>
-          </Card>
+      {/* Search and Filter Controls */}
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="relative flex-grow">
+           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search stores by name or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
         </div>
-
-        {/* Column 2: Map & Tracking */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Delivery Tracking</CardTitle>
-              <CardDescription>View the live delivery route and location.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4 min-h-[600px]">
-              {selectedDriver ? (
-                <>
-                  <div className="h-[500px] w-full bg-muted rounded-md flex items-center justify-center">
-                     {/* Replace with actual map component */}
-                    <MapComponent
-                        driverLocation={selectedDriver.location}
-                        pickupLocation={order.pickupLocation}
-                        dropoffLocation={order.dropoffLocation}
-                     />
-                  </div>
-                </>
-              ) : (
-                <div className="h-[500px] w-full bg-muted rounded-md flex items-center justify-center">
-                    <p className="text-muted-foreground">Select a driver to view the map and tracking details.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        <Select
+           value={selectedCategory}
+           onValueChange={(value: StoreCategory | "all") => setSelectedCategory(value)}
+         >
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Filter by category" />
+          </SelectTrigger>
+          <SelectContent>
+             {categories.map(category => (
+               <SelectItem key={category} value={category} className="capitalize">
+                 {category === "all" ? "All Categories" : category}
+               </SelectItem>
+             ))}
+          </SelectContent>
+        </Select>
       </div>
+
+      {/* Store Grid */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, index) => (
+             <StoreSkeleton key={index} />
+          ))}
+        </div>
+      ) : error ? (
+        <p className="text-destructive text-center">{error}</p>
+      ) : filteredStores.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredStores.map(store => (
+            <StoreCard key={store.id} store={store} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-muted-foreground mt-10">No stores found matching your criteria.</p>
+      )}
     </div>
   );
 }
