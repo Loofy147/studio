@@ -435,7 +435,7 @@ async function initializeMockData() {
         // Assign owners from mock users if possible
         mockStores.forEach(store => {
             if (!store.ownerId) {
-                const potentialOwner = mockUserProfiles.find(u => u.role === 'store_owner' && Math.random() > 0.5); // Assign randomly
+                const potentialOwner = mockUserProfiles!.find(u => u.role === 'store_owner' && Math.random() > 0.5); // Assign randomly
                  if (potentialOwner) store.ownerId = potentialOwner.id;
             }
         })
@@ -458,7 +458,7 @@ async function initializeMockData() {
         mockSubscriptions = [];
         const customers = mockUserProfiles.filter(u => u.role === 'customer');
         customers.slice(0, 5).forEach(c => { // Generate for first 5 customers
-            mockSubscriptions = mockSubscriptions!.concat(generateMockSubscriptions(c.id, mockDailyOffers, mockStores!));
+            mockSubscriptions = mockSubscriptions!.concat(generateMockSubscriptions(c.id, mockDailyOffers!, mockStores!));
         });
     }
 }
@@ -504,7 +504,7 @@ export async function getStoreById(storeId: string): Promise<Store | null> {
      });
 }
 
-export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'isActive' | 'createdAt'>, ownerId: string): Promise<Store> {
+export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'isActive' | 'createdAt' | 'ownerId'>, ownerId: string): Promise<Store> {
   console.log("Creating store:", storeData);
   await initializeMockData();
   const newStore: Store = {
@@ -718,4 +718,3 @@ export async function deleteDailyOffer(offerId: string): Promise<void> {
    // TODO: Cancel related subscriptions?
    mockSubscriptions = mockSubscriptions?.filter(s => s.offerId !== offerId) ?? null;
 }
-```

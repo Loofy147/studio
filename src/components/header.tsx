@@ -150,7 +150,7 @@ export function Header() {
              )}
 
              {/* Login/Profile Button - Placeholder */}
-              <Link href={isAdminRoute ? "/admin/profile" : "/profile"} passHref legacyBehavior> {/* Adjust link for admin */}
+              <Link href={isAdminRoute ? "/admin/profile" : "/profile"}> {/* Adjust link for admin */}
                  <Button variant="outline" size="sm" className="rounded-full border-border"> {/* Use outline and border */}
                     <User className="h-4 w-4 md:mr-2" />
                     <span className="hidden md:inline">{isAdminRoute ? 'Admin' : 'Account'}</span>
@@ -165,4 +165,3 @@ export function Header() {
     </header>
   );
 }
-```
