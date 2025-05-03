@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress"; // Import Progress
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
 import Link from "next/link"; // Import Link
 import { cn } from "@/lib/utils"; // Import cn
+import React from 'react'; // Import React for forwardRef etc.
 
 // Helper to format currency
 const formatCurrency = (amount: number) => {
@@ -296,3 +297,4 @@ import * as ProgressPrimitive from "@radix-ui/react-progress"; // Need primitive
 // Remove the custom progress definition above and ensure the Progress component from ui/progress
 // is correctly used with the indicatorClassName prop.
 // The 'declare module' already extends the props for the original component.
+
