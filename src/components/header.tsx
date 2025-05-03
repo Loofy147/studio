@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -55,7 +54,7 @@ export function Header() {
            ))}
         </nav>
 
-         <div className="flex items-center justify-end space-x-2 md:space-x-4">
+         <div className="flex items-center justify-end space-x-2 md:space-x-4 ml-auto"> {/* Added ml-auto */}
             {/* Cart Button - Placeholder */}
              <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-accent/50"> {/* Rounded button */}
                 <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
@@ -117,6 +116,8 @@ export function Header() {
                             </Link>
                          ))}
                     </nav>
+                     {/* Add Mobile Specific Actions (Cart, Account) if needed */}
+                     {/* <div className="mt-auto pt-6 border-t"> ... </div> */}
                 </SheetContent>
             </Sheet>
         </div>

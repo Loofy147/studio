@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,10 +7,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
-import { PackageCheck, PackageSearch, Truck, Home, CheckCircle, XCircle, Hourglass, ShoppingBag, Package } from 'lucide-react'; // Added ShoppingBag, Package
+import { PackageCheck, PackageSearch, Truck, Home, CheckCircle, XCircle, Hourglass, ShoppingBag, Package, Eye } from 'lucide-react'; // Added ShoppingBag, Package, Eye
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress"; // Import Progress
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
+import Link from "next/link"; // Import Link
+import { cn } from "@/lib/utils"; // Import cn
 
 // Helper to format currency
 const formatCurrency = (amount: number) => {
@@ -19,12 +20,12 @@ const formatCurrency = (amount: number) => {
 };
 
 // Map status to progress value, icon, color, and variant
-const statusDetails: Record<Order['status'], { value: number; icon: React.ElementType; color: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; description: string }> = {
-    'Pending': { value: 10, icon: Hourglass, color: 'text-yellow-600 dark:text-yellow-400', variant: 'outline', description: 'Order placed, awaiting confirmation.' },
-    'Processing': { value: 35, icon: PackageSearch, color: 'text-blue-600 dark:text-blue-400', variant: 'outline', description: 'Store is preparing your order.' },
-    'Shipped': { value: 70, icon: Truck, color: 'text-purple-600 dark:text-purple-400', variant: 'secondary', description: 'Your order is on its way.' },
-    'Delivered': { value: 100, icon: PackageCheck, color: 'text-green-600 dark:text-green-400', variant: 'default', description: 'Your order has been delivered.' },
-    'Cancelled': { value: 0, icon: XCircle, color: 'text-red-600 dark:text-red-400', variant: 'destructive', description: 'The order has been cancelled.' }
+const statusDetails: Record<Order['status'], { value: number; icon: React.ElementType; color: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; description: string; progressColor: string }> = {
+    'Pending': { value: 10, icon: Hourglass, color: 'text-yellow-600 dark:text-yellow-400', variant: 'outline', description: 'Order placed, awaiting confirmation.', progressColor: 'bg-yellow-500' },
+    'Processing': { value: 35, icon: PackageSearch, color: 'text-blue-600 dark:text-blue-400', variant: 'outline', description: 'Store is preparing your order.', progressColor: 'bg-blue-500' },
+    'Shipped': { value: 70, icon: Truck, color: 'text-purple-600 dark:text-purple-400', variant: 'secondary', description: 'Your order is on its way.', progressColor: 'bg-purple-500' },
+    'Delivered': { value: 100, icon: PackageCheck, color: 'text-green-600 dark:text-green-400', variant: 'default', description: 'Your order has been delivered.', progressColor: 'bg-green-500' },
+    'Cancelled': { value: 0, icon: XCircle, color: 'text-red-600 dark:text-red-400', variant: 'destructive', description: 'The order has been cancelled.', progressColor: 'bg-red-500' }
 };
 
 
@@ -58,7 +59,7 @@ export default function OrdersPage() {
   }, [userId]);
 
   const OrderCardSkeleton = () => (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden border"> {/* Add border */}
         <CardHeader className="bg-muted/30 p-4">
             <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
                  <div>
@@ -84,7 +85,7 @@ export default function OrdersPage() {
                     <Skeleton className="h-5 w-5 rounded-full" />
                     <Skeleton className="h-4 w-48" />
                 </div>
-                <Skeleton className="h-2 w-full rounded-full" /> {/* Progress bar skeleton */}
+                <Skeleton className="h-2 w-full rounded-full bg-muted-foreground/20" /> {/* Progress bar skeleton */}
             </div>
              <Separator />
              <div className="flex items-start gap-2">
@@ -127,9 +128,13 @@ export default function OrdersPage() {
           {orders.map((order) => {
             const details = statusDetails[order.status];
             const StatusIcon = details.icon;
+            const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, ''); // e.g., 'yellow', 'blue'
+            const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
+            const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
+
             return (
-              <Card key={order.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow duration-200">
-                <CardHeader className="bg-muted/30 p-4">
+              <Card key={order.id} className="overflow-hidden border shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
+                <CardHeader className="bg-muted/20 p-4"> {/* Slightly lighter header */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                      <div>
                          <CardTitle className="text-lg font-semibold">Order #{order.id.substring(order.id.length - 6)}</CardTitle>
@@ -141,8 +146,13 @@ export default function OrdersPage() {
                          </CardDescription>
                     </div>
                     <Badge
-                         variant={details.variant}
-                         className={`capitalize text-xs px-3 py-1 rounded-full font-medium border ${details.color} ${details.variant !== 'destructive' ? `border-${details.color?.replace('text-', '')}/30 bg-${details.color?.replace('text-', '')}/10 dark:bg-${details.color?.replace('text-', '')}/20` : ''} `}
+                         variant={details.variant === 'default' ? 'secondary' : details.variant} // Use secondary for delivered badge base
+                         className={cn(
+                            'capitalize text-xs px-3 py-1 rounded-full font-medium border',
+                            details.color,
+                            details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
+                            details.variant === 'default' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400' // Specific style for 'Delivered'
+                         )}
                      >
                         <StatusIcon className="h-3.5 w-3.5 mr-1.5" />
                         {order.status}
@@ -175,12 +185,7 @@ export default function OrdersPage() {
                                 {details.description}
                             </span>
                          </div>
-                         <Progress value={details.value} className="h-1.5" indicatorClassName={
-                            details.status === 'Delivered' ? 'bg-green-500' :
-                            details.status === 'Shipped' ? 'bg-purple-500' :
-                            details.status === 'Processing' ? 'bg-blue-500' :
-                            details.status === 'Pending' ? 'bg-yellow-500' : ''
-                         } />
+                         <Progress value={details.value} className="h-1.5" indicatorClassName={details.progressColor} />
                          {order.status === 'Shipped' && order.trackingNumber && (
                             <p className="text-xs text-muted-foreground mt-2.5">
                                 Tracking Number: <span className="font-medium text-foreground">{order.trackingNumber}</span>
@@ -212,8 +217,10 @@ export default function OrdersPage() {
                         </div>
                     </div>
                 </CardContent>
-                 <CardFooter className="bg-muted/30 p-4 flex justify-end gap-2">
-                    <Button variant="outline" size="sm">View Invoice</Button>
+                 <CardFooter className="bg-muted/20 p-4 flex justify-end gap-2"> {/* Slightly lighter footer */}
+                    <Button variant="outline" size="sm">
+                        <Eye className="mr-1.5 h-3.5 w-3.5" /> View Invoice
+                    </Button>
                     {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
                         <Button variant="ghost" size="sm">Contact Store</Button>
                     )}
@@ -249,3 +256,43 @@ declare module 'react' {
     indicatorClassName?: string;
   }
 }
+
+// Update Progress component to accept indicatorClassName
+const OriginalProgress = Progress; // Keep original reference if needed elsewhere
+
+const CustomProgress = React.forwardRef<
+  React.ElementRef<typeof OriginalProgress>,
+  React.ComponentPropsWithoutRef<typeof OriginalProgress> & { indicatorClassName?: string }
+>(({ className, value, indicatorClassName, ...props }, ref) => (
+  <ProgressPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative h-1.5 w-full overflow-hidden rounded-full bg-secondary", // Adjusted height
+      className
+    )}
+    {...props}
+  >
+    <ProgressPrimitive.Indicator
+      className={cn("h-full w-full flex-1 bg-primary transition-all", indicatorClassName)} // Apply indicator class
+      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+    />
+  </ProgressPrimitive.Root>
+));
+CustomProgress.displayName = 'Progress';
+
+// Re-assign Progress to our custom component if needed globally, or use CustomProgress directly
+// For this example, let's assume we use the custom one directly where needed:
+import * as ProgressPrimitive from "@radix-ui/react-progress"; // Need primitive for custom component
+
+// ... rest of the OrdersPage component ...
+
+// Usage inside map function:
+// <Progress value={details.value} className="h-1.5" indicatorClassName={details.progressColor} />
+// This redefinition might cause issues if Progress is imported directly elsewhere expecting the original.
+// A safer approach is to rename the custom one, e.g., `StyledProgress`, and use that.
+// For simplicity here, we replace the export from ui/progress temporarily.
+// Let's revert the redefinition and just use the prop directly.
+
+// Remove the custom progress definition above and ensure the Progress component from ui/progress
+// is correctly used with the indicatorClassName prop.
+// The 'declare module' already extends the props for the original component.

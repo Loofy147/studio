@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -72,7 +71,7 @@ export default function StorePage() {
    };
 
   const ProductCard = ({ product }: { product: Product }) => (
-    <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-md border border-transparent hover:border-accent/20 group">
+    <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-md border hover:border-accent/30 hover:bg-muted/20 group">
       <CardHeader className="p-0">
         <div className="relative w-full h-40 overflow-hidden">
           <Image
@@ -84,16 +83,16 @@ export default function StorePage() {
             data-ai-hint={`${product.category} product`}
           />
         </div>
-        <div className="p-4 pb-0">
+        <div className="p-3 pb-0"> {/* Adjusted padding */}
            <CardTitle className="text-base font-semibold line-clamp-1 group-hover:text-primary transition-colors">{product.name}</CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="flex-grow p-4 pt-1">
-        <CardDescription className="text-xs line-clamp-2 mb-2 text-muted-foreground">{product.description}</CardDescription>
+      <CardContent className="flex-grow p-3 pt-1"> {/* Adjusted padding */}
+        <CardDescription className="text-xs line-clamp-2 mb-1.5 text-muted-foreground">{product.description}</CardDescription>
          <p className="font-bold text-sm">{formatCurrency(product.price)}</p>
       </CardContent>
-      <CardFooter className="p-4 pt-0 mt-auto"> {/* Ensure footer sticks to bottom */}
-        <Button size="sm" className="w-full group/button" onClick={() => handleAddToCart(product)}>
+      <CardFooter className="p-3 pt-0 mt-auto"> {/* Adjusted padding */}
+        <Button size="sm" className="w-full group/button" variant="default" onClick={() => handleAddToCart(product)}> {/* Changed to default variant */}
            <Plus className="mr-1 h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" /> Add to Cart
         </Button>
       </CardFooter>
@@ -101,17 +100,17 @@ export default function StorePage() {
   );
 
    const ProductSkeleton = () => (
-     <Card className="flex flex-col overflow-hidden">
-        <Skeleton className="h-40 w-full" />
-        <CardHeader className="p-4 pb-0">
+     <Card className="flex flex-col overflow-hidden border"> {/* Added border */}
+        <Skeleton className="h-40 w-full bg-muted-foreground/10" /> {/* Darker skeleton */}
+        <CardHeader className="p-3 pb-0"> {/* Matched padding */}
             <Skeleton className="h-5 w-3/4 mb-1" />
         </CardHeader>
-        <CardContent className="p-4 pt-1">
+        <CardContent className="p-3 pt-1"> {/* Matched padding */}
             <Skeleton className="h-3 w-full mb-1" />
             <Skeleton className="h-3 w-5/6 mb-2" />
             <Skeleton className="h-5 w-1/4" />
         </CardContent>
-        <CardFooter className="p-4 pt-0">
+        <CardFooter className="p-3 pt-0"> {/* Matched padding */}
             <Skeleton className="h-9 w-full" />
         </CardFooter>
     </Card>
@@ -125,7 +124,7 @@ export default function StorePage() {
                 <Skeleton className="h-9 w-32" />
             </div>
             <div className="flex flex-col md:flex-row gap-8 items-start">
-                <Skeleton className="w-full md:w-1/3 lg:w-1/4 aspect-square rounded-lg" />
+                <Skeleton className="w-full md:w-1/3 lg:w-1/4 aspect-square rounded-lg bg-muted-foreground/10" />
                 <div className="w-full md:w-2/3 lg:w-3/4 space-y-3">
                     <Skeleton className="h-10 w-3/4" />
                     <Skeleton className="h-6 w-1/4" />
@@ -203,7 +202,7 @@ export default function StorePage() {
          </div>
          <div className="w-full md:w-2/3 lg:w-3/4 mt-2 md:mt-0">
              <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">{store.name}</h1>
-             <Badge variant="outline" className="capitalize mb-4 text-sm py-1 px-3">{store.category}</Badge>
+             <Badge variant="secondary" className="capitalize mb-4 text-sm py-1 px-3">{store.category}</Badge> {/* Changed variant */}
              <p className="text-muted-foreground leading-relaxed mb-4">{store.description}</p>
              {store.rating && (
                 <div className="flex items-center gap-1.5 text-sm font-medium">

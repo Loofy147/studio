@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -11,7 +10,7 @@ import { getStores, Store, StoreCategory } from "@/services/store"; // Updated s
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, Store as StoreIcon, Filter, ArrowRight } from 'lucide-react'; // Added Filter, ArrowRight
+import { Search, Store as StoreIcon, Filter, ArrowRight, Eye } from 'lucide-react'; // Added Eye icon
 
 export default function Home() {
   const [stores, setStores] = useState<Store[]>([]);
@@ -53,7 +52,7 @@ export default function Home() {
   }, [stores]);
 
   const StoreCard = ({ store }: { store: Store }) => (
-    <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-transparent hover:border-primary/20 group">
+    <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border hover:border-primary/30 hover:bg-muted/20 group">
       <CardHeader className="p-0">
         <div className="relative w-full h-48 overflow-hidden">
           <Image
@@ -77,8 +76,9 @@ export default function Home() {
       <CardFooter className="p-4 pt-2">
          <Link href={`/store/${store.id}`} passHref legacyBehavior>
             <Button className="w-full group/button" variant="outline">
+                <Eye className="mr-2 h-4 w-4" /> {/* Replaced ArrowRight with Eye */}
                 Visit Store
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover/button:translate-x-1" />
+                <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover/button:translate-x-1" /> {/* Kept arrow for visual cue */}
             </Button>
          </Link>
       </CardFooter>
@@ -86,8 +86,8 @@ export default function Home() {
   );
 
   const StoreSkeleton = () => (
-     <Card className="flex flex-col overflow-hidden">
-        <Skeleton className="h-48 w-full" />
+     <Card className="flex flex-col overflow-hidden border"> {/* Added subtle border to skeleton */}
+        <Skeleton className="h-48 w-full bg-muted-foreground/10" /> {/* Slightly darker skeleton */}
         <CardHeader className="p-4 pb-2">
             <Skeleton className="h-6 w-3/4 mb-2" />
             <Skeleton className="h-4 w-1/4" />
