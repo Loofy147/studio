@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ShoppingCart, Trash2, Package, CreditCard, Truck, MapPin } from 'lucide-react';
+import { ShoppingCart, Trash2, Package, CreditCard, Truck, MapPin, Wallet } from 'lucide-react'; // Added Wallet icon
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -39,6 +39,7 @@ export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
     const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>(undefined); // Store selected address ID
     const [deliveryMethod, setDeliveryMethod] = useState<string>("standard"); // "standard", "express"
+    const [paymentMethod, setPaymentMethod] = useState<string>("card"); // Added payment method state: "card", "cod"
     const [promoCode, setPromoCode] = useState<string>("");
     const [isLoadingProfile, setIsLoadingProfile] = useState(true);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -111,7 +112,7 @@ export default function CartPage() {
              toast({ title: "Empty Cart", description: "Your cart is empty.", variant: "destructive" });
             return;
         }
-        console.log("Placing order with:", { cartItems, deliveryAddressId: selectedAddressId, deliveryMethod, promoCode, total });
+        console.log("Placing order with:", { cartItems, deliveryAddressId: selectedAddressId, deliveryMethod, paymentMethod, promoCode, total });
         // In a real app: send order to backend, clear cart, navigate to order confirmation
         toast({ title: "Order Placed!", description: "Thank you for your purchase!" });
         setCartItems([]); // Clear cart on successful order (mock)
@@ -252,6 +253,25 @@ export default function CartPage() {
                              </div>
                              <Separator />
 
+                             {/* Payment Method */}
+                              <div className="space-y-2">
+                                <Label className="flex items-center gap-1.5"><CreditCard className="h-4 w-4 text-primary"/>Payment Method</Label>
+                                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="flex flex-col gap-2">
+                                    <Label htmlFor="card" className="flex items-center space-x-3 p-3 border rounded-md hover:bg-accent/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
+                                        <RadioGroupItem value="card" id="card" />
+                                        <CreditCard className="h-5 w-5 text-muted-foreground"/>
+                                        <span className="font-normal">Credit/Debit Card</span>
+                                    </Label>
+                                    <Label htmlFor="cod" className="flex items-center space-x-3 p-3 border rounded-md hover:bg-accent/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
+                                        <RadioGroupItem value="cod" id="cod" />
+                                        <Wallet className="h-5 w-5 text-muted-foreground"/>
+                                        <span className="font-normal">Cash on Delivery</span>
+                                    </Label>
+                                </RadioGroup>
+                             </div>
+                             <Separator />
+
+
                             {/* Promo Code */}
                              <div className="flex items-end gap-2">
                                 <div className="flex-grow space-y-1">
@@ -291,7 +311,8 @@ export default function CartPage() {
                         </CardContent>
                         <CardFooter>
                             <Button className="w-full" size="lg" onClick={handlePlaceOrder} disabled={cartItems.length === 0 || !selectedAddressId || isLoadingProfile}>
-                                <CreditCard className="mr-2 h-5 w-5" /> Proceed to Checkout
+                                {paymentMethod === 'card' ? <CreditCard className="mr-2 h-5 w-5" /> : <Wallet className="mr-2 h-5 w-5" />}
+                                {paymentMethod === 'card' ? 'Proceed to Checkout' : 'Place Order (Cash)'}
                             </Button>
                         </CardFooter>
                     </Card>
@@ -300,3 +321,4 @@ export default function CartPage() {
         </div>
     );
 }
+
