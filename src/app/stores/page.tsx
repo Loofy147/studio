@@ -8,16 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { getStores, Store } from "@/services/store"; // Assuming a way to get stores by owner
 import { Skeleton } from "@/components/ui/skeleton";
-import { PlusCircle, Building, ArrowRight, Edit } from 'lucide-react'; // Added icons
+import { PlusCircle, Building, ArrowRight, Edit, Star } from 'lucide-react'; // Added icons
 import Image from 'next/image';
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
+import { useToast } from '@/hooks/use-toast';
 
-export default function StoreManagementPage() { // Renamed component
+export default function StoreManagementPage() {
   const [userStores, setUserStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showNewStoreForm, setShowNewStoreForm] = useState(false);
+  const { toast } = useToast();
 
   // In a real app, you'd get the userId from authentication context
   const userId = "user123"; // Hardcoded for demonstration
@@ -30,7 +32,8 @@ export default function StoreManagementPage() { // Renamed component
         // Simulate fetching stores owned by the current user
         // In a real backend, this would filter by ownerId
         const allStores = await getStores();
-        const ownedStores = allStores.filter(store => store.ownerId === userId || !store.ownerId); // Mock: Show stores without owner or owned by user123
+        // Mock: Show stores explicitly owned by user123 or those without an owner ID for demo purposes
+        const ownedStores = allStores.filter(store => store.ownerId === userId || !store.ownerId);
         setUserStores(ownedStores);
       } catch (err) {
         console.error("Failed to fetch user stores:", err);
@@ -42,33 +45,38 @@ export default function StoreManagementPage() { // Renamed component
     fetchUserStores();
   }, [userId]);
 
-  const handleStoreCreated = (newStore: Store) => { // Update to accept the full store object
+  const handleStoreCreated = (newStore: Store) => {
     setUserStores(prevStores => [...prevStores, newStore]);
     setShowNewStoreForm(false);
+    toast({
+      title: "Store Created Successfully!",
+      description: `${newStore.name} is now ready to be managed.`,
+      variant: "default", // Use a success variant if available
+    });
   };
 
    const StoreCardSkeleton = () => (
-     <Card className="animate-pulse">
-       <CardHeader>
+     <Card className="animate-pulse border">
+       <CardHeader className="p-0">
          <Skeleton className="h-48 w-full bg-muted/50" />
-         <div className="pt-4 space-y-2">
+         <div className="p-4 space-y-2">
             <Skeleton className="h-6 w-3/4 bg-muted/50" />
             <Skeleton className="h-4 w-1/4 bg-muted/50" />
          </div>
        </CardHeader>
-       <CardContent>
+       <CardContent className="p-4 pt-0">
          <Skeleton className="h-4 w-full mb-1 bg-muted/50" />
          <Skeleton className="h-4 w-5/6 bg-muted/50" />
        </CardContent>
-       <CardFooter>
-         <Skeleton className="h-10 w-full bg-muted/50" />
+       <CardFooter className="p-4 pt-2">
+         <Skeleton className="h-10 w-full bg-muted/50 rounded-md" />
        </CardFooter>
      </Card>
    );
 
   return (
     <div className="container mx-auto py-10 space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6">
         <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
           <Building className="h-8 w-8 text-primary" /> Manage Your Stores
         </h1>
@@ -79,7 +87,7 @@ export default function StoreManagementPage() { // Renamed component
       </div>
 
       {showNewStoreForm && (
-        <Card className="border-dashed border-primary/30 bg-primary/5">
+        <Card className="border-dashed border-primary/30 bg-primary/5 shadow-sm">
             <CardHeader>
                 <CardTitle>Create a New Store</CardTitle>
                 <CardDescription>Fill in the details for your new marketplace storefront.</CardDescription>
@@ -99,7 +107,7 @@ export default function StoreManagementPage() { // Renamed component
        )}
 
       <div>
-        <h2 className="text-2xl font-semibold mb-6">Your Stores</h2>
+        <h2 className="text-2xl font-semibold mb-6">Your Stores ({userStores.length})</h2>
         {isLoading ? (
            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
              <StoreCardSkeleton />
@@ -129,15 +137,15 @@ export default function StoreManagementPage() { // Renamed component
                     </div>
                      <div className="p-4 pb-2">
                          <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">{store.name}</CardTitle>
-                         <Badge variant="outline" className="mt-2 capitalize text-xs tracking-wide border-primary/30 text-primary/90">{store.category}</Badge>
+                         <Badge variant="outline" className="mt-2 capitalize text-xs tracking-wide border-primary/30 text-primary/90 bg-primary/5">{store.category}</Badge>
                      </div>
                  </CardHeader>
                  <CardContent className="flex-grow p-4 pt-0">
                     <CardDescription className="text-sm line-clamp-3 text-muted-foreground">{store.description}</CardDescription>
                  </CardContent>
-                 <CardFooter className="p-4 pt-2 mt-auto">
+                 <CardFooter className="p-4 pt-2 mt-auto bg-muted/20">
                    <Link href={`/store/${store.id}/manage`} passHref legacyBehavior>
-                       <Button className="w-full group/button" variant="outline"> {/* Changed to outline */}
+                       <Button className="w-full group/button" variant="default"> {/* Use default variant */}
                            <Edit className="mr-2 h-4 w-4" />
                            Manage Store
                            <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover/button:translate-x-1" />
@@ -148,7 +156,7 @@ export default function StoreManagementPage() { // Renamed component
             ))}
           </div>
         ) : (
-          <Card className="border-dashed">
+          <Card className="border-dashed border-muted-foreground/30 bg-card/50">
              <CardContent className="p-10 text-center text-muted-foreground">
                  <Building className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
                 <p className="text-lg font-medium">You haven't created any stores yet.</p>

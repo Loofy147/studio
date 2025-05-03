@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, PlusCircle, Edit, Trash2, Package, CalendarClock, XCircle, Building, Tag } from 'lucide-react'; // Added icons
 import Image from 'next/image';
-import { formatCurrency } from '@/lib/utils'; // Assuming you have this helper
+import { formatCurrency, cn } from '@/lib/utils'; // Assuming you have this helper
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from '@/components/ui/separator';
 import {
@@ -66,7 +66,7 @@ export default function StoreManagePage() {
           setProducts(storeData.products || []);
           setDailyOffers(storeData.dailyOffers || []);
         } else {
-          setError("Store not found.");
+          setError("Store not found or you don't have permission to manage it.");
         }
       } catch (err) {
         console.error("Failed to fetch store data:", err);
@@ -100,6 +100,19 @@ export default function StoreManagePage() {
             variant: "destructive"
         });
         // In real app: await deleteProduct(productId); + error handling
+        try {
+            await deleteProduct(productId); // Call the actual delete function
+        } catch (err) {
+            console.error("Failed to delete product from backend:", err);
+            // Optionally revert state or show persistent error
+            toast({
+                 title: "Deletion Failed",
+                 description: `Failed to sync deletion for ${productName} with the server.`,
+                 variant: "destructive",
+            });
+            // Re-add the product to the list if the backend call fails
+            // This requires storing the deleted product temporarily or re-fetching
+        }
   };
 
     const handleDeleteOffer = async (offerId: string, offerName: string) => {
@@ -111,6 +124,16 @@ export default function StoreManagePage() {
             variant: "destructive"
         });
         // In real app: await deleteDailyOffer(offerId); + error handling
+         try {
+            await deleteDailyOffer(offerId); // Call the actual delete function
+        } catch (err) {
+            console.error("Failed to delete offer from backend:", err);
+            toast({
+                 title: "Deletion Failed",
+                 description: `Failed to sync deletion for ${offerName} with the server.`,
+                 variant: "destructive",
+            });
+        }
     };
 
   // Loading State
@@ -156,11 +179,11 @@ export default function StoreManagePage() {
     );
   }
 
-  // Store Not Found State
+  // Store Not Found State (Redundant if error state handles it, but good practice)
   if (!store) {
      return (
         <div className="container mx-auto py-10 flex flex-col items-center">
-           <Card className="w-full max-w-md text-center">
+           <Card className="w-full max-w-md text-center border-dashed">
                <CardContent className="p-10">
                    <Building className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
                    <p className="text-lg font-medium text-muted-foreground">Store Not Found</p>
@@ -192,19 +215,20 @@ export default function StoreManagePage() {
         </div>
 
         {/* Product Management Section */}
-        <Card>
+        <Card className="border shadow-sm">
             <CardHeader className="flex flex-row justify-between items-center">
                 <div>
                     <CardTitle className="flex items-center gap-2"><Package className="h-5 w-5 text-primary"/>Products</CardTitle>
                     <CardDescription>Manage the items available in your store.</CardDescription>
                 </div>
-                <Button size="sm" onClick={() => setShowNewProductForm(!showNewProductForm)}>
+                <Button size="sm" onClick={() => setShowNewProductForm(!showNewProductForm)} variant={showNewProductForm ? 'secondary' : 'default'}>
                     <PlusCircle className="mr-2 h-4 w-4" /> {showNewProductForm ? 'Cancel' : 'Add Product'}
                 </Button>
             </CardHeader>
             <CardContent className="space-y-6">
                  {showNewProductForm && (
-                    <Card className="bg-muted/30 p-6">
+                    <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
+                        <h3 className="text-lg font-medium mb-4">New Product Details</h3>
                       <ProductForm
                         onProductCreated={handleProductCreated}
                         storeId={store.id}
@@ -213,136 +237,54 @@ export default function StoreManagePage() {
                     </Card>
                   )}
                 {products.length > 0 ? (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[80px]">Image</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Category</TableHead>
-                                <TableHead className="text-right">Price</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {products.map((product) => (
-                                <TableRow key={product.id}>
-                                    <TableCell>
-                                        <Image
-                                            src={product.imageUrl || `https://picsum.photos/seed/${product.id}/100/100`}
-                                            alt={product.name}
-                                            width={40}
-                                            height={40}
-                                            className="rounded-sm object-cover bg-muted"
-                                        />
-                                    </TableCell>
-                                    <TableCell className="font-medium">{product.name}</TableCell>
-                                    <TableCell className="capitalize text-muted-foreground">{product.category}</TableCell>
-                                    <TableCell className="text-right">{formatCurrency(product.price)}</TableCell>
-                                    <TableCell className="text-right space-x-1">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Product">
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                         <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Product">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                <AlertDialogTitle>Delete Product?</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    Are you sure you want to delete "{product.name}"? This action cannot be undone.
-                                                </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction
-                                                     onClick={() => handleDeleteProduct(product.id, product.name)}
-                                                     className={buttonVariants({ variant: "destructive" })}
-                                                    >
-                                                    Yes, Delete
-                                                </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                ) : !showNewProductForm && (
-                    <p className="text-center text-muted-foreground py-6">No products added yet. Click "Add Product" to get started.</p>
-                )}
-            </CardContent>
-        </Card>
-
-        {/* Daily Offers Management Section (Conditional) */}
-        {isEligibleForOffers && (
-            <Card>
-                <CardHeader className="flex flex-row justify-between items-center">
-                     <div>
-                        <CardTitle className="flex items-center gap-2"><CalendarClock className="h-5 w-5 text-amber-500"/>Daily/Weekly Offers</CardTitle>
-                        <CardDescription>Manage subscription offers for recurring deliveries.</CardDescription>
-                    </div>
-                     <Button size="sm" variant="outline" onClick={() => setShowNewOfferForm(!showNewOfferForm)}>
-                       <PlusCircle className="mr-2 h-4 w-4" /> {showNewOfferForm ? 'Cancel' : 'Add Offer'}
-                    </Button>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                     {showNewOfferForm && (
-                         <Card className="bg-muted/30 p-6">
-                            <DailyOfferForm
-                                onOfferCreated={handleOfferCreated}
-                                storeId={store.id}
-                                availableProducts={products} // Pass products to select from
-                            />
-                         </Card>
-                     )}
-                    {dailyOffers.length > 0 ? (
+                    <div className="border rounded-md overflow-hidden">
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead className="w-[60px] sm:w-[80px]">Image</TableHead>
                                     <TableHead>Name</TableHead>
-                                    <TableHead>Frequency</TableHead>
+                                    <TableHead className="hidden sm:table-cell">Category</TableHead>
                                     <TableHead className="text-right">Price</TableHead>
-                                     <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                                    <TableHead className="text-right pr-4">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {dailyOffers.map((offer) => (
-                                    <TableRow key={offer.id}>
-                                        <TableCell className="font-medium">{offer.name}</TableCell>
-                                        <TableCell className="capitalize">{offer.frequency}</TableCell>
-                                        <TableCell className="text-right">{formatCurrency(offer.price)}</TableCell>
-                                         <TableCell>
-                                             <Badge variant={offer.isActive ? "secondary" : "outline"} className={cn(offer.isActive ? "text-green-600 border-green-400/50 bg-green-500/10" : "text-muted-foreground")}>
-                                                {offer.isActive ? "Active" : "Inactive"}
-                                             </Badge>
-                                         </TableCell>
-                                        <TableCell className="text-right space-x-1">
-                                             <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Offer">
-                                                <Edit className="h-4 w-4" />
+                                {products.map((product) => (
+                                    <TableRow key={product.id} className="hover:bg-muted/50">
+                                        <TableCell>
+                                            <Image
+                                                src={product.imageUrl || `https://picsum.photos/seed/${product.id}/100/100`}
+                                                alt={product.name}
+                                                width={40}
+                                                height={40}
+                                                className="rounded-sm object-cover bg-muted"
+                                            />
+                                        </TableCell>
+                                        <TableCell className="font-medium">{product.name}</TableCell>
+                                        <TableCell className="capitalize text-muted-foreground hidden sm:table-cell">{product.category}</TableCell>
+                                        <TableCell className="text-right">{formatCurrency(product.price)}</TableCell>
+                                        <TableCell className="text-right space-x-1 pr-4">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Product (Not Implemented)">
+                                                <Edit className="h-4 w-4 opacity-50" />
                                             </Button>
                                              <AlertDialog>
                                                 <AlertDialogTrigger asChild>
-                                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Offer">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Product">
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </AlertDialogTrigger>
                                                 <AlertDialogContent>
                                                     <AlertDialogHeader>
-                                                    <AlertDialogTitle>Delete Offer?</AlertDialogTitle>
+                                                    <AlertDialogTitle>Delete Product?</AlertDialogTitle>
                                                     <AlertDialogDescription>
-                                                        Are you sure you want to delete the offer "{offer.name}"? This will not affect existing subscriptions, but users can no longer subscribe.
+                                                        Are you sure you want to delete "{product.name}"? This action cannot be undone.
                                                     </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                     <AlertDialogAction
-                                                         onClick={() => handleDeleteOffer(offer.id, offer.name)}
-                                                          className={buttonVariants({ variant: "destructive" })}
+                                                         onClick={() => handleDeleteProduct(product.id, product.name)}
+                                                         className={buttonVariants({ variant: "destructive" })}
                                                         >
                                                         Yes, Delete
                                                     </AlertDialogAction>
@@ -354,8 +296,103 @@ export default function StoreManagePage() {
                                 ))}
                             </TableBody>
                         </Table>
+                    </div>
+                ) : !showNewProductForm && (
+                    <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
+                        <Package className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
+                        <p>No products added yet.</p>
+                         <p className="text-sm">Click "Add Product" to get started.</p>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+
+        {/* Daily Offers Management Section (Conditional) */}
+        {isEligibleForOffers && (
+            <Card className="border shadow-sm">
+                <CardHeader className="flex flex-row justify-between items-center">
+                     <div>
+                        <CardTitle className="flex items-center gap-2"><CalendarClock className="h-5 w-5 text-amber-500"/>Daily/Weekly Offers</CardTitle>
+                        <CardDescription>Manage subscription offers for recurring deliveries.</CardDescription>
+                    </div>
+                     <Button size="sm" onClick={() => setShowNewOfferForm(!showNewOfferForm)} variant={showNewOfferForm ? 'secondary' : 'default'}>
+                       <PlusCircle className="mr-2 h-4 w-4" /> {showNewOfferForm ? 'Cancel' : 'Add Offer'}
+                    </Button>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                     {showNewOfferForm && (
+                         <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
+                            <h3 className="text-lg font-medium mb-4">New Subscription Offer</h3>
+                            <DailyOfferForm
+                                onOfferCreated={handleOfferCreated}
+                                storeId={store.id}
+                                availableProducts={products} // Pass products to select from
+                            />
+                         </Card>
+                     )}
+                    {dailyOffers.length > 0 ? (
+                         <div className="border rounded-md overflow-hidden">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Frequency</TableHead>
+                                        <TableHead className="text-right">Price</TableHead>
+                                        <TableHead className="hidden md:table-cell">Status</TableHead>
+                                        <TableHead className="text-right pr-4">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {dailyOffers.map((offer) => (
+                                        <TableRow key={offer.id} className="hover:bg-muted/50">
+                                            <TableCell className="font-medium">{offer.name}</TableCell>
+                                            <TableCell className="capitalize hidden sm:table-cell">{offer.frequency}</TableCell>
+                                            <TableCell className="text-right">{formatCurrency(offer.price)}</TableCell>
+                                             <TableCell className="hidden md:table-cell">
+                                                 <Badge variant={offer.isActive ? "secondary" : "outline"} className={cn(offer.isActive ? "text-green-600 border-green-400/50 bg-green-500/10" : "text-muted-foreground")}>
+                                                    {offer.isActive ? "Active" : "Inactive"}
+                                                 </Badge>
+                                             </TableCell>
+                                            <TableCell className="text-right space-x-1 pr-4">
+                                                 <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Offer (Not Implemented)">
+                                                    <Edit className="h-4 w-4 opacity-50" />
+                                                </Button>
+                                                 <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Offer">
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                        <AlertDialogTitle>Delete Offer?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Are you sure you want to delete the offer "{offer.name}"? This will not affect existing subscriptions, but users can no longer subscribe.
+                                                        </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                             onClick={() => handleDeleteOffer(offer.id, offer.name)}
+                                                              className={buttonVariants({ variant: "destructive" })}
+                                                            >
+                                                            Yes, Delete
+                                                        </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     ) : !showNewOfferForm && (
-                         <p className="text-center text-muted-foreground py-6">No daily or weekly offers created yet.</p>
+                         <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
+                            <CalendarClock className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
+                            <p>No daily or weekly offers created yet.</p>
+                             <p className="text-sm">Click "Add Offer" to create subscription options.</p>
+                        </div>
                     )}
                 </CardContent>
             </Card>
@@ -365,17 +402,4 @@ export default function StoreManagePage() {
 
     </div>
   );
-}
-
-// Mock delete functions (replace with actual API calls)
-async function deleteProduct(productId: string): Promise<void> {
-  console.log(`Mock deleting product: ${productId}`);
-  await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API call
-  // No actual data modification in this mock
-}
-
-async function deleteDailyOffer(offerId: string): Promise<void> {
-  console.log(`Mock deleting offer: ${offerId}`);
-  await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API call
-   // No actual data modification in this mock
 }

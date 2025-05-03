@@ -1,8 +1,9 @@
+
 "use client";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield } from 'lucide-react'; // Added admin icons
+import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building } from 'lucide-react'; // Added Building icon
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
@@ -21,6 +22,7 @@ export function Header() {
    const customerNavItems = [
       { href: "/", label: "Stores", icon: PackageSearch },
       { href: "/orders", label: "My Orders", icon: Package },
+      { href: "/stores", label: "Manage Stores", icon: Building }, // Added Manage Stores link
       { href: "/profile", label: "Profile", icon: User },
    ];
 
@@ -150,7 +152,7 @@ export function Header() {
              )}
 
              {/* Login/Profile Button - Placeholder */}
-              <Link href={isAdminRoute ? "/admin/profile" : "/profile"}> {/* Adjust link for admin */}
+              <Link href={isAdminRoute ? "/admin/profile" : "/profile"} passHref>
                  <Button variant="outline" size="sm" className="rounded-full border-border"> {/* Use outline and border */}
                     <User className="h-4 w-4 md:mr-2" />
                     <span className="hidden md:inline">{isAdminRoute ? 'Admin' : 'Account'}</span>
