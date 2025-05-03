@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,6 +15,7 @@ import { format } from 'date-fns'; // For date formatting
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
 import Link from "next/link"; // Import Link
 import { cn } from "@/lib/utils"; // Import cn
+import React from 'react'; // Import React for forwardRef etc.
 
 // Helper to format currency
 const formatCurrency = (amount: number) => {
@@ -272,8 +274,8 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-semibold flex items-center gap-2">
                 <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History {/* Added color */}
             </h2>
-            <Link href="/orders" passHref legacyBehavior>
-                <Button variant="link" className="text-primary px-0">View All Orders</Button> {/* Removed padding */}
+            <Link href="/orders" passHref>
+                <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button> {/* Removed padding */}
             </Link>
         </div>
 
@@ -332,10 +334,10 @@ export default function ProfilePage() {
                                 </TableCell>
                                 <TableCell className="text-right pr-4"> {/* Added padding */}
                                     {/* Link to specific order section on /orders page */}
-                                    <Link href={`/orders#order-${order.id}`} passHref legacyBehavior>
-                                         <Button variant="ghost" size="sm" className="h-8 px-2"> {/* Smaller button */}
+                                    <Link href={`/orders#order-${order.id}`} passHref>
+                                         <Button asChild variant="ghost" size="sm" className="h-8 px-2"><a> {/* Smaller button */}
                                             <Eye className="h-4 w-4"/>
-                                         </Button>
+                                         </a></Button>
                                     </Link>
                                 </TableCell>
                             </TableRow>
