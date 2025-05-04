@@ -30,6 +30,18 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 import { LayoutAnimator } from "@/components/LayoutAnimator"; // Import LayoutAnimator
 
+// Re-define AddressFormData if needed or import from a shared types file
+interface AddressFormData {
+    id?: string;
+    label: string;
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country?: string;
+    isDefault: boolean;
+}
+
 
 // Map status to icon and variant for the order table
 const orderStatusDetails: Record<Order['status'], { icon: React.ElementType; variant: BadgeProps["variant"]; color: string }> = {
@@ -127,7 +139,7 @@ export default function ProfilePage() {
 
 
   const ProfileInfoSkeleton = () => (
-     <Card>
+     <Card className="border-primary/10 shadow-md">
         {/* Use p-6 for consistent padding */}
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-accent/5">
              <Skeleton className="h-24 w-24 rounded-full bg-muted/50" />
@@ -178,7 +190,7 @@ export default function ProfilePage() {
   )
 
    const OrderHistorySkeleton = () => (
-    <Card>
+    <Card className="border-primary/10 shadow-md">
         {/* Use p-4 for consistent padding */}
         <CardHeader className="flex flex-row justify-between items-center p-4">
             <div className="space-y-1">
@@ -217,7 +229,7 @@ export default function ProfilePage() {
    )
 
    const SubscriptionsSkeleton = () => (
-     <Card>
+     <Card className="border-primary/10 shadow-md">
          {/* Use p-4 for consistent padding */}
         <CardHeader className="flex flex-row justify-between items-center p-4">
             <div className="space-y-1">
@@ -278,9 +290,9 @@ export default function ProfilePage() {
         {/* Use standard page padding and spacing */}
         <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 space-y-10">
             {/* Profile Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border pb-6">
                 {/* Use Heading 1 size */}
-                <h1 className="h1 flex items-center gap-3"> {/* Use h1 class */}
+                <h1 className="h1 flex items-center gap-3 text-foreground"> {/* Use h1 class */}
                     <User className="h-8 w-8 text-primary" /> Your Profile Overview
                 </h1>
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive self-start sm:self-center">
@@ -322,7 +334,7 @@ export default function ProfilePage() {
                         )}
                     </div>
                     <Link href="/profile/account-settings" passHref>
-                         <Button variant="default" size="sm" className="self-start sm:self-center">
+                         <Button variant="default" size="sm" className="self-start sm:self-center" withRipple>
                             <Settings className="mr-2 h-4 w-4" /> Account Settings
                         </Button>
                     </Link>
@@ -334,9 +346,10 @@ export default function ProfilePage() {
                      {/* Default Address Display */}
                     <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-medium flex items-center gap-2"><MapPin className="h-5 w-5 text-primary"/>Default Delivery Address</h3>
+                             {/* Use text-lg */}
+                            <h3 className="text-lg font-medium flex items-center gap-2 text-foreground"><MapPin className="h-5 w-5 text-primary"/>Default Delivery Address</h3>
                             <Link href="/profile/addresses" passHref>
-                                <Button variant="outline" size="sm">Manage Addresses</Button>
+                                <Button variant="outline" size="sm" withRipple>Manage Addresses</Button>
                             </Link>
                         </div>
                         {profile.addresses && profile.addresses.length > 0 ? (
@@ -359,11 +372,12 @@ export default function ProfilePage() {
                                  {/* Use p-4 */}
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                                     {/* Use text-lg */}
-                                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                    <CardTitle className="text-lg font-semibold flex items-center gap-2 text-foreground">
                                         <UsersIcon className="h-5 w-5 text-primary"/> My Friends
                                     </CardTitle>
                                     <span className="text-base font-semibold text-primary">({profile.friendIds?.length || 0})</span>
                                 </CardHeader>
+                                 {/* Use p-4 pt-0 */}
                                 <CardContent className="p-4 pt-0">
                                     <p className="text-sm text-muted-foreground">View and manage your friends list.</p>
                                 </CardContent>
@@ -371,12 +385,15 @@ export default function ProfilePage() {
                         </Link>
                         <Link href="/profile/followed-stores" passHref>
                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
+                                 {/* Use p-4 */}
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
-                                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                     {/* Use text-lg */}
+                                    <CardTitle className="text-lg font-semibold flex items-center gap-2 text-foreground">
                                         <StoreIcon className="h-5 w-5 text-primary"/> Followed Stores
                                     </CardTitle>
                                     <span className="text-base font-semibold text-primary">({profile.followedStoreIds?.length || 0})</span>
                                 </CardHeader>
+                                 {/* Use p-4 pt-0 */}
                                 <CardContent className="p-4 pt-0">
                                     <p className="text-sm text-muted-foreground">See updates from stores you follow.</p>
                                 </CardContent>
@@ -390,9 +407,11 @@ export default function ProfilePage() {
                      <div className="flex items-center gap-4 bg-gradient-to-r from-yellow-100 via-amber-50 to-orange-100 dark:from-yellow-900/30 dark:via-amber-950/30 dark:to-orange-950/30 rounded-lg p-6 border border-secondary/30 shadow-inner"> {/* Use p-6 */}
                         <Award className="h-10 w-10 text-secondary shrink-0" /> {/* Use h-10 w-10 */}
                         <div>
+                             {/* Use text-lg */}
                             <span className="font-semibold block text-lg text-foreground/90">Loyalty Points</span>
                              {/* Use Heading 2 size */}
                             <span className="h2 text-secondary">{profile.loyaltyPoints}</span> {/* Use h2 class */}
+                             {/* Use text-base */}
                             <span className="text-muted-foreground text-base"> points earned</span>
                         </div>
                     </div>
@@ -402,12 +421,14 @@ export default function ProfilePage() {
                     {profile.role === 'store_owner' && (
                         <>
                             <Separator />
-                            <div className="space-y-3 border p-6 rounded-md bg-muted/30"> {/* Use p-6 */}
+                             {/* Use p-6 */}
+                            <div className="space-y-3 border p-6 rounded-md bg-muted/30">
                                 {/* Use Heading 3 size */}
                                 <h3 className="h3 flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3> {/* Use h3 class */}
-                                <p className="text-base text-muted-foreground">Manage your stores, products, and orders.</p> {/* Use text-base */}
+                                 {/* Use text-base */}
+                                <p className="text-base text-muted-foreground">Manage your stores, products, and orders.</p>
                                 <Link href="/stores" passHref>
-                                     <Button variant="default" size="lg">Go to Store Management</Button> {/* Use size="lg" */}
+                                     <Button variant="default" size="lg" withRipple>Go to Store Management</Button> {/* Use size="lg" */}
                                 </Link>
                             </div>
                         </>
@@ -415,6 +436,7 @@ export default function ProfilePage() {
                 </CardContent>
             </Card>
             ) : !profileError && !isLoadingProfile ? ( // Only show if not loading and no error message already shown
+             // Use p-6
             <Card><CardContent className="p-6 text-muted-foreground text-center">Could not load profile information.</CardContent></Card>
             ): null}
 
@@ -422,10 +444,11 @@ export default function ProfilePage() {
             <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
 
             {/* Recent Orders Section */}
+             {/* Use space-y-6 */}
             <div className="space-y-6">
                  {/* Use Heading 2 size */}
                 <div className="flex justify-between items-center">
-                    <h2 className="h2 flex items-center gap-2"> {/* Use h2 class */}
+                    <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
                         <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
                     </h2>
                      <Link href="/orders" passHref>
@@ -447,12 +470,13 @@ export default function ProfilePage() {
                        initial="hidden"
                        animate="visible"
                      >
-                        <Card className="shadow-sm overflow-hidden border">
+                         <Card className="shadow-sm overflow-hidden border border-primary/10">
                              {/* Remove CardContent padding */}
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
+                                         {/* Use text-xs */}
+                                        <TableRow className="bg-muted/20 hover:bg-muted/30 text-xs uppercase tracking-wider">
                                              {/* Add padding */}
                                             <TableHead className="w-[100px] pl-4">Order ID</TableHead>
                                             <TableHead>Date</TableHead>
@@ -523,15 +547,16 @@ export default function ProfilePage() {
                         </Card>
                     </motion.div>
                 ) : !orderError && !isLoadingOrders ? (
-                     <Card>
+                     <Card className="border-dashed border-border/50 bg-muted/20">
                          {/* Use p-4 */}
                          <CardContent className="p-10 text-center text-muted-foreground">
                             <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
+                             {/* Use text-lg */}
                            <p className="text-lg font-medium">No recent orders found.</p>
                             {/* Use Body 2 */}
                            <p className="text-body2 mt-2">Start shopping to see your orders here!</p>
                            <Link href="/" passHref legacyBehavior>
-                                <Button variant="default" className="mt-6">Browse Stores</Button>
+                                <Button variant="default" className="mt-6" withRipple>Browse Stores</Button>
                            </Link>
                        </CardContent>
                      </Card>
@@ -546,7 +571,7 @@ export default function ProfilePage() {
             <div className="space-y-6">
                  {/* Use Heading 2 size */}
                  <div className="flex justify-between items-center">
-                     <h2 className="h2 flex items-center gap-2"> {/* Use h2 class */}
+                     <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
                         <CalendarClock className="h-7 w-7 text-primary" /> Recent Subscriptions
                     </h2>
                     <Link href="/profile/subscriptions" passHref>
@@ -568,12 +593,13 @@ export default function ProfilePage() {
                         initial="hidden"
                         animate="visible"
                     >
-                        <Card className="shadow-sm overflow-hidden border">
+                         <Card className="shadow-sm overflow-hidden border border-primary/10">
                              {/* Remove padding */}
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
+                                         {/* Use text-xs */}
+                                        <TableRow className="bg-muted/20 hover:bg-muted/30 text-xs uppercase tracking-wider">
                                              {/* Add padding */}
                                             <TableHead className="pl-4">Offer</TableHead>
                                             <TableHead>Store</TableHead>
@@ -614,7 +640,7 @@ export default function ProfilePage() {
                                                             <Badge
                                                                 variant={details.variant === 'default' ? 'secondary' : details.variant}
                                                                 className={cn(
-                                                                    'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit',
+                                                                    'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit', // Use text-xs
                                                                     details.color,
                                                                     details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
                                                                     sub.status === 'active' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
@@ -635,13 +661,16 @@ export default function ProfilePage() {
                         </Card>
                     </motion.div>
                 ) : !subError && !isLoadingSubs ? (
-                    <Card>
+                     <Card className="border-dashed border-border/50 bg-muted/20">
+                         {/* Use p-4 */}
                         <CardContent className="p-10 text-center text-muted-foreground">
                             <CalendarClock className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
+                             {/* Use text-lg */}
                            <p className="text-lg font-medium">No active subscriptions found.</p>
-                            <p className="text-sm mt-2">Explore stores offering daily or weekly deliveries!</p>
+                            {/* Use Body 2 */}
+                            <p className="text-body2 mt-2">Explore stores offering daily or weekly deliveries!</p>
                              <Link href="/" passHref>
-                                <Button variant="default" className="mt-6">Browse Stores</Button>
+                                <Button variant="default" className="mt-6" withRipple>Browse Stores</Button>
                              </Link>
                         </CardContent>
                      </Card>
