@@ -59,7 +59,19 @@ export default {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+                // Added store accent colors for Tailwind utility classes
+                'store-accent-electronics': 'hsl(var(--store-accent-electronics))',
+                'store-accent-clothing': 'hsl(var(--store-accent-clothing))',
+                'store-accent-groceries': 'hsl(var(--store-accent-groceries))',
+                'store-accent-books': 'hsl(var(--store-accent-books))',
+                'store-accent-home-goods': 'hsl(var(--store-accent-home-goods))',
+                'store-accent-toys': 'hsl(var(--store-accent-toys))',
+                'store-accent-restaurants': 'hsl(var(--store-accent-restaurants))',
+                'store-accent-coffee-shops': 'hsl(var(--store-accent-coffee-shops))',
+                'store-accent-other': 'hsl(var(--store-accent-other))',
+                // Foreground colors for store accents (example for toys)
+                'store-accent-toys-foreground': 'hsl(40, 80%, 10%)',
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

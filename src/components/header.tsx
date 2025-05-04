@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -93,6 +94,10 @@ export function Header() {
                 </SheetTrigger>
                 {/* Mobile Menu Content */}
                 <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0"> {/* Remove padding for full control */}
+                    {/* Add accessible title */}
+                    <VisuallyHidden asChild>
+                        <SheetTitle>Main Navigation</SheetTitle>
+                    </VisuallyHidden>
                     <SheetHeader className="p-4 mb-0 border-b"> {/* Adjust padding/margin */}
                         <SheetTitle className="flex items-center gap-2">
                             <Logo className="h-6 w-auto text-primary"/> {/* Use Logo */}
@@ -175,21 +180,21 @@ export function Header() {
             {/* Cart Button - Only for customer view */}
              {(!isAdminRoute && !isDriverRoute && !isStoreOwnerRoute) && (
                 <Link href="/cart" passHref>
-                     <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-accent/50">
+                     <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-accent/50" aria-label={`Shopping Cart with ${cartItemCount} items`}> {/* Added ARIA Label */}
                         <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
                         {cartItemCount > 0 && (
-                            <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] rounded-full">
+                            <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] rounded-full" aria-hidden="true"> {/* Hide badge from screen reader */}
                                 {cartItemCount}
                             </Badge>
                         )}
-                        <span className="sr-only">Shopping Cart</span>
+                        {/* <span className="sr-only">Shopping Cart</span> - Removed in favor of aria-label */}
                      </Button>
                  </Link>
              )}
 
              {/* Login/Profile Button */}
               <Link href={accountLink} passHref>
-                 <Button variant="outline" size="sm" className="rounded-full border-border"> {/* Use outline and border */}
+                 <Button variant="outline" size="sm" className="rounded-full border-border" aria-label="Account options"> {/* Use outline and border */}
                     <User className="h-4 w-4 md:mr-2" />
                      <span className="hidden md:inline">
                         {isAdminRoute ? 'Admin' : (isDriverRoute ? 'Driver' : (isStoreOwnerRoute ? 'Owner' : 'Account'))}

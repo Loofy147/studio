@@ -12,9 +12,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, ArrowRight, Eye, Star, ShoppingBag, TrendingUp, Building, Filter, Truck as TruckIcon } from 'lucide-react';
-import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from "@/components/ui/sidebar"; // Import Sidebar components
 import { Separator } from "@/components/ui/separator";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // Import motion
 import { cn, formatCurrency } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { XCircle } from "lucide-react";
@@ -110,20 +110,24 @@ export default function HomePage() {
                </Badge>
             )}
           </div>
+          {/* Adjusted padding and typography */}
           <div className="p-4 pb-2">
               {/* Use theme accent color for title hover */}
-              <CardTitle className="text-xl font-bold group-hover:text-[hsl(var(--store-accent))] transition-colors truncate">{store.name}</CardTitle>
+              {/* Applied h2 typography class */}
+              <CardTitle className="text-2xl font-semibold group-hover:text-[hsl(var(--store-accent))] transition-colors truncate">{store.name}</CardTitle>
               {/* Use theme accent color for category badge */}
               <Badge variant="outline" className="mt-1 capitalize text-[11px] tracking-wide border-[hsl(var(--store-accent))] text-[hsl(var(--store-accent))] bg-[hsl(var(--store-accent))]/10 px-1.5 py-0.5">{store.category}</Badge>
           </div>
         </CardHeader>
+         {/* Adjusted padding */}
         <CardContent className="flex-grow p-4 pt-0">
           <CardDescription className="text-sm line-clamp-3 text-muted-foreground">{store.description}</CardDescription>
         </CardContent>
-        <CardFooter className="p-4 pt-2 mt-auto"> {/* Added mt-auto */}
+         {/* Adjusted padding and used solid primary button */}
+        <CardFooter className="p-4 pt-2 mt-auto">
           <Link href={`/store/${store.id}`} passHref legacyBehavior>
-              {/* Use theme accent colors for button */}
-              <Button className="w-full group/button bg-[hsl(var(--store-accent))] text-[hsl(var(--store-accent-foreground))] hover:bg-[hsl(var(--store-accent))] hover:opacity-90 shadow hover:shadow-md transition-all" size="sm" style={{ '--store-accent': 'hsl(var(--store-accent))', '--store-accent-foreground': 'hsl(var(--store-accent-foreground))' } as React.CSSProperties}>
+              {/* Use theme accent colors for button - changed to primary */}
+              <Button className="w-full group/button btn-text-uppercase-semibold" size="sm" variant="default">
                   <Eye className="mr-1.5 h-4 w-4" />
                   Visit Store
                   <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover/button:translate-x-1" />
@@ -168,18 +172,21 @@ export default function HomePage() {
                 </Link>
              )}
           </div>
+          {/* Adjusted padding */}
           <div className="p-3 pb-0">
-            {/* Use theme accent color on hover */}
-            <CardTitle className="text-sm font-semibold line-clamp-1 group-hover:text-[hsl(var(--store-accent))] transition-colors">{product.name}</CardTitle>
+            {/* Applied h2 typography class */}
+            <CardTitle className="text-2xl font-semibold line-clamp-1 group-hover:text-[hsl(var(--store-accent))] transition-colors">{product.name}</CardTitle>
           </div>
         </CardHeader>
+         {/* Adjusted padding */}
         <CardContent className="flex-grow p-3 pt-1">
-          {/* Use theme accent color for price */}
-          <p className="font-bold text-lg text-[hsl(var(--store-accent))]">{formatCurrency(product.price)}</p>
+          {/* Applied h2 typography class and theme accent color for price */}
+          <p className="text-2xl font-bold text-[hsl(var(--store-accent))]">{formatCurrency(product.price)}</p>
         </CardContent>
+         {/* Adjusted padding and button text style */}
         <CardFooter className="p-3 pt-0 mt-auto">
              {/* Use theme accent color for button */}
-             <Button size="sm" className="w-full group/button text-xs h-8 bg-[hsl(var(--store-accent))] text-[hsl(var(--store-accent-foreground))] hover:bg-[hsl(var(--store-accent))] hover:opacity-90" style={{ '--store-accent': 'hsl(var(--store-accent))' } as React.CSSProperties}>
+             <Button size="sm" variant="default" className="w-full group/button text-xs h-8 btn-text-uppercase-semibold">
                  View Details <ArrowRight className="ml-auto h-3 w-3 transition-transform duration-300 group-hover/button:translate-x-0.5" />
              </Button>
         </CardFooter>
@@ -207,13 +214,13 @@ export default function HomePage() {
   )
 
    const ProductSkeleton = () => (
-     <Card className="flex flex-col overflow-hidden border animate-pulse">
+     <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50">
         <Skeleton className="h-32 w-full bg-muted/50 rounded-t-md" /> {/* Rounded top */}
         <CardHeader className="p-3 pb-0">
-            <Skeleton className="h-5 w-3/4 mb-1 bg-muted/50" />
+            <Skeleton className="h-6 w-3/4 mb-1 bg-muted/50" /> {/* Title skeleton adjusted */}
         </CardHeader>
         <CardContent className="p-3 pt-1">
-             <Skeleton className="h-5 w-1/4 bg-muted/50" />
+             <Skeleton className="h-6 w-1/3 bg-muted/50" /> {/* Price skeleton adjusted */}
         </CardContent>
         <CardFooter className="p-3 pt-0">
             <Skeleton className="h-8 w-full bg-muted/50" />
@@ -264,14 +271,14 @@ export default function HomePage() {
          </Sidebar>
 
          <SidebarInset className="flex-1 flex flex-col">
-            {/* Main content area */}
-            <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-12"> {/* Increased spacing */}
+            {/* Main content area - Adjusted padding */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8"> {/* Adjusted spacing */}
 
                 {/* Hero/Welcome Section */}
-                <section className="text-center py-12 px-4 bg-gradient-to-br from-primary/5 via-background to-accent/5 rounded-xl shadow-sm border border-primary/10 relative overflow-hidden">
+                <section className="text-center py-12 px-4 bg-gradient-to-br from-primary/5 via-background to-secondary/5 rounded-xl shadow-sm border border-primary/10 relative overflow-hidden"> {/* Use secondary for gradient */}
                     {/* Background shapes (optional enhancement) */}
                     <div className="absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full opacity-50 -translate-x-1/2 -translate-y-1/2 blur-2xl"></div>
-                    <div className="absolute bottom-0 right-0 w-48 h-48 bg-accent/10 rounded-full opacity-50 translate-x-1/3 translate-y-1/3 blur-3xl"></div>
+                    <div className="absolute bottom-0 right-0 w-48 h-48 bg-secondary/10 rounded-full opacity-50 translate-x-1/3 translate-y-1/3 blur-3xl"></div> {/* Use secondary */}
 
                   <motion.h1
                      initial={{ opacity: 0, y: -20 }}
@@ -318,15 +325,16 @@ export default function HomePage() {
                 {/* Best Selling Products Section */}
                 <section className="space-y-6">
                   <h2 className="text-2xl font-semibold flex items-center gap-2 border-b pb-3 text-foreground/90"> {/* Adjusted padding */}
-                    <TrendingUp className="text-accent" /> Best Selling Products
+                    {/* Use secondary color for trending icon */}
+                    <TrendingUp className="text-secondary" /> Best Selling Products
                   </h2>
                   {isLoadingProducts ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5"> {/* Adjusted gap */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"> {/* Adjusted gap */}
                       {Array.from({ length: 6 }).map((_, index) => <ProductSkeleton key={index} />)}
                     </div>
                   ) : products.length > 0 ? (
                     <motion.div
-                        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5" /* Adjusted gap */
+                        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6" /* Adjusted gap */
                         variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
                         initial="hidden"
                         animate="visible"
@@ -343,7 +351,12 @@ export default function HomePage() {
                 </section>
 
                  {/* Become a Driver Section */}
-                 <section className="bg-gradient-to-r from-blue-600 to-teal-600 text-white p-8 rounded-lg shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden"> {/* Added overflow */}
+                  <motion.section
+                     initial={{ opacity: 0, y: 20 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ duration: 0.5, delay: 0.3 }}
+                     className="bg-primary text-primary-foreground p-8 rounded-lg shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden" /* Use primary color */
+                    >
                      {/* Subtle background pattern */}
                      <div className="absolute inset-0 opacity-10 bg-[url('/circuit-pattern.svg')] bg-repeat"></div>
                     <div className="flex-1 relative z-10">
@@ -355,11 +368,12 @@ export default function HomePage() {
                         </p>
                     </div>
                     <Link href="/driver/apply" passHref legacyBehavior>
-                         <Button size="lg" variant="secondary" className="bg-white text-teal-700 hover:bg-gray-100 font-bold py-3 px-8 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative z-10">
+                         {/* Use Secondary button for contrast */}
+                         <Button size="lg" variant="secondary" className="font-bold py-3 px-8 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative z-10 btn-text-uppercase-semibold">
                            Start Earning Now <ArrowRight className="ml-2 h-5 w-5"/>
                          </Button>
                     </Link>
-                 </section>
+                 </motion.section>
 
 
                 <Separator className="my-8 border-border/50"/> {/* Slightly more prominent separator */}
@@ -370,12 +384,12 @@ export default function HomePage() {
                     <Building className="text-primary" /> Top Rated Stores
                   </h2>
                   {isLoadingStores ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"> {/* Adjusted gap */}
                       {Array.from({ length: 3 }).map((_, index) => <StoreSkeleton key={index} />)}
                     </div>
                   ) : topStores.length > 0 ? (
                     <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" /* Adjusted gap */
                         variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
                         initial="hidden"
                         animate="visible"
@@ -403,7 +417,7 @@ export default function HomePage() {
                   </div>
 
                   {isLoadingStores ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"> {/* Adjusted gap */}
                       {Array.from({ length: 6 }).map((_, index) => <StoreSkeleton key={index} />)}
                     </div>
                   ) : error && !isLoadingStores ? ( // Show error only if not loading
@@ -412,7 +426,7 @@ export default function HomePage() {
                     </Card>
                   ) : filteredStores.length > 0 ? (
                     <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" /* Adjusted gap */
                         variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
                         initial="hidden"
                         animate="visible"
@@ -442,4 +456,3 @@ export default function HomePage() {
     </SidebarProvider>
   );
 }
-

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -21,7 +22,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // 
 const getThemeClass = (category: StoreCategory | undefined): string => {
    if (!category) return 'theme-category-other'; // Default theme
    const formattedCategory = category.replace(/\s+/g, '-').toLowerCase();
-   return `theme-category-${formattedCategory}`;
+   return `theme-category-theme-category-${formattedCategory}`; // Ensure prefix matches CSS
 }
 
 
@@ -236,23 +237,29 @@ export default function StorePage() {
                     />
                      {product.size && <Badge variant="secondary" className="absolute bottom-1 right-1 text-[10px] px-1.5 py-0.5 bg-black/50 text-white border-none">{product.size}</Badge>}
                 </div>
+                 {/* Adjusted padding */}
                 <div className="p-3 pb-1">
-                    <CardTitle className="text-base font-semibold line-clamp-1 group-hover:text-[hsl(var(--store-accent))] transition-colors">{product.name}</CardTitle>
+                    {/* Applied h2 typography */}
+                    <CardTitle className="text-2xl font-semibold line-clamp-1 group-hover:text-[hsl(var(--store-accent))] transition-colors">{product.name}</CardTitle>
                     <Badge variant="secondary" className="mt-1 capitalize text-[10px] font-normal px-1.5 py-0.5 tracking-wide">{product.category}</Badge>
                 </div>
             </CardHeader>
+            {/* Adjusted padding */}
             <CardContent className="flex-grow p-3 pt-1 space-y-1">
-                <p className="font-bold text-lg text-[hsl(var(--store-accent))]">{formatCurrency(product.price)}</p>
+                 {/* Applied h2 typography */}
+                <p className="text-2xl font-bold text-[hsl(var(--store-accent))]">{formatCurrency(product.price)}</p>
                 <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
                  {product.ingredients && (
                      <p className="text-xs text-muted-foreground/80 pt-1">Ingredients: {product.ingredients.join(', ')}</p>
                  )}
             </CardContent>
+             {/* Adjusted padding */}
             <CardFooter className="p-3 pt-1 mt-auto">
                 <Button
                     size="sm"
+                    variant="default" // Use solid primary button
                     className={cn(
-                        "w-full group/button bg-[hsl(var(--store-accent))] text-[hsl(var(--store-accent-foreground))] hover:bg-[hsl(var(--store-accent))] hover:opacity-90",
+                        "w-full group/button btn-text-uppercase-semibold", // Added uppercase class
                          !store?.isOpen && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed" // Style for closed store button
                     )}
                     onClick={() => handleAddToCart(product)}
@@ -320,7 +327,7 @@ export default function StorePage() {
                     size="sm"
                     variant="default" // Consider a different variant for subscriptions
                     className={cn(
-                        "w-full group/button bg-amber-500 hover:bg-amber-600 text-white",
+                        "w-full group/button bg-amber-500 hover:bg-amber-600 text-white btn-text-uppercase-semibold", // Added uppercase class
                         !store?.isOpen && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
                     )}
                     onClick={() => handleSubscribe(offer)}
@@ -343,11 +350,11 @@ export default function StorePage() {
      <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50">
         <Skeleton className="h-40 w-full bg-muted/50" />
         <CardHeader className="p-3 pb-1">
-            <Skeleton className="h-5 w-3/4 mb-1 bg-muted/50" />
+            <Skeleton className="h-6 w-3/4 mb-1 bg-muted/50" /> {/* Title skeleton adjusted */}
             <Skeleton className="h-3 w-1/3 bg-muted/50" />
         </CardHeader>
         <CardContent className="p-3 pt-1 space-y-1">
-            <Skeleton className="h-6 w-1/4 bg-muted/50" />
+            <Skeleton className="h-6 w-1/4 bg-muted/50" /> {/* Price skeleton adjusted */}
             <Skeleton className="h-3 w-full bg-muted/50" />
             <Skeleton className="h-3 w-5/6 bg-muted/50" />
         </CardContent>
@@ -378,7 +385,7 @@ export default function StorePage() {
 
   if (isLoading || isLoadingProfile) { // Show loading skeleton if either store or profile is loading
     return (
-        <div className="container mx-auto px-4 py-10 space-y-8 animate-pulse"> {/* Added container and padding */}
+        <div className="container mx-auto px-4 py-10 space-y-8 animate-pulse"> {/* Adjusted container padding */}
             {/* Loading state structure */}
              <div className="flex items-center mb-6">
                 <Skeleton className="h-8 w-32 bg-muted/50" /> {/* Back button */}
@@ -403,24 +410,20 @@ export default function StorePage() {
             <Separator className="my-8"/>
 
              {/* Offer Skeleton section (if applicable) */}
-            {/* A simple check like this isn't ideal for loading state, but okay for now */}
-             {/* {dailyOfferEligibleCategories.includes('groceries') && ( */}
-                <>
-                     <Skeleton className="h-8 w-1/3 mb-4 bg-muted/50" />
-                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                        <DailyOfferSkeleton />
-                        <DailyOfferSkeleton />
-                     </div>
-                     <Separator className="my-8"/>
-                </>
-            {/* )} */}
-
+             <>
+                 <Skeleton className="h-8 w-1/3 mb-4 bg-muted/50" />
+                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"> {/* Adjusted gap */}
+                    <DailyOfferSkeleton />
+                    <DailyOfferSkeleton />
+                 </div>
+                 <Separator className="my-8"/>
+            </>
 
             <div className="flex justify-between items-center mb-6">
                 <Skeleton className="h-8 w-1/4 bg-muted/50" /> {/* Products Title */}
                 <Skeleton className="h-10 w-[220px] bg-muted/50" /> {/* Filter */}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"> {/* Adjusted gap */}
                 {Array.from({ length: 10 }).map((_, index) => <ProductSkeleton key={index} />)}
             </div>
         </div>
@@ -429,7 +432,7 @@ export default function StorePage() {
 
   if (error) {
      return (
-       <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center h-[60vh]"> {/* Added container */}
+       <div className="container mx-auto px-6 md:px-8 py-10 flex flex-col items-center justify-center h-[60vh]"> {/* Adjusted padding */}
            <Alert variant="destructive" className="max-w-md w-full">
                 <XCircle className="h-4 w-4" />
                 <AlertTitle>Oops! Something went wrong.</AlertTitle>
@@ -450,7 +453,7 @@ export default function StorePage() {
 
   if (!store) {
      return (
-        <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center h-[60vh]"> {/* Added container */}
+        <div className="container mx-auto px-6 md:px-8 py-10 flex flex-col items-center justify-center h-[60vh]"> {/* Adjusted padding */}
            <Card className="w-full max-w-md">
                <CardContent className="p-10 text-center text-muted-foreground">
                    <StoreIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/> {/* Changed Icon */}
@@ -468,7 +471,7 @@ export default function StorePage() {
    }
 
   return (
-     <div className={cn("container mx-auto px-4 py-10 space-y-10", themeClass)}> {/* Added container and padding */}
+     <div className={cn("container mx-auto px-6 md:px-8 py-10 space-y-10", themeClass)}> {/* Adjusted padding and spacing */}
       {/* Back Button */}
         <Link href="/" passHref legacyBehavior>
             <Button variant="ghost" size="sm" className="mb-0 text-muted-foreground hover:text-foreground">
@@ -521,6 +524,7 @@ export default function StorePage() {
                      )}
                  </div>
             </CardHeader>
+             {/* Adjusted padding */}
             <CardContent className={cn("pt-16 text-center -mt-14 relative z-0 pb-6 space-y-2", (!store.isOpen || !store.isActive) && "opacity-70")}> {/* Adjust padding for overlap, reduce opacity if closed/inactive */}
                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{store.name}</h1>
                  <Badge
@@ -532,7 +536,8 @@ export default function StorePage() {
                  <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto text-sm">{store.description}</p>
 
                  {/* Store Details Row */}
-                 <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-2 pt-2 text-xs text-muted-foreground">
+                  {/* Adjusted spacing and font size */}
+                 <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-2 pt-2 text-sm text-muted-foreground">
                     {store.rating && (
                         <div className="flex items-center gap-1 font-medium">
                             <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" /> {/* Filled star */}
@@ -541,12 +546,12 @@ export default function StorePage() {
                      )}
                      {store.address && (
                         <div className="flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5" /> {store.address}
+                            <MapPin className="w-4 h-4" /> {store.address}
                         </div>
                      )}
                       {store.openingHours && (
                         <div className="flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5" /> {store.openingHours}
+                            <Clock className="w-4 h-4" /> {store.openingHours}
                         </div>
                      )}
                  </div>
@@ -576,10 +581,12 @@ export default function StorePage() {
        {/* Daily Offers Section (if applicable) */}
        {dailyOfferEligibleCategories.includes(store.category as StoreCategory) && activeDailyOffers.length > 0 && store.isActive && ( // Ensure StoreCategory type check and active check
           <section className="pt-0"> {/* Removed top padding */}
-            <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
+             {/* Adjusted spacing */}
+            <h2 className="text-3xl font-semibold flex items-center gap-2 mb-6">
                <CalendarClock className="text-amber-500"/> Daily & Weekly Offers
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+             {/* Adjusted gap */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                  <AnimatePresence>
                     {activeDailyOffers.map((offer, index) => ( // Render only active offers
                         <DailyOfferCard key={offer.id} offer={offer} delay={index} />
@@ -594,8 +601,10 @@ export default function StorePage() {
 
        {/* Products Section */}
        <div className="pt-0"> {/* Removed top padding */}
+            {/* Adjusted spacing */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <h2 className="text-2xl font-semibold flex items-center gap-2">
+                 {/* Applied h2 typography */}
+                <h2 className="text-3xl font-semibold flex items-center gap-2">
                    <Tag className="text-[hsl(var(--store-accent))]"/> Products
                 </h2>
                  {/* Product Category Filter */}
@@ -622,7 +631,8 @@ export default function StorePage() {
 
             {store.products && store.products.length > 0 && store.isActive ? ( // Only render product grid if store is active
                  filteredProducts.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                     // Adjusted gap
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                         <AnimatePresence>
                             {filteredProducts.map((product, index) => (
                                 <ProductCard key={product.id} product={product} delay={index}/>
