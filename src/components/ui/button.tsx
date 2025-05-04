@@ -9,11 +9,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 shadow-md border border-primary/60", // Adjusted hover/active, added border
-        blue: "bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 shadow-md", // Adjusted hover/active
-	      vibrant: "bg-accent text-accent-foreground hover:bg-accent/90 active:bg-accent/80 shadow-md", // Adjusted hover/active
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 shadow border border-primary/60", // Subtle shadow and border for default
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 shadow-md", // Adjusted hover/active
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 shadow-sm", // Added shadow-sm
         outline:
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground active:bg-accent/90", // Adjusted active
         secondary:
@@ -46,7 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }), className)}
+        className={cn(buttonVariants({ variant, size, className }))} // Removed redundant className merge
         ref={ref}
         {...props}
       />

@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google'; // Import Inter font
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
 import { cn } from '@/lib/utils';
 import { LayoutAnimator } from '@/components/LayoutAnimator';
-import { Logo } from '@/components/Logo'; // Import the Logo component
+import { Logo } from '@/components/Logo';
+
+// Configure Inter font
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'SwiftDispatch Marketplace',
@@ -17,10 +21,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning> {/* Add suppressHydrationWarning for theme changes */}
+      {/* Apply Inter font variable to body */}
       <body
         className={cn(
-          "antialiased flex flex-col min-h-screen bg-background"
+          inter.variable, // Apply Inter font variable
+          "font-sans antialiased flex flex-col min-h-screen bg-background" // Use 'font-sans' which defaults to the variable
         )}
       >
         <Header />
