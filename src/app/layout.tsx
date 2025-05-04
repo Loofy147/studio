@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning> {/* Removed whitespace */}
+    <html lang="en" suppressHydrationWarning>{/* Add suppressHydrationWarning for theme changes */}
       {/* Apply Inter font variable to body */}
       <body
         className={cn(
