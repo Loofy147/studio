@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -9,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getDriverById, Driver } from '@/services/driver';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Phone, Truck, Star, Edit, Save, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, Truck, Star, Edit, Save, Loader2, Bike } from 'lucide-react'; // Use Bike instead of Moped
 import { motion } from 'framer-motion';
 import {
   Select,
@@ -25,8 +26,17 @@ async function updateDriverProfile(driverId: string, data: Partial<Driver>): Pro
   console.log(`Updating profile for driver ${driverId}`, data);
   await new Promise(resolve => setTimeout(resolve, 800));
   // In a real app, update the backend
-  return null; // Placeholder return
+  // For demo, find and update in mock data (careful, this is not persistent)
+   const driverIndex = mockDrivers!.findIndex(d => d.id === driverId);
+   if (driverIndex !== -1) {
+       mockDrivers![driverIndex] = { ...mockDrivers![driverIndex], ...data };
+       return { ...mockDrivers![driverIndex] }; // Return the updated mock data
+   }
+  return null; // Return null if not found (or throw error)
 }
+
+// Temp definition until service file is fixed
+let mockDrivers: Driver[] | null = null;
 
 
 export default function DriverProfilePage() {
@@ -48,15 +58,21 @@ export default function DriverProfilePage() {
       setError(null);
       try {
         const data = await getDriverById(driverId);
-        if (data) {
-          setDriver(data);
+         // Assign mock data if service call fails (for development)
+        if (!mockDrivers) mockDrivers = [ // Initialize if not already done
+             {id: 'driver-001', name: 'Driver Dan', email: 'dan.driver@dispatch.com', phone: '555-555-6666', vehicleType: 'car', status: 'active', availability: 'available', rating: 4.7, licensePlate: 'DRV-123', joinedAt: new Date(Date.now() - 90*86400000)}
+         ];
+        const driverData = data ?? mockDrivers.find(d => d.id === driverId) ?? null; // Fallback to mock
+
+        if (driverData) {
+          setDriver(driverData);
           setFormData({ // Initialize form data
-            name: data.name,
-            phone: data.phone,
-            email: data.email,
-            vehicleType: data.vehicleType,
-            vehicleDetails: data.vehicleDetails,
-            licensePlate: data.licensePlate,
+            name: driverData.name,
+            phone: driverData.phone,
+            email: driverData.email,
+            vehicleType: driverData.vehicleType,
+            vehicleDetails: driverData.vehicleDetails,
+            licensePlate: driverData.licensePlate,
           });
         } else {
           setError("Could not find your driver profile.");
@@ -84,10 +100,14 @@ export default function DriverProfilePage() {
       setIsSaving(true);
       try {
           const updatedDriverData = await updateDriverProfile(driverId, formData);
-          // TODO: Handle response, update local state 'driver' if successful
-          setDriver(prev => prev ? { ...prev, ...formData } : null); // Optimistic update for now
-          toast({ title: "Profile Updated", description: "Your profile details have been saved." });
-          setIsEditing(false);
+          // If update successful, update local state 'driver'
+          if (updatedDriverData) {
+            setDriver(updatedDriverData);
+            toast({ title: "Profile Updated", description: "Your profile details have been saved." });
+            setIsEditing(false);
+          } else {
+             throw new Error("Failed to update profile on the server.");
+          }
       } catch (err) {
           toast({ title: "Save Failed", description: "Could not save profile changes.", variant: "destructive"});
       } finally {
@@ -242,4 +262,3 @@ export default function DriverProfilePage() {
 
 // Add XCircle icon
 import { XCircle } from 'lucide-react';
-```
