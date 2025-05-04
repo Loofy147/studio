@@ -156,28 +156,28 @@ export default function OrdersPage() {
             return (
               <motion.div key={order.id} variants={itemVariants}>
                 <Card className="overflow-hidden border shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
-                  <CardHeader className="bg-muted/20 p-4"> {/* Slightly lighter header */}
+                  <CardHeader className="bg-muted/30 p-4"> {/* Slightly lighter header */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                       <div>
                           <CardTitle className="text-lg font-semibold">Order #{order.id.substring(order.id.length - 6)}</CardTitle>
                           <CardDescription className="text-sm mt-0.5">
                               Placed on {format(order.orderDate, 'MMMM d, yyyy')} from{' '}
                                 <Link href={`/store/${order.storeId}`} className="font-medium text-primary hover:underline">
-                                  {order.storeName}
+                                    {order.storeName}
                                 </Link>
                           </CardDescription>
                       </div>
                       <Badge
                           variant={details.variant === 'default' ? 'secondary' : details.variant} // Use secondary for delivered badge base
                           className={cn(
-                              'capitalize text-xs px-3 py-1 rounded-full font-medium border',
+                              'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit',
                               details.color,
                               details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
                               details.variant === 'default' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400' // Specific style for 'Delivered'
                           )}
                       >
-                          <StatusIcon className="h-3.5 w-3.5 mr-1.5" />
-                          {order.status}
+                          <StatusIcon className="h-3 w-3" />
+                          <span>{order.status}</span>
                       </Badge>
                     </div>
                   </CardHeader>

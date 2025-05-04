@@ -2,16 +2,17 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+// Assume a service function getUserProfiles exists, similar to getStores/getProducts
 import { getUserProfile, UserProfile, removeFriend, getFriendProfiles } from '@/services/store';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ArrowLeft, Users, XCircle, Trash2, Loader2, MessageSquare, UserPlus } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArrowLeft, Users, XCircle, Trash2, Loader2, MessageSquare, UserPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Input } from '@/components/ui/input';
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +25,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 
 export default function FriendsListPage() {
@@ -89,9 +91,10 @@ export default function FriendsListPage() {
                     description: `You are no longer friends with ${friendName}.`,
                     variant: "destructive",
                  });
-            } else {
-                 throw new Error("Failed to update profile after removing friend.");
-            }
+             } else {
+                  throw new Error("Failed to update profile after removing friend.");
+             }
+
         } catch (err: any) {
             console.error("Failed to remove friend:", err);
             toast({
@@ -129,7 +132,7 @@ export default function FriendsListPage() {
     return (
         <div className="container mx-auto py-10 space-y-8">
             <div>
-                <Link href="/profile" passHref>
+                <Link href="/profile" passHref legacyBehavior>
                     <Button variant="ghost" size="sm" className="mb-2 text-muted-foreground hover:text-foreground">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Profile
                     </Button>
@@ -191,13 +194,15 @@ export default function FriendsListPage() {
                                             <AvatarFallback>{friend.name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <p className="font-semibold">{friend.name}</p>
+                                            <p className="font-semibold"><Link href={`/profile?user=${friend.id}`} className="hover:underline">{friend.name}</Link></p>
                                             <p className="text-sm text-muted-foreground">{friend.email}</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2 mt-3 sm:mt-0">
-                                        <Button variant="outline" size="sm" disabled> {/* Chat functionality TBD */}
-                                            <MessageSquare className="mr-2 h-4 w-4"/> Chat
+                                        <Button variant="outline" size="sm" asChild>
+                                             <Link href={`/chat?user=${friend.id}`} className="flex items-center justify-center"> {/* Link to chat */}
+                                                <MessageSquare className="mr-2 h-4 w-4"/> Chat
+                                            </Link>
                                         </Button>
                                          <AlertDialog>
                                             <AlertDialogTrigger asChild>
