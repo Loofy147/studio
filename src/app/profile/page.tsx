@@ -3,13 +3,13 @@
 
 import { useState, useEffect, useCallback } from "react"; // Added useCallback
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, updateSubscriptionStatus, DailyOffer, DeliveryAddress, addUserAddress, updateUserAddress, deleteUserAddress } from "@/services/store"; // Import address functions
+import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, updateSubscriptionStatus, DailyOffer, DeliveryAddress, addUserAddress, updateUserAddress, deleteUserAddress } from '@/services/store'; // Import address functions
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Button, buttonVariants } from "@/components/ui/button"; // Import buttonVariants
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge, badgeVariants } from "@/components/ui/badge"; // Import badgeVariants
+import { Badge, badgeVariants, type BadgeProps } from "@/components/ui/badge"; // Import badgeVariants and BadgeProps type
 import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat, Home, Briefcase, Plus, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon, Check } from 'lucide-react'; // Added Check icon
 import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -37,7 +37,7 @@ import { LayoutAnimator } from "@/components/LayoutAnimator"; // Import Layout A
 
 
 // Map status to icon and variant for the order table
-const orderStatusDetails: Record<Order['status'], { icon: React.ElementType; variant: VariantProps<typeof badgeVariants>["variant"]; color: string }> = {
+const orderStatusDetails: Record<Order['status'], { icon: React.ElementType; variant: BadgeProps["variant"]; color: string }> = {
     'Pending': { icon: Hourglass, variant: 'secondary', color: 'text-yellow-600 dark:text-yellow-400' }, // Use secondary for pending
     'Processing': { icon: Settings, variant: 'secondary', color: 'text-blue-600 dark:text-blue-400' }, // Use secondary for processing
     'Shipped': { icon: Truck, variant: 'secondary', color: 'text-purple-600 dark:text-purple-400' }, // Use secondary for shipped
@@ -46,7 +46,7 @@ const orderStatusDetails: Record<Order['status'], { icon: React.ElementType; var
 };
 
 // Map status to icon and variant for the subscription table
-const subscriptionStatusDetails: Record<Subscription['status'], { icon: React.ElementType; variant: VariantProps<typeof badgeVariants>["variant"]; color: string; label: string }> = {
+const subscriptionStatusDetails: Record<Subscription['status'], { icon: React.ElementType; variant: BadgeProps["variant"]; color: string; label: string }> = {
     'active': { icon: Play, variant: 'success', color: 'text-accent-foreground dark:text-accent-foreground', label: 'Active' },
     'paused': { icon: Pause, variant: 'secondary', color: 'text-yellow-600 dark:text-yellow-400', label: 'Paused' }, // Use secondary for paused
     'cancelled': { icon: XCircle, variant: 'destructive', color: 'text-destructive-foreground dark:text-destructive-foreground', label: 'Cancelled' }
@@ -375,7 +375,7 @@ export default function ProfilePage() {
             {/* Profile Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6">
                 {/* Use Heading 1 size */}
-                <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-3">
+                <h1 className="h1 flex items-center gap-3"> {/* Use h1 class */}
                     <User className="h-8 w-8 text-primary" /> Your Profile
                 </h1>
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
@@ -405,7 +405,7 @@ export default function ProfilePage() {
                     </Avatar>
                     <div className="flex-grow mt-2 sm:mt-0">
                          {/* Use Heading 2 size */}
-                        <CardTitle className="text-3xl font-bold text-primary">{profile.name}</CardTitle>
+                        <CardTitle className="h2 text-primary">{profile.name}</CardTitle> {/* Use h2 class */}
                          {/* Use text-lg */}
                         <CardDescription className="flex items-center gap-1.5 text-lg mt-1 text-muted-foreground">
                             <Mail className="h-5 w-5"/>{profile.email}
@@ -417,9 +417,9 @@ export default function ProfilePage() {
                             </CardDescription>
                         )}
                     </div>
-                    <Link href="/profile/account-settings" passHref legacyBehavior>
+                    <Link href="/profile/account-settings" passHref>
                         {/* Use primary button */}
-                        <Button variant="default" size="sm" className="self-start sm:self-center">
+                         <Button variant="default" size="sm" className="self-start sm:self-center">
                             <Settings className="mr-2 h-4 w-4" /> Account Settings
                         </Button>
                     </Link>
@@ -431,7 +431,7 @@ export default function ProfilePage() {
                     <div className="space-y-4">
                          {/* Use Heading 3 size */}
                         <div className="flex justify-between items-center">
-                            <h3 className="text-2xl font-semibold flex items-center gap-2 text-foreground/90"><MapPin className="h-5 w-5 text-primary"/>Delivery Addresses</h3>
+                            <h3 className="h3 flex items-center gap-2 text-foreground/90"><MapPin className="h-5 w-5 text-primary"/>Delivery Addresses</h3> {/* Use h3 class */}
                             <Button variant="outline" size="sm" onClick={() => handleOpenAddressDialog()}>
                                 <Plus className="mr-2 h-4 w-4" /> Add Address
                             </Button>
@@ -509,7 +509,7 @@ export default function ProfilePage() {
                     {/* Friends & Followed Stores Links */}
                     <Separator />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Use gap-6 */}
-                        <Link href="/profile/friends" passHref legacyBehavior>
+                        <Link href="/profile/friends" passHref>
                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
                                  {/* Use p-4 */}
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
@@ -524,7 +524,7 @@ export default function ProfilePage() {
                                 </CardContent>
                             </Card>
                         </Link>
-                        <Link href="/profile/followed-stores" passHref legacyBehavior>
+                        <Link href="/profile/followed-stores" passHref>
                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -547,7 +547,7 @@ export default function ProfilePage() {
                         <div>
                             <span className="font-semibold block text-lg text-foreground/90">Loyalty Points</span>
                              {/* Use Heading 2 size */}
-                            <span className="text-4xl font-bold text-secondary">{profile.loyaltyPoints}</span>
+                            <span className="h2 text-secondary">{profile.loyaltyPoints}</span> {/* Use h2 class */}
                             <span className="text-muted-foreground text-base"> points earned</span>
                         </div>
                     </div>
@@ -559,10 +559,10 @@ export default function ProfilePage() {
                             <Separator />
                             <div className="space-y-3 border p-6 rounded-md bg-muted/30"> {/* Use p-6 */}
                                 {/* Use Heading 3 size */}
-                                <h3 className="text-2xl font-semibold flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3>
+                                <h3 className="h3 flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3> {/* Use h3 class */}
                                 <p className="text-base text-muted-foreground">Manage your stores, products, and orders.</p> {/* Use text-base */}
-                                <Link href="/stores" passHref legacyBehavior>
-                                    <Button variant="default" size="lg">Go to Store Management</Button> {/* Use size="lg" */}
+                                <Link href="/stores" passHref>
+                                     <Button variant="default" size="lg">Go to Store Management</Button> {/* Use size="lg" */}
                                 </Link>
                             </div>
                         </>
@@ -591,7 +591,7 @@ export default function ProfilePage() {
              {/* Use space-y-6 */}
             <div className="space-y-6">
                  {/* Use Heading 2 size */}
-                <h2 className="text-3xl font-bold flex items-center gap-2">
+                <h2 className="h2 flex items-center gap-2"> {/* Use h2 class */}
                     <CalendarClock className="h-7 w-7 text-primary" /> My Subscriptions
                 </h2>
 
@@ -727,12 +727,12 @@ export default function ProfilePage() {
             <div className="space-y-6"> {/* Use space-y-6 */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     {/* Use Heading 2 size */}
-                    <h2 className="text-3xl font-bold flex items-center gap-2">
+                    <h2 className="h2 flex items-center gap-2"> {/* Use h2 class */}
                         <ShoppingBag className="h-7 w-7 text-primary" /> Recent Order History
                     </h2>
-                    <Link href="/orders" passHref legacyBehavior>
-                         <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
-                    </Link>
+                     <Link href="/orders" passHref legacyBehavior>
+                          <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
+                     </Link>
                 </div>
 
                 {orderError && !isLoadingOrders && ( // Show order-specific error

@@ -1,4 +1,5 @@
-"use client";
+// src/components/header.tsx:219:17
+'use client';
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { Logo } from '@/components/Logo'; // Import the new Logo component
 // Assume a cart state/hook exists (replace with actual implementation)
 // import { useCart } from '@/hooks/useCart';
 
-export function Header() {
+function defaultHeader() {
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
    const pathname = usePathname();
    const isAdminRoute = pathname.startsWith('/admin');
@@ -203,5 +204,18 @@ export function Header() {
         </div>
       </div>
     </header>
-  );
+  )
 }
+
+Header=defaultHeader;
+
+function _c1({className,side="right",...props}){
+  const SheetContent =Sheet["SheetContent"];
+  const X =lucideReact["X"];
+  const SheetPrimitive =radixUiReactDialog;
+  return SheetPrimitive.Content({ref:null,className:"cn(sheetVariants({ side }), className)",...props,children:[React.createElement(SheetPrimitive.Close,{className:"absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"},React.createElement(X,{className:"h-4 w-4"}),React.createElement("span",{className:"sr-only"},"Close"))]})
+}
+
+
+
+//# sourceMappingURL=header.module.css.map

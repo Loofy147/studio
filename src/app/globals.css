@@ -11,68 +11,68 @@ body {
 }
 
 @layer base {
-  /* Default Theme (Teal/Orange) */
+  /* Default Theme (MUI-Inspired) */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    --background: 0 0% 96%; /* MUI #f5f5f5 */
+    --foreground: 224 71.4% 4.1%; /* Default dark text */
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 180 100% 25.1%; /* Teal */
-    --primary-foreground: 180 100% 96.1%;
-    --secondary: 210 20% 98%; /* Light Gray */
-    --secondary-foreground: 224 71.4% 4.1%;
-    --muted: 210 20% 94%; /* Slightly darker muted */
-    --muted-foreground: 215 20% 65.1%;
-    --accent: 28 100% 50%; /* Orange */
-    --accent-foreground: 28 100% 5%;
+    --primary: 210 69% 46%; /* MUI #1976d2 */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 337 100% 43%; /* MUI #dc004e */
+    --secondary-foreground: 337 100% 98%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 180 100% 25.1%; /* Kept original Teal as accent */
+    --accent-foreground: 180 100% 96.1%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 20% 88%; /* Lighter border */
-    --input: 210 20% 92%; /* Input background */
-    --ring: 180 100% 35.1%; /* Slightly darker teal for focus rings */
-    --radius: 0.5rem; /* Consistent with shadcn default */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 69% 56%; /* Lighter primary */
+    --radius: 0.5rem; /* MUI 8px */
 
     /* Chart Colors (Example) */
     --chart-1: hsl(var(--primary));
-    --chart-2: hsl(var(--accent));
+    --chart-2: hsl(var(--secondary)); /* Use secondary for charts */
     --chart-3: hsl(120, 70%, 45%); /* Green */
-    --chart-4: hsl(300 70% 50%); /* Violet */
+    --chart-4: hsl(var(--accent)); /* Use accent */
     --chart-5: hsl(50 80% 55%); /* Gold */
 
-    /* Sidebar Theme Variables (Default - matching light theme) */
-    --sidebar-background: hsl(210 20% 98%);
+    /* Sidebar Theme Variables (Unified - matching light theme) */
+    --sidebar-background: hsl(210 20% 98%); /* Light Gray */
     --sidebar-foreground: hsl(224 71.4% 4.1%);
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: hsl(210 20% 94%); /* Muted as accent */
+    --sidebar-accent: hsl(210 40% 96.1%); /* Muted as accent */
     --sidebar-accent-foreground: hsl(224 71.4% 4.1%);
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
   }
 
   .dark {
-    /* Dark Mode Theme */
+    /* Dark Mode Theme (MUI-Inspired) */
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
     --card: 224 71.4% 4.1%;
     --card-foreground: 210 20% 98%;
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 210 20% 98%;
-    --primary: 180 90% 45%; /* Brighter Teal */
-    --primary-foreground: 180 90% 5%;
-    --secondary: 215 25% 16.7%; /* Dark Gray */
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 20% 25%; /* Dark Muted */
+    --primary: 210 75% 55%; /* Brighter Blue */
+    --primary-foreground: 210 75% 5%;
+    --secondary: 337 95% 55%; /* Brighter Pink */
+    --secondary-foreground: 337 95% 5%;
+    --muted: 215 20% 25%;
     --muted-foreground: 215 20% 65%;
-    --accent: 28 90% 55%; /* Brighter Orange */
-    --accent-foreground: 28 90% 5%;
+    --accent: 180 90% 45%; /* Brighter Teal accent */
+    --accent-foreground: 180 90% 5%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 215 15% 35%; /* Dark Border */
-    --input: 215 15% 30%; /* Dark Input */
-    --ring: 180 90% 55%; /* Even brighter teal for focus rings */
+    --border: 215 15% 35%;
+    --input: 215 15% 30%;
+    --ring: 210 75% 65%; /* Even brighter blue for focus rings */
 
     /* Sidebar Dark */
     --sidebar-background: hsl(224 71.4% 4.1%);
@@ -85,217 +85,9 @@ body {
     --sidebar-ring: hsl(var(--ring));
   }
 
-  /* --- THEME: Store Owner --- */
-  /* Professional and reliable: Deep blue primary, earthy secondary, gold accent. */
-  .store-owner-layout {
-    --so-primary: 220 70% 45%; /* Slate Blue */
-    --so-primary-foreground: 0 0% 100%; /* White */
-    --so-secondary: 35 30% 60%; /* Muted Tan/Brown */
-    --so-secondary-foreground: 35 30% 10%; /* Dark Brown */
-    --so-accent: 40 90% 50%; /* Golden Yellow */
-    --so-accent-foreground: 40 90% 10%; /* Dark Gold */
-    --so-background: 210 30% 98%; /* Very Light Cool Gray */
-    --so-foreground: 215 25% 10%; /* Dark Slate */
-    --so-card: 0 0% 100%;
-    --so-card-foreground: 215 25% 10%;
-    --so-popover: 0 0% 100%;
-    --so-popover-foreground: 215 25% 10%;
-    --so-muted: 210 20% 90%; /* Lighter Gray */
-    --so-muted-foreground: 215 20% 55%; /* Medium Slate */
-    --so-border: 210 20% 85%; /* Light Gray */
-    --so-input: 210 20% 88%;
-    --so-ring: 220 70% 55%; /* Lighter Slate Blue */
-    --so-destructive: 0 80% 55%; /* Standard Red */
-    --so-destructive-foreground: 0 0% 98%;
+  /* --- REMOVED PER-ROLE THEMES --- */
 
-    /* Sidebar Theme */
-    --so-sidebar-background: 215 25% 25%; /* Darker Slate Blue */
-    --so-sidebar-foreground: 210 30% 90%; /* Light Gray */
-    --so-sidebar-primary: 220 70% 65%; /* Brighter Slate Blue */
-    --so-sidebar-primary-foreground: 215 25% 5%; /* Very Dark Slate */
-    --so-sidebar-accent: 215 18% 35%; /* Hover Accent */
-    --so-sidebar-accent-foreground: 0 0% 100%; /* White */
-    --so-sidebar-border: 215 15% 40%; /* Sidebar Border */
-    --so-sidebar-ring: 220 70% 65%;
-  }
-
-  .dark .store-owner-layout {
-    --so-primary: 220 70% 65%;
-    --so-primary-foreground: 220 70% 10%;
-    --so-secondary: 35 30% 40%;
-    --so-secondary-foreground: 35 30% 90%;
-    --so-accent: 40 90% 60%;
-    --so-accent-foreground: 40 90% 10%;
-    --so-background: 215 25% 12%; /* Dark Slate */
-    --so-foreground: 210 30% 95%; /* Very Light Gray */
-    --so-card: 215 20% 18%; /* Darker Slate */
-    --so-card-foreground: 210 30% 95%;
-    --so-popover: 215 20% 15%;
-    --so-popover-foreground: 210 30% 95%;
-    --so-muted: 215 20% 25%;
-    --so-muted-foreground: 215 20% 60%;
-    --so-border: 215 15% 38%;
-    --so-input: 215 15% 35%;
-    --so-ring: 220 70% 75%;
-    --so-destructive: 0 75% 55%; /* Slightly darker red for dark */
-    --so-destructive-foreground: 0 0% 98%;
-
-    /* Sidebar Dark */
-    --so-sidebar-background: 215 25% 25%;
-    --so-sidebar-foreground: 210 30% 90%;
-    --so-sidebar-primary: 220 70% 70%;
-    --so-sidebar-primary-foreground: 215 25% 5%;
-    --so-sidebar-accent: 215 18% 35%;
-    --so-sidebar-accent-foreground: 0 0% 100%;
-    --so-sidebar-border: 215 15% 40%;
-    --so-sidebar-ring: 220 70% 70%;
-  }
-
-  /* --- THEME: Driver --- */
-  /* Energetic and efficient: Teal primary, warm orange secondary, lime accent. */
-  .driver-layout {
-    --drv-primary: 175 75% 40%; /* Teal */
-    --drv-primary-foreground: 175 75% 95%; /* Very Light Teal */
-    --drv-secondary: 28 85% 55%; /* Warm Orange */
-    --drv-secondary-foreground: 28 85% 10%; /* Dark Orange */
-    --drv-accent: 80 60% 50%; /* Lime Green */
-    --drv-accent-foreground: 80 60% 10%; /* Dark Lime */
-    --drv-background: 210 15% 97%; /* Very Light Gray */
-    --drv-foreground: 210 20% 12%; /* Dark Gray-Blue */
-    --drv-card: 0 0% 100%;
-    --drv-card-foreground: 210 20% 12%;
-    --drv-popover: 0 0% 100%;
-    --drv-popover-foreground: 210 20% 12%;
-    --drv-muted: 210 10% 92%; /* Lighter Gray */
-    --drv-muted-foreground: 210 15% 55%; /* Medium Gray */
-    --drv-border: 210 10% 88%; /* Light Gray */
-    --drv-input: 210 10% 90%;
-    --drv-ring: 175 75% 50%; /* Brighter Teal */
-    --drv-destructive: 0 80% 58%; /* Slightly brighter red */
-    --drv-destructive-foreground: 0 0% 98%;
-
-    /* Sidebar Theme */
-    --drv-sidebar-background: 175 30% 30%; /* Dark Teal */
-    --drv-sidebar-foreground: 175 30% 95%; /* Very Light Teal */
-    --drv-sidebar-primary: 175 75% 55%; /* Brighter Teal */
-    --drv-sidebar-primary-foreground: 175 30% 5%; /* Very Dark Teal */
-    --drv-sidebar-accent: 175 25% 40%; /* Hover Accent */
-    --drv-sidebar-accent-foreground: 175 25% 98%; /* Very Light Teal */
-    --drv-sidebar-border: 175 20% 45%; /* Sidebar Border */
-    --drv-sidebar-ring: 175 75% 50%;
-  }
-
-  .dark .driver-layout {
-    --drv-primary: 175 75% 50%;
-    --drv-primary-foreground: 175 75% 5%;
-    --drv-secondary: 28 85% 65%;
-    --drv-secondary-foreground: 28 85% 5%;
-    --drv-accent: 80 60% 60%;
-    --drv-accent-foreground: 80 60% 8%;
-    --drv-background: 210 20% 15%; /* Dark Gray-Blue */
-    --drv-foreground: 210 15% 92%; /* Light Gray */
-    --drv-card: 210 15% 20%; /* Darker Gray-Blue */
-    --drv-card-foreground: 210 15% 92%;
-    --drv-popover: 210 15% 18%;
-    --drv-popover-foreground: 210 15% 92%;
-    --drv-muted: 210 15% 28%;
-    --drv-muted-foreground: 210 15% 65%;
-    --drv-border: 210 15% 40%;
-    --drv-input: 210 15% 38%;
-    --drv-ring: 175 75% 60%;
-    --drv-destructive: 0 70% 55%; /* Darker red */
-    --drv-destructive-foreground: 0 0% 98%;
-
-    /* Sidebar Dark */
-    --drv-sidebar-background: 175 30% 30%;
-    --drv-sidebar-foreground: 175 30% 95%;
-    --drv-sidebar-primary: 175 75% 60%;
-    --drv-sidebar-primary-foreground: 175 30% 5%;
-    --drv-sidebar-accent: 175 25% 40%;
-    --drv-sidebar-accent-foreground: 175 25% 98%;
-    --drv-sidebar-border: 175 20% 45%;
-    --drv-sidebar-ring: 175 75% 60%;
-  }
-
-   /* --- THEME: Admin --- */
-   /* Authoritative and clear: Deep purple primary, neutral gray secondary, blue accent. */
-  .admin-layout {
-    --adm-primary: 260 60% 55%; /* Deep Purple */
-    --adm-primary-foreground: 260 60% 98%; /* Almost White */
-    --adm-secondary: 220 10% 50%; /* Medium Gray */
-    --adm-secondary-foreground: 220 10% 95%; /* Very Light Gray */
-    --adm-accent: 217 91% 60%; /* Bright Blue (from SDP) */
-    --adm-accent-foreground: 217 91% 98%; /* Almost White */
-    --adm-background: 225 10% 98%; /* Very Light Gray */
-    --adm-foreground: 225 15% 15%; /* Dark Gray */
-    --adm-card: 0 0% 100%;
-    --adm-card-foreground: 225 15% 15%;
-    --adm-popover: 0 0% 100%;
-    --adm-popover-foreground: 225 15% 15%;
-    --adm-muted: 225 10% 94%; /* Lighter Gray */
-    --adm-muted-foreground: 225 10% 60%; /* Medium Gray */
-    --adm-border: 225 10% 85%; /* Light Gray */
-    --adm-input: 225 10% 88%;
-    --adm-ring: 260 60% 65%; /* Lighter Purple */
-    --adm-destructive: 0 80% 60%; /* Standard Red */
-    --adm-destructive-foreground: 0 0% 98%;
-
-    /* Sidebar Theme */
-    --adm-sidebar-background: 225 20% 22%; /* Dark Slate Gray */
-    --adm-sidebar-foreground: 215 20% 92%; /* Light Gray */
-    --adm-sidebar-primary: 260 60% 68%; /* Brighter Purple */
-    --adm-sidebar-primary-foreground: 260 60% 10%; /* Very Dark Purple */
-    --adm-sidebar-accent: 225 15% 32%; /* Hover Accent */
-    --adm-sidebar-accent-foreground: 0 0% 100%; /* White */
-    --adm-sidebar-border: 225 10% 38%; /* Sidebar Border */
-    --adm-sidebar-ring: 260 60% 68%;
-  }
-
-   .dark .admin-layout {
-    --adm-primary: 260 60% 65%;
-    --adm-primary-foreground: 260 60% 10%;
-    --adm-secondary: 220 10% 40%;
-    --adm-secondary-foreground: 220 10% 85%;
-    --adm-accent: 217 91% 65%;
-    --adm-accent-foreground: 217 91% 10%;
-    --adm-background: 225 15% 12%; /* Very Dark Gray */
-    --adm-foreground: 215 20% 95%; /* Light Gray */
-    --adm-card: 225 15% 18%; /* Darker Gray */
-    --adm-card-foreground: 215 20% 95%;
-    --adm-popover: 225 15% 15%;
-    --adm-popover-foreground: 215 20% 95%;
-    --adm-muted: 225 10% 25%;
-    --adm-muted-foreground: 225 10% 65%;
-    --adm-border: 225 10% 35%;
-    --adm-input: 225 10% 32%;
-    --adm-ring: 260 60% 75%;
-    --adm-destructive: 0 75% 58%; /* Darker red */
-    --adm-destructive-foreground: 0 0% 98%;
-
-    /* Sidebar Dark */
-    --adm-sidebar-background: 225 20% 22%;
-    --adm-sidebar-foreground: 215 20% 92%;
-    --adm-sidebar-primary: 260 60% 72%;
-    --adm-sidebar-primary-foreground: 260 60% 8%;
-    --adm-sidebar-accent: 225 15% 32%;
-    --adm-sidebar-accent-foreground: 0 0% 100%;
-    --adm-sidebar-border: 225 10% 38%;
-    --adm-sidebar-ring: 260 60% 72%;
-  }
-
-  /* Base Typography Scale */
-  h1, .h1 { @apply text-4xl font-extrabold tracking-tight lg:text-5xl; }
-  h2, .h2 { @apply text-2xl font-bold tracking-tight lg:text-3xl; }
-  h3, .h3 { @apply text-xl font-semibold tracking-tight lg:text-2xl; }
-  h4, .h4 { @apply text-lg font-semibold tracking-tight lg:text-xl; }
-  p { @apply leading-relaxed [&:not(:first-child)]:mt-4; }
-  .lead { @apply text-lg text-muted-foreground lg:text-xl; }
-  .large { @apply text-base font-semibold lg:text-lg; }
-  .small { @apply text-sm font-medium leading-none; }
-  .muted { @apply text-sm text-muted-foreground; }
-  .extra-small { @apply text-xs tracking-wide; }
-
-  /* Define themed variables within the scope */
+  /* Define themed variables for Store Categories (using original logic) */
   .theme-category-electronics,
   .theme-category-clothing,
   .theme-category-groceries,
@@ -337,6 +129,34 @@ body {
   }
 }
 
+/* Typography Definitions */
+@layer base {
+    /* Base font size (e.g., 16px) */
+    html {
+        font-size: 16px; /* Or use rem/em */
+    }
+
+    /* Heading Styles - inspired by spec */
+    h1, .h1 { @apply text-3xl font-extrabold tracking-tight lg:text-4xl; } /* Reduced size slightly */
+    h2, .h2 { @apply text-2xl font-bold tracking-tight lg:text-3xl; }
+    h3, .h3 { @apply text-xl font-semibold tracking-tight lg:text-2xl; }
+    h4, .h4 { @apply text-lg font-semibold tracking-tight lg:text-xl; }
+
+    /* Paragraph and Body Text */
+    p { @apply leading-relaxed [&:not(:first-child)]:mt-4 text-base; } /* Base text size */
+    .lead { @apply text-lg text-muted-foreground; } /* Adjusted size */
+    .large { @apply text-base font-semibold lg:text-lg; } /* Adjusted size */
+    .small { @apply text-sm font-medium leading-none; }
+    .muted { @apply text-sm text-muted-foreground; }
+    .extra-small { @apply text-xs tracking-wide; }
+
+    /* Button Text - Uppercase added via component */
+    .btn-text-uppercase-semibold {
+        @apply uppercase font-semibold tracking-wider text-xs;
+    }
+}
+
+
 /* Utility Classes */
 @layer utilities {
   .focus-ring {
@@ -356,112 +176,7 @@ body {
    html {
      scroll-behavior: smooth;
    }
-   .btn-text-uppercase-semibold {
-        @apply uppercase font-semibold tracking-wider text-xs;
-    }
-}
-
-/* Apply context-specific themes */
-/* Apply Store Owner Theme */
-.store-owner-layout {
-    --background: hsl(var(--so-background));
-    --foreground: hsl(var(--so-foreground));
-    --card: hsl(var(--so-card));
-    --card-foreground: hsl(var(--so-card-foreground));
-    --popover: hsl(var(--so-popover));
-    --popover-foreground: hsl(var(--so-popover-foreground));
-    --primary: hsl(var(--so-primary));
-    --primary-foreground: hsl(var(--so-primary-foreground));
-    --secondary: hsl(var(--so-secondary));
-    --secondary-foreground: hsl(var(--so-secondary-foreground));
-    --muted: hsl(var(--so-muted));
-    --muted-foreground: hsl(var(--so-muted-foreground));
-    --accent: hsl(var(--so-accent));
-    --accent-foreground: hsl(var(--so-accent-foreground));
-    --destructive: hsl(var(--so-destructive));
-    --destructive-foreground: hsl(var(--so-destructive-foreground));
-    --border: hsl(var(--so-border));
-    --input: hsl(var(--so-input));
-    --ring: hsl(var(--so-ring));
-    @apply bg-background text-foreground;
-}
-.store-owner-layout .store-owner-sidebar {
-    --sidebar-background: hsl(var(--so-sidebar-background));
-    --sidebar-foreground: hsl(var(--so-sidebar-foreground));
-    --sidebar-primary: hsl(var(--so-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--so-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--so-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--so-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--so-sidebar-border));
-    --sidebar-ring: hsl(var(--so-sidebar-ring));
-}
-
-/* Apply Driver Theme */
-.driver-layout {
-    --background: hsl(var(--drv-background));
-    --foreground: hsl(var(--drv-foreground));
-    --card: hsl(var(--drv-card));
-    --card-foreground: hsl(var(--drv-card-foreground));
-    --popover: hsl(var(--drv-popover));
-    --popover-foreground: hsl(var(--drv-popover-foreground));
-    --primary: hsl(var(--drv-primary));
-    --primary-foreground: hsl(var(--drv-primary-foreground));
-    --secondary: hsl(var(--drv-secondary));
-    --secondary-foreground: hsl(var(--drv-secondary-foreground));
-    --muted: hsl(var(--drv-muted));
-    --muted-foreground: hsl(var(--drv-muted-foreground));
-    --accent: hsl(var(--drv-accent));
-    --accent-foreground: hsl(var(--drv-accent-foreground));
-    --destructive: hsl(var(--drv-destructive));
-    --destructive-foreground: hsl(var(--drv-destructive-foreground));
-    --border: hsl(var(--drv-border));
-    --input: hsl(var(--drv-input));
-    --ring: hsl(var(--drv-ring));
-    @apply bg-background text-foreground;
-}
-.driver-layout .driver-sidebar {
-    --sidebar-background: hsl(var(--drv-sidebar-background));
-    --sidebar-foreground: hsl(var(--drv-sidebar-foreground));
-    --sidebar-primary: hsl(var(--drv-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--drv-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--drv-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--drv-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--drv-sidebar-border));
-    --sidebar-ring: hsl(var(--drv-sidebar-ring));
-}
-
-/* Apply Admin Theme */
-.admin-layout {
-    --background: hsl(var(--adm-background));
-    --foreground: hsl(var(--adm-foreground));
-    --card: hsl(var(--adm-card));
-    --card-foreground: hsl(var(--adm-card-foreground));
-    --popover: hsl(var(--adm-popover));
-    --popover-foreground: hsl(var(--adm-popover-foreground));
-    --primary: hsl(var(--adm-primary));
-    --primary-foreground: hsl(var(--adm-primary-foreground));
-    --secondary: hsl(var(--adm-secondary));
-    --secondary-foreground: hsl(var(--adm-secondary-foreground));
-    --muted: hsl(var(--adm-muted));
-    --muted-foreground: hsl(var(--adm-muted-foreground));
-    --accent: hsl(var(--adm-accent));
-    --accent-foreground: hsl(var(--adm-accent-foreground));
-    --destructive: hsl(var(--adm-destructive));
-    --destructive-foreground: hsl(var(--adm-destructive-foreground));
-    --border: hsl(var(--adm-border));
-    --input: hsl(var(--adm-input));
-    --ring: hsl(var(--adm-ring));
-    @apply bg-background text-foreground;
-}
-.admin-layout .admin-sidebar {
-    --sidebar-background: hsl(var(--adm-sidebar-background));
-    --sidebar-foreground: hsl(var(--adm-sidebar-foreground));
-    --sidebar-primary: hsl(var(--adm-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--adm-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--adm-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--adm-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--adm-sidebar-border));
-    --sidebar-ring: hsl(var(--adm-sidebar-ring));
+   /* Removed duplicate .btn-text-uppercase-semibold */
 }
 
 /* Custom scrollbar styles */
@@ -500,11 +215,17 @@ body {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+/* Wheel spinning animation */
+@keyframes spin-wheel {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
 /* Apply animations */
 .animate-slide-in { animation: slide-in-from-bottom 0.3s ease-out; }
 .animate-fade-in { animation: fade-in 0.4s ease-in-out; }
 .animate-spin { animation: spin 1s linear infinite; }
+.animate-spin-wheel { animation: spin-wheel 0.8s linear infinite; } /* Added wheel animation */
 .animate-shimmer {
   background-image: linear-gradient(90deg, hsl(var(--muted)/0.5) 25%, hsl(var(--muted)/0.7) 50%, hsl(var(--muted)/0.5) 75%);
   background-size: 400% 100%;
