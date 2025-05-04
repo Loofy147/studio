@@ -125,4 +125,3 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
     </SidebarProvider>
   );
 }
-```
