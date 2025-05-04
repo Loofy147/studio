@@ -16,11 +16,11 @@ const storeOwnerNavItems = [
   { href: "/stores", label: "Overview", icon: LayoutDashboard },
   // Link to manage a specific store (will be dynamic later)
   // For now, just placeholders or link back to the list
-  { href: "/stores", label: "Products", icon: Package },
-  { href: "/stores", label: "Orders", icon: Package }, // Reuse Package icon for orders
-  { href: "/stores", label: "Subscriptions", icon: CalendarClock },
-  { href: "/stores", label: "Promotions", icon: Ticket },
-  { href: "/stores", label: "Analytics", icon: BarChart },
+  { href: "/stores", label: "Products", icon: Package }, // Potential duplicate href
+  { href: "/stores", label: "Orders", icon: Package }, // Potential duplicate href, Reuse Package icon for orders
+  { href: "/stores", label: "Subscriptions", icon: CalendarClock }, // Potential duplicate href
+  { href: "/stores", label: "Promotions", icon: Ticket }, // Potential duplicate href
+  { href: "/stores", label: "Analytics", icon: BarChart }, // Potential duplicate href
   { href: "/stores/settings", label: "Store Settings", icon: Settings },
 ];
 
@@ -32,32 +32,46 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
 
   // Determine if we are on the main /stores page or a manage/[storeId] page
   const isOnManagePage = pathname.includes('/manage/');
+  const storeIdMatch = pathname.match(/\/stores\/([^/]+)\/manage/);
+  const currentManagingStoreId = storeIdMatch ? storeIdMatch[1] : null;
+
+  // Define navigation items specifically for the store management view
+  const manageStoreNavItems = currentManagingStoreId ? [
+      { href: `/stores/${currentManagingStoreId}/manage#details`, label: "Store Details", icon: Settings },
+      { href: `/stores/${currentManagingStoreId}/manage#products`, label: "Products", icon: Package },
+      { href: `/stores/${currentManagingStoreId}/manage#offers`, label: "Offers", icon: CalendarClock },
+      { href: `/stores/${currentManagingStoreId}/manage#promotions`, label: "Promotions", icon: Ticket },
+      // Add more manage-specific links as needed
+  ] : [];
+
 
   return (
      <SidebarProvider>
       {/* Apply store-owner-layout class for scoping theme variables */}
       <div className={cn("flex min-h-screen", "store-owner-layout")}>
         {/* Store Owner Sidebar */}
-        <Sidebar collapsible="icon" side="left" variant="sidebar" className={cn("bg-[--store-owner-sidebar-background] text-[--store-owner-sidebar-foreground] border-r border-[--store-owner-sidebar-border]", "store-owner-sidebar")}>
-          <SidebarHeader className="p-2 border-b border-[--store-owner-sidebar-border]">
+        {/* Use store-owner theme for sidebar */}
+        <Sidebar collapsible="icon" side="left" variant="sidebar" className={cn("bg-sidebar text-sidebar-foreground border-r border-sidebar-border", "store-owner-sidebar")}>
+          <SidebarHeader className="p-2 border-b border-sidebar-border">
              <div className="flex items-center justify-between p-2">
                  <Link href="/stores" className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
-                     <Logo className="h-7 w-auto text-[--store-owner-sidebar-primary]" /> {/* Use logo with primary color */}
-                     <span className="font-bold text-lg group-data-[collapsible=icon]:hidden text-[--store-owner-sidebar-foreground]">Your Stores</span>
+                      {/* Use themed logo */}
+                     <Logo className="h-7 w-auto text-sidebar-primary" />
+                     <span className="font-bold text-lg group-data-[collapsible=icon]:hidden text-sidebar-foreground">Your Stores</span>
                  </Link>
              </div>
              {/* Store Owner Avatar/Info */}
-              <div className="flex items-center gap-3 p-2 border-t border-[--store-owner-sidebar-border] mt-2 group-data-[collapsible=icon]:hidden">
+              <div className="flex items-center gap-3 p-2 border-t border-sidebar-border mt-2 group-data-[collapsible=icon]:hidden">
                     <Avatar className="h-9 w-9">
                         <AvatarImage src={`https://avatar.vercel.sh/${ownerEmail}?size=36`} alt={ownerName} />
                         <AvatarFallback>{ownerName.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div>
-                        <p className="text-sm font-medium text-[--store-owner-sidebar-foreground]">{ownerName}</p>
-                        <p className="text-xs text-[--store-owner-sidebar-foreground]/70">{ownerEmail}</p>
+                        <p className="text-sm font-medium text-sidebar-foreground">{ownerName}</p>
+                        <p className="text-xs text-sidebar-foreground/70">{ownerEmail}</p>
                     </div>
               </div>
-              <div className="flex justify-center p-2 border-t border-[--store-owner-sidebar-border] mt-2 group-data-[collapsible=icon]:flex hidden">
+              <div className="flex justify-center p-2 border-t border-sidebar-border mt-2 group-data-[collapsible=icon]:flex hidden">
                   <Avatar className="h-8 w-8">
                        <AvatarImage src={`https://avatar.vercel.sh/${ownerEmail}?size=32`} alt={ownerName} />
                        <AvatarFallback>{ownerName.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
@@ -68,13 +82,14 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
              {/* Conditionally render different nav based on page */}
              {isOnManagePage ? (
                  <SidebarMenu className="px-2 py-4">
-                     {/* Simplified nav for managing a specific store */}
+                     {/* Back Button */}
                      <SidebarMenuItem>
                           <Link href="/stores" passHref legacyBehavior>
                              <SidebarMenuButton
                                 asChild
                                 tooltip="Back to Stores List"
-                                className="focus:bg-[--store-owner-sidebar-accent] focus:text-[--store-owner-sidebar-accent-foreground] hover:bg-[--store-owner-sidebar-accent]/80 hover:text-[--store-owner-sidebar-accent-foreground]"
+                                 // Use themed styles
+                                className="focus:bg-sidebar-accent focus:text-sidebar-accent-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground"
                                 variant="ghost"
                               >
                                 <a>
@@ -84,39 +99,40 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                              </SidebarMenuButton>
                          </Link>
                      </SidebarMenuItem>
-                      {/* Add manage-specific links here if needed */}
-                      <SidebarMenuItem>
-                         <Link href={`${pathname}#products`} passHref legacyBehavior>
-                             <SidebarMenuButton asChild variant="ghost" className="focus:bg-[--store-owner-sidebar-accent] focus:text-[--store-owner-sidebar-accent-foreground] hover:bg-[--store-owner-sidebar-accent]/80 hover:text-[--store-owner-sidebar-accent-foreground]">
-                                <a><Package className="h-4 w-4"/> <span className="group-data-[collapsible=icon]:hidden">Manage Products</span></a>
-                             </SidebarMenuButton>
-                         </Link>
-                     </SidebarMenuItem>
-                      <SidebarMenuItem>
-                         <Link href={`${pathname}#offers`} passHref legacyBehavior>
-                             <SidebarMenuButton asChild variant="ghost" className="focus:bg-[--store-owner-sidebar-accent] focus:text-[--store-owner-sidebar-accent-foreground] hover:bg-[--store-owner-sidebar-accent]/80 hover:text-[--store-owner-sidebar-accent-foreground]">
-                                <a><CalendarClock className="h-4 w-4"/> <span className="group-data-[collapsible=icon]:hidden">Manage Offers</span></a>
-                             </SidebarMenuButton>
-                         </Link>
-                     </SidebarMenuItem>
-                      <SidebarMenuItem>
-                         <Link href={`${pathname}#promotions`} passHref legacyBehavior>
-                             <SidebarMenuButton asChild variant="ghost" className="focus:bg-[--store-owner-sidebar-accent] focus:text-[--store-owner-sidebar-accent-foreground] hover:bg-[--store-owner-sidebar-accent]/80 hover:text-[--store-owner-sidebar-accent-foreground]">
-                                <a><Ticket className="h-4 w-4"/> <span className="group-data-[collapsible=icon]:hidden">Manage Promotions</span></a>
-                             </SidebarMenuButton>
-                         </Link>
-                     </SidebarMenuItem>
+                      {/* Manage-specific links */}
+                      {manageStoreNavItems.map((item, index) => (
+                          <SidebarMenuItem key={`${item.href}-${index}`}>
+                             <Link href={item.href} passHref legacyBehavior>
+                                 <SidebarMenuButton
+                                     asChild
+                                     tooltip={item.label}
+                                      // Use themed styles
+                                     className="focus:bg-sidebar-accent focus:text-sidebar-accent-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground"
+                                     // Simple active check based on hash for now
+                                     isActive={typeof window !== 'undefined' && window.location.hash === item.href.split('#')[1]}
+                                     variant="ghost"
+                                    >
+                                    <a>
+                                        <item.icon className="h-4 w-4"/>
+                                        <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                                    </a>
+                                 </SidebarMenuButton>
+                             </Link>
+                         </SidebarMenuItem>
+                      ))}
                  </SidebarMenu>
              ) : (
                  <SidebarMenu className="px-2 py-4">
-                    {storeOwnerNavItems.map(item => (
-                        <SidebarMenuItem key={item.href}>
+                    {storeOwnerNavItems.map((item, index) => (
+                        // Use index in key to prevent duplicate key error if hrefs are the same
+                        <SidebarMenuItem key={`${item.href}-${index}`}>
                         <Link href={item.href} passHref legacyBehavior>
                             <SidebarMenuButton
                             asChild
                             isActive={pathname === item.href} // Simple active check for this layout
                             tooltip={item.label}
-                            className="capitalize focus:bg-[--store-owner-sidebar-accent] focus:text-[--store-owner-sidebar-accent-foreground] data-[active=true]:bg-[var(--store-owner-sidebar-primary)] data-[active=true]:text-[var(--store-owner-sidebar-primary-foreground)] hover:bg-[--store-owner-sidebar-accent]/80 hover:text-[--store-owner-sidebar-accent-foreground]"
+                            // Use themed styles
+                            className="capitalize focus:bg-sidebar-accent focus:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground"
                             variant="ghost"
                             >
                             <a>
@@ -130,13 +146,14 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                  </SidebarMenu>
              )}
           </SidebarContent>
-           <SidebarHeader className="p-2 border-t border-[--store-owner-sidebar-border] mt-auto">
+           <SidebarHeader className="p-2 border-t border-sidebar-border mt-auto">
                 <SidebarMenu className="px-0">
                      {/* Settings Button */}
                      <SidebarMenuItem>
                          <SidebarMenuButton
                             tooltip="Account Settings"
-                            className="capitalize focus:bg-[--store-owner-sidebar-accent] focus:text-[--store-owner-sidebar-accent-foreground] hover:bg-[--store-owner-sidebar-accent]/80 hover:text-[--store-owner-sidebar-accent-foreground]"
+                            // Use themed styles
+                            className="capitalize focus:bg-sidebar-accent focus:text-sidebar-accent-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground"
                             variant="ghost"
                          >
                              <Link href="/profile/account-settings" className="flex items-center w-full">
@@ -149,6 +166,7 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                      <SidebarMenuItem>
                          <SidebarMenuButton
                             tooltip="Logout"
+                            // Use themed (destructive) styles
                             className="capitalize focus:bg-red-900/50 focus:text-white hover:bg-red-900/50 hover:text-white text-red-300 hover:!text-red-100"
                             variant="ghost"
                         >
@@ -164,15 +182,17 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
 
         {/* Main Content Area */}
         <SidebarInset className="flex-1 flex flex-col">
-           <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur px-6 shadow-sm"> {/* Use theme background */}
+             {/* Use themed header background */}
+           <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border bg-background/80 backdrop-blur px-6 shadow-sm">
                 <SidebarTrigger className="md:hidden" /> {/* Mobile Trigger */}
-                <h1 className="text-xl font-semibold md:text-2xl flex-1 text-foreground"> {/* Use theme foreground */}
+                <h1 className="text-xl font-semibold md:text-2xl flex-1 text-foreground"> {/* Use themed text */}
                      {/* Dynamic Header Title */}
                      {isOnManagePage ? 'Manage Store' : 'Your Stores Overview'}
                 </h1>
                 {/* Add header actions if needed */}
            </header>
-          <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-background"> {/* Use theme background */}
+            {/* Use themed main background */}
+          <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-background">
             {children}
           </main>
         </SidebarInset>
