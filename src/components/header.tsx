@@ -3,16 +3,18 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building, Truck } from 'lucide-react'; // Added Truck
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"; // Removed unused SheetDescription
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden'; // Import VisuallyHidden
+import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building, Truck, Bell } from 'lucide-react'; // Added Bell
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import * as VisuallyHiddenPrimitive from '@radix-ui/react-visually-hidden'; // Import VisuallyHidden correctly
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Logo } from '@/components/Logo'; // Import the new Logo component
+import { Logo } from '@/components/Logo';
 // Assume a cart state/hook exists (replace with actual implementation)
 // import { useCart } from '@/hooks/useCart';
+// Mock profile for conditional rendering examples (replace with actual auth logic)
+const profile = { role: 'customer' }; // Change to 'customer', 'driver', 'store_owner', 'admin', or null as needed
 
 export function Header() {
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -39,7 +41,7 @@ export function Header() {
    const customerNavItems = [
       { href: "/", label: "Browse", icon: PackageSearch },
       { href: "/orders", label: "My Orders", icon: Package },
-      { href: "/stores", label: "My Stores", icon: Building }, // Changed from "Manage Stores"
+      { href: "/stores", label: "My Stores", icon: Building }, // Link for users to manage their stores
       { href: "/driver/apply", label: "Drive", icon: Truck }, // Added Drive link
       { href: "/profile", label: "Profile", icon: User },
    ];
@@ -103,10 +105,9 @@ export function Header() {
                 </SheetTrigger>
                 {/* Mobile Menu Content */}
                 <SheetContent side="left" className={cn("w-[280px] sm:w-[320px] p-0 bg-background", headerStyle)}> {/* Apply theme class */}
-                    {/* Add VisuallyHidden Title */}
-                    <VisuallyHidden.Root asChild>
-                        <SheetTitle>Main Menu</SheetTitle>
-                    </VisuallyHidden.Root>
+                     <VisuallyHiddenPrimitive.Root asChild>
+                        <SheetTitle>Main Navigation Menu</SheetTitle>
+                    </VisuallyHiddenPrimitive.Root>
                     <SheetHeader className="p-4 border-b">
                          {/* Use themed logo */}
                         <SheetTitle className="flex items-center gap-2 text-xl">
@@ -262,7 +263,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
-// Mock profile for conditional rendering examples (replace with actual auth logic)
-const profile = { role: 'admin' }; // Change to 'customer', 'driver', 'store_owner', or null as needed
