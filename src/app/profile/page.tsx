@@ -16,7 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import React from 'react';
-import { useToast } from "@/hooks/use-toast"; // Import useToast
+import { useToast } from '@/hooks/use-toast'; // Import useToast
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input"; // For edit forms
 import { Label } from "@/components/ui/label"; // For edit forms
 import { Checkbox } from "@/components/ui/checkbox"; // For default address
 import { AddressDialog } from './AddressDialog'; // Import AddressDialog component
+import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 
 
 // Helper to format currency
@@ -353,6 +354,16 @@ export default function ProfilePage() {
   const orderError = error?.includes("orders") ? "Failed to load recent orders." : null;
   const subError = error?.includes("subscriptions") ? "Failed to load subscriptions." : null;
 
+  // Animation variants
+  const listVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }, // Stagger table row animations
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0 },
+  };
 
   return (
     <div className="container mx-auto px-4 py-12 space-y-12"> {/* Added container and padding */}
@@ -416,61 +427,71 @@ export default function ProfilePage() {
                       </Button>
                 </div>
                 {profile.addresses.length > 0 ? (
-                    <div className="space-y-3">
-                        {profile.addresses.map((address) => (
-                             <div key={address.id} className="flex items-start justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/50 transition-colors">
-                                <div className="flex items-start gap-3 text-sm">
-                                    {address.label === 'Home' ? <Home className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> :
-                                     address.label === 'Work' ? <Briefcase className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> :
-                                     <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />}
-                                    <div>
-                                         <span className="font-medium block text-foreground">
-                                            {address.label} {address.isDefault && <Badge variant="secondary" className="ml-1 text-xs">Default</Badge>}
-                                         </span>
-                                        <span className="text-muted-foreground">{address.street}, {address.city}, {address.state} {address.zipCode}</span>
+                    <motion.div layout className="space-y-3"> {/* Add layout animation */}
+                         <AnimatePresence>
+                            {profile.addresses.map((address) => (
+                                <motion.div
+                                    key={address.id}
+                                    layout // Enable layout animation for add/remove
+                                    variants={itemVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    className="flex items-start justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/50 transition-colors"
+                                >
+                                    <div className="flex items-start gap-3 text-sm">
+                                        {address.label === 'Home' ? <Home className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> :
+                                        address.label === 'Work' ? <Briefcase className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> :
+                                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />}
+                                        <div>
+                                            <span className="font-medium block text-foreground">
+                                                {address.label} {address.isDefault && <Badge variant="secondary" className="ml-1 text-xs">Default</Badge>}
+                                            </span>
+                                            <span className="text-muted-foreground">{address.street}, {address.city}, {address.state} {address.zipCode}</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex gap-1">
-                                     <Button variant="ghost" size="icon" className="h-7 w-7" title="Edit Address" onClick={() => handleOpenAddressDialog(address)}>
-                                         <Edit className="h-3.5 w-3.5 opacity-70"/>
-                                     </Button>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button
-                                              variant="ghost"
-                                              size="icon"
-                                              className="h-7 w-7 text-destructive hover:bg-destructive/10"
-                                              title="Delete Address"
-                                              disabled={profile.addresses.length === 1 || address.isDefault} // Disable deleting the only or default address
-                                              >
-                                                <Trash2 className="h-3.5 w-3.5"/>
-                                            </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                            <AlertDialogTitle>Delete Address?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                Are you sure you want to delete the address labeled "{address.label}"?
-                                                {address.isDefault && " You must set another address as default before deleting this one."}
-                                            </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction
-                                                onClick={() => handleDeleteAddress(address.id)}
-                                                className={buttonVariants({ variant: "destructive" })}
-                                                disabled={address.isDefault} // Double disable check
+                                    <div className="flex gap-1">
+                                        <Button variant="ghost" size="icon" className="h-7 w-7" title="Edit Address" onClick={() => handleOpenAddressDialog(address)}>
+                                            <Edit className="h-3.5 w-3.5 opacity-70"/>
+                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                                title="Delete Address"
+                                                disabled={profile.addresses.length === 1 || address.isDefault} // Disable deleting the only or default address
                                                 >
-                                                Yes, Delete
-                                            </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
+                                                    <Trash2 className="h-3.5 w-3.5"/>
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                <AlertDialogTitle>Delete Address?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Are you sure you want to delete the address labeled "{address.label}"?
+                                                    {address.isDefault && profile.addresses.length > 1 && " You must set another address as default before deleting this one."}
+                                                </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={() => handleDeleteAddress(address.id)}
+                                                    className={buttonVariants({ variant: "destructive" })}
+                                                    disabled={address.isDefault && profile.addresses.length > 1} // Double disable check
+                                                    >
+                                                    Yes, Delete
+                                                </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
 
-                                </div>
-                             </div>
-                        ))}
-                    </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </motion.div>
                 ) : (
                      <p className="text-sm text-muted-foreground text-center py-4 border border-dashed rounded-md">No addresses saved yet. Click "Add Address" to add one.</p>
                 )}
@@ -540,101 +561,117 @@ export default function ProfilePage() {
              )}
 
             {isLoadingSubs ? <SubscriptionsSkeleton /> : subscriptions.length > 0 ? (
-                <Card className="shadow-sm overflow-hidden border">
-                    <CardContent className="p-0">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="pl-4">Offer</TableHead>
-                                    <TableHead>Store</TableHead>
-                                    <TableHead className="hidden md:table-cell">Next Delivery</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right pr-4">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {subscriptions.map((sub) => {
-                                    const details = subscriptionStatusDetails[sub.status];
-                                    const StatusIcon = details.icon;
-                                    const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
-                                    const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
-                                    const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
-                                    const isUpdating = updatingSubId === sub.id;
+                <motion.div
+                     variants={listVariants}
+                     initial="hidden"
+                     animate="visible"
+                 >
+                    <Card className="shadow-sm overflow-hidden border">
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="pl-4">Offer</TableHead>
+                                        <TableHead>Store</TableHead>
+                                        <TableHead className="hidden md:table-cell">Next Delivery</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right pr-4">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                   <AnimatePresence>
+                                        {subscriptions.map((sub) => {
+                                            const details = subscriptionStatusDetails[sub.status];
+                                            const StatusIcon = details.icon;
+                                            const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
+                                            const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
+                                            const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
+                                            const isUpdating = updatingSubId === sub.id;
 
-                                    return (
-                                        <TableRow key={sub.id} className="hover:bg-muted/20 transition-colors duration-150">
-                                            <TableCell className="font-medium pl-4">{sub.offerName}</TableCell>
-                                            <TableCell>
-                                                <Link href={`/store/${sub.storeId}`} className="hover:underline text-primary">
-                                                    {sub.storeName}
-                                                </Link>
-                                            </TableCell>
-                                            <TableCell className="hidden md:table-cell">
-                                                {sub.status === 'active' && sub.nextDeliveryDate ? format(sub.nextDeliveryDate, 'MMM d, yyyy') : '-'}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge
-                                                    variant={details.variant === 'default' ? 'secondary' : details.variant}
-                                                    className={cn(
-                                                        'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit',
-                                                        details.color,
-                                                         details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
-                                                         sub.status === 'active' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
-                                                    )}
+                                            return (
+                                                <motion.tr
+                                                    key={sub.id}
+                                                    variants={itemVariants}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                    exit="exit"
+                                                    layout
+                                                    className="hover:bg-muted/20 transition-colors duration-150"
                                                 >
-                                                    <StatusIcon className="h-3 w-3" />
-                                                    <span>{details.label}</span>
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-right pr-4 space-x-1">
-                                                 {sub.status === 'active' && (
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleUpdateSubscription(sub.id, 'paused')} disabled={isUpdating} title="Pause Subscription">
-                                                        {isUpdating ? <Repeat className="h-4 w-4 animate-spin"/> : <Pause className="h-4 w-4 text-yellow-600"/>}
-                                                    </Button>
-                                                 )}
-                                                 {sub.status === 'paused' && (
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleUpdateSubscription(sub.id, 'active')} disabled={isUpdating} title="Resume Subscription">
-                                                         {isUpdating ? <Repeat className="h-4 w-4 animate-spin"/> : <Play className="h-4 w-4 text-green-600"/>}
-                                                    </Button>
-                                                 )}
-                                                 {sub.status !== 'cancelled' && (
-                                                     <AlertDialog>
-                                                         <AlertDialogTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" disabled={isUpdating} title="Cancel Subscription">
-                                                                <Trash2 className="h-4 w-4"/>
+                                                    <TableCell className="font-medium pl-4">{sub.offerName}</TableCell>
+                                                    <TableCell>
+                                                        <Link href={`/store/${sub.storeId}`} className="hover:underline text-primary">
+                                                            {sub.storeName}
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell className="hidden md:table-cell">
+                                                        {sub.status === 'active' && sub.nextDeliveryDate ? format(sub.nextDeliveryDate, 'MMM d, yyyy') : '-'}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge
+                                                            variant={details.variant === 'default' ? 'secondary' : details.variant}
+                                                            className={cn(
+                                                                'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit',
+                                                                details.color,
+                                                                details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
+                                                                sub.status === 'active' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
+                                                            )}
+                                                        >
+                                                            <StatusIcon className="h-3 w-3" />
+                                                            <span>{details.label}</span>
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-right pr-4 space-x-1">
+                                                        {sub.status === 'active' && (
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleUpdateSubscription(sub.id, 'paused')} disabled={isUpdating} title="Pause Subscription">
+                                                                {isUpdating ? <Repeat className="h-4 w-4 animate-spin"/> : <Pause className="h-4 w-4 text-yellow-600"/>}
                                                             </Button>
-                                                         </AlertDialogTrigger>
-                                                         <AlertDialogContent>
-                                                            <AlertDialogHeader>
-                                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                            <AlertDialogDescription>
-                                                                This will permanently cancel your subscription to "{sub.offerName}". This action cannot be undone.
-                                                            </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter>
-                                                            <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
-                                                            <AlertDialogAction
-                                                                onClick={() => handleUpdateSubscription(sub.id, 'cancelled')}
-                                                                className={buttonVariants({ variant: "destructive" })}
-                                                                disabled={isUpdating}
-                                                            >
-                                                                 {isUpdating ? 'Cancelling...' : 'Yes, Cancel'}
-                                                            </AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                     </AlertDialog>
-                                                 )}
-                                                  {sub.status === 'cancelled' && (
-                                                        <span className="text-xs text-muted-foreground italic mr-2">Cancelled</span>
-                                                  )}
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                                                        )}
+                                                        {sub.status === 'paused' && (
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleUpdateSubscription(sub.id, 'active')} disabled={isUpdating} title="Resume Subscription">
+                                                                {isUpdating ? <Repeat className="h-4 w-4 animate-spin"/> : <Play className="h-4 w-4 text-green-600"/>}
+                                                            </Button>
+                                                        )}
+                                                        {sub.status !== 'cancelled' && (
+                                                            <AlertDialog>
+                                                                <AlertDialogTrigger asChild>
+                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" disabled={isUpdating} title="Cancel Subscription">
+                                                                        <Trash2 className="h-4 w-4"/>
+                                                                    </Button>
+                                                                </AlertDialogTrigger>
+                                                                <AlertDialogContent>
+                                                                    <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        This will permanently cancel your subscription to "{sub.offerName}". This action cannot be undone.
+                                                                    </AlertDialogDescription>
+                                                                    </AlertDialogHeader>
+                                                                    <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+                                                                    <AlertDialogAction
+                                                                        onClick={() => handleUpdateSubscription(sub.id, 'cancelled')}
+                                                                        className={buttonVariants({ variant: "destructive" })}
+                                                                        disabled={isUpdating}
+                                                                    >
+                                                                        {isUpdating ? 'Cancelling...' : 'Yes, Cancel'}
+                                                                    </AlertDialogAction>
+                                                                    </AlertDialogFooter>
+                                                                </AlertDialogContent>
+                                                            </AlertDialog>
+                                                        )}
+                                                        {sub.status === 'cancelled' && (
+                                                                <span className="text-xs text-muted-foreground italic mr-2">Cancelled</span>
+                                                        )}
+                                                    </TableCell>
+                                                </motion.tr>
+                                            );
+                                        })}
+                                   </AnimatePresence>
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </motion.div>
              ) : !subError && !isLoadingSubs ? (
                  <Card>
                     <CardContent className="p-10 text-center text-muted-foreground">
@@ -655,7 +692,7 @@ export default function ProfilePage() {
                 <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
             </h2>
              <Link href="/orders" passHref>
-                 <Button variant="link" className="text-primary px-0">View All Orders</Button>
+                 <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
              </Link>
         </div>
 
@@ -668,66 +705,82 @@ export default function ProfilePage() {
         )}
 
         {isLoadingOrders ? <OrderHistorySkeleton /> : orders.length > 0 ? (
-            <Card className="shadow-sm overflow-hidden border">
-                <CardContent className="p-0">
-                    <Table>
-                    <TableHeader>
-                        <TableRow>
-                        <TableHead className="w-[100px] pl-4">Order ID</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Store</TableHead>
-                        <TableHead className="hidden md:table-cell text-right">Total</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right pr-4">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {orders.map((order) => {
-                            const details = orderStatusDetails[order.status];
-                            const StatusIcon = details.icon;
-                            const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
-                            const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
-                            const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
-                            return (
-                            <TableRow key={order.id} className="hover:bg-muted/20 transition-colors duration-150">
-                                <TableCell className="font-mono text-xs pl-4">#{order.id.substring(order.id.length - 6)}</TableCell>
-                                <TableCell>{format(order.orderDate, 'MMM d, yyyy')}</TableCell>
-                                <TableCell>
-                                    <Link href={`/store/${order.storeId}`} className="hover:underline font-medium text-primary">
-                                        {order.storeName}
-                                    </Link>
-                                </TableCell>
-                                <TableCell className="hidden md:table-cell text-right font-medium">{formatCurrency(order.totalAmount)}</TableCell>
-                                <TableCell>
-                                    <Badge
-                                        variant={details.variant === 'default' ? 'secondary' : details.variant}
-                                        className={cn(
-                                            'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit',
-                                            details.color,
-                                            details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
-                                            order.status === 'Delivered' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
-                                        )}
-                                    >
-                                        <StatusIcon className="h-3 w-3" />
-                                        <span>{order.status}</span>
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right pr-4">
-                                    {/* Link to specific order section on /orders page */}
-                                    <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                                      <Link href={`/orders#order-${order.id}`}> {/* Adjusted size */}
-                                        <Eye className="h-4 w-4"/>
-                                        <span className="sr-only">View Order</span>
-                                      </Link>
-                                    </Button>
-                                </TableCell>
+             <motion.div
+                 variants={listVariants}
+                 initial="hidden"
+                 animate="visible"
+             >
+                <Card className="shadow-sm overflow-hidden border">
+                    <CardContent className="p-0">
+                        <Table>
+                        <TableHeader>
+                            <TableRow>
+                            <TableHead className="w-[100px] pl-4">Order ID</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Store</TableHead>
+                            <TableHead className="hidden md:table-cell text-right">Total</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right pr-4">Actions</TableHead>
                             </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+                        </TableHeader>
+                        <TableBody>
+                            <AnimatePresence>
+                                {orders.map((order) => {
+                                    const details = orderStatusDetails[order.status];
+                                    const StatusIcon = details.icon;
+                                    const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
+                                    const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
+                                    const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
+                                    return (
+                                    <motion.tr
+                                        key={order.id}
+                                        variants={itemVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="exit"
+                                        layout
+                                        className="hover:bg-muted/20 transition-colors duration-150"
+                                    >
+                                        <TableCell className="font-mono text-xs pl-4">#{order.id.substring(order.id.length - 6)}</TableCell>
+                                        <TableCell>{format(order.orderDate, 'MMM d, yyyy')}</TableCell>
+                                        <TableCell>
+                                            <Link href={`/store/${order.storeId}`} className="hover:underline font-medium text-primary">
+                                                {order.storeName}
+                                            </Link>
+                                        </TableCell>
+                                        <TableCell className="hidden md:table-cell text-right font-medium">{formatCurrency(order.totalAmount)}</TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={details.variant === 'default' ? 'secondary' : details.variant}
+                                                className={cn(
+                                                    'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit',
+                                                    details.color,
+                                                    details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
+                                                    order.status === 'Delivered' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
+                                                )}
+                                            >
+                                                <StatusIcon className="h-3 w-3" />
+                                                <span>{order.status}</span>
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right pr-4">
+                                            {/* Link to specific order section on /orders page */}
+                                            <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                                            <Link href={`/orders#order-${order.id}`}> {/* Adjusted size */}
+                                                <Eye className="h-4 w-4"/>
+                                                <span className="sr-only">View Order</span>
+                                            </Link>
+                                            </Button>
+                                        </TableCell>
+                                    </motion.tr>
+                                    );
+                                })}
+                            </AnimatePresence>
+                        </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </motion.div>
         ) : !orderError && !isLoadingOrders ? ( // Only show if not loading and no error shown
             <Card>
                 <CardContent className="p-10 text-center text-muted-foreground">

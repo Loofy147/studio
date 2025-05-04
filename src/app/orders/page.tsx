@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,6 +15,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // 
 import Link from "next/link"; // Import Link
 import { cn } from "@/lib/utils"; // Import cn
 import React from 'react'; // Import React for forwardRef etc.
+import { motion } from 'framer-motion'; // Import motion
+import * as ProgressPrimitive from "@radix-ui/react-progress"; // Need primitive for custom component
 
 // Helper to format currency
 const formatCurrency = (amount: number) => {
@@ -43,10 +46,7 @@ export default function OrdersPage() {
       setIsLoadingOrders(true);
       setError(null);
       try {
-        // Simulate slightly longer loading
-        // await new Promise(resolve => setTimeout(resolve, 1500));
         const orderData = await getUserOrders(userId);
-        // Sort orders by date, newest first
         setOrders(orderData.sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime()));
       } catch (err) {
         console.error("Failed to fetch orders:", err);
@@ -101,9 +101,24 @@ export default function OrdersPage() {
     </Card>
   );
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 1 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1 // Stagger children animation
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
+  };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 container mx-auto py-10"> {/* Added container */}
        <div className="flex items-center gap-3">
             <ShoppingBag className="h-8 w-8 text-primary"/>
             <h1 className="text-3xl font-bold tracking-tight">Your Orders</h1>
@@ -125,7 +140,12 @@ export default function OrdersPage() {
            {Array.from({ length: 3 }).map((_, i) => <OrderCardSkeleton key={i} />)}
         </div>
       ) : orders.length > 0 ? (
-        <div className="space-y-6">
+        <motion.div
+           className="space-y-6"
+           variants={containerVariants}
+           initial="hidden"
+           animate="show"
+         >
           {orders.map((order) => {
             const details = statusDetails[order.status];
             const StatusIcon = details.icon;
@@ -134,105 +154,107 @@ export default function OrdersPage() {
             const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
 
             return (
-              <Card key={order.id} className="overflow-hidden border shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
-                <CardHeader className="bg-muted/20 p-4"> {/* Slightly lighter header */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                     <div>
-                         <CardTitle className="text-lg font-semibold">Order #{order.id.substring(order.id.length - 6)}</CardTitle>
-                         <CardDescription className="text-sm mt-0.5">
-                             Placed on {format(order.orderDate, 'MMMM d, yyyy')} from{' '}
-                              <Link href={`/store/${order.storeId}`} className="font-medium text-primary hover:underline">
-                                {order.storeName}
-                              </Link>
-                         </CardDescription>
+              <motion.div key={order.id} variants={itemVariants}>
+                <Card className="overflow-hidden border shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
+                  <CardHeader className="bg-muted/20 p-4"> {/* Slightly lighter header */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                      <div>
+                          <CardTitle className="text-lg font-semibold">Order #{order.id.substring(order.id.length - 6)}</CardTitle>
+                          <CardDescription className="text-sm mt-0.5">
+                              Placed on {format(order.orderDate, 'MMMM d, yyyy')} from{' '}
+                                <Link href={`/store/${order.storeId}`} className="font-medium text-primary hover:underline">
+                                  {order.storeName}
+                                </Link>
+                          </CardDescription>
+                      </div>
+                      <Badge
+                          variant={details.variant === 'default' ? 'secondary' : details.variant} // Use secondary for delivered badge base
+                          className={cn(
+                              'capitalize text-xs px-3 py-1 rounded-full font-medium border',
+                              details.color,
+                              details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
+                              details.variant === 'default' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400' // Specific style for 'Delivered'
+                          )}
+                      >
+                          <StatusIcon className="h-3.5 w-3.5 mr-1.5" />
+                          {order.status}
+                      </Badge>
                     </div>
-                    <Badge
-                         variant={details.variant === 'default' ? 'secondary' : details.variant} // Use secondary for delivered badge base
-                         className={cn(
-                            'capitalize text-xs px-3 py-1 rounded-full font-medium border',
-                            details.color,
-                            details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
-                            details.variant === 'default' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400' // Specific style for 'Delivered'
-                         )}
-                     >
-                        <StatusIcon className="h-3.5 w-3.5 mr-1.5" />
-                        {order.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 space-y-5">
-                    {/* Item Summary */}
-                    <div>
-                        <h4 className="font-medium text-sm mb-2 flex items-center gap-1.5"><Package className="h-4 w-4 text-muted-foreground"/>Items</h4>
-                         <ul className="text-sm text-muted-foreground list-disc list-inside pl-2 space-y-1">
-                            {order.items.map(item => (
-                                <li key={item.productId}>
-                                    <span className="font-medium text-foreground">{item.quantity} x {item.name}</span> ({formatCurrency(item.price)} each)
-                                </li>
-                            ))}
-                         </ul>
-                         <p className="text-right font-semibold text-base mt-3">Total: {formatCurrency(order.totalAmount)}</p>
-                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 space-y-5">
+                      {/* Item Summary */}
+                      <div>
+                          <h4 className="font-medium text-sm mb-2 flex items-center gap-1.5"><Package className="h-4 w-4 text-muted-foreground"/>Items</h4>
+                          <ul className="text-sm text-muted-foreground list-disc list-inside pl-2 space-y-1">
+                              {order.items.map(item => (
+                                  <li key={item.productId}>
+                                      <span className="font-medium text-foreground">{item.quantity} x {item.name}</span> ({formatCurrency(item.price)} each)
+                                  </li>
+                              ))}
+                          </ul>
+                          <p className="text-right font-semibold text-base mt-3">Total: {formatCurrency(order.totalAmount)}</p>
+                      </div>
 
-                   <Separator />
+                    <Separator />
 
-                   {/* Tracking Information */}
-                   {order.status !== 'Cancelled' && (
-                     <div>
-                         <h4 className="font-medium text-sm mb-2">Tracking Status:</h4>
-                         <div className="flex items-center gap-2 mb-2">
-                            <StatusIcon className={`h-5 w-5 ${details.color}`} />
-                            <span className={`text-sm font-medium ${details.color}`}>
-                                {details.description}
-                            </span>
-                         </div>
-                         <Progress value={details.value} className="h-1.5" indicatorClassName={details.progressColor} />
-                         {order.status === 'Shipped' && order.trackingNumber && (
-                            <p className="text-xs text-muted-foreground mt-2.5">
-                                Tracking Number: <span className="font-medium text-foreground">{order.trackingNumber}</span>
-                                {/* Add link to carrier if available */}
-                            </p>
-                         )}
-                         {order.status === 'Delivered' && (
-                            <p className="text-xs text-green-600 dark:text-green-400 mt-2.5 flex items-center gap-1">
-                               <CheckCircle className="h-3.5 w-3.5"/> Delivered successfully.
-                            </p>
-                         )}
-                     </div>
-                   )}
-                    {order.status === 'Cancelled' && (
-                         <div className="text-sm text-destructive flex items-center gap-2">
-                             <XCircle className="h-4 w-4"/>
-                             <span>This order was cancelled.</span>
-                         </div>
+                    {/* Tracking Information */}
+                    {order.status !== 'Cancelled' && (
+                      <div>
+                          <h4 className="font-medium text-sm mb-2">Tracking Status:</h4>
+                          <div className="flex items-center gap-2 mb-2">
+                              <StatusIcon className={`h-5 w-5 ${details.color}`} />
+                              <span className={`text-sm font-medium ${details.color}`}>
+                                  {details.description}
+                              </span>
+                          </div>
+                          <Progress value={details.value} className="h-1.5" indicatorClassName={details.progressColor} />
+                          {order.status === 'Shipped' && order.trackingNumber && (
+                              <p className="text-xs text-muted-foreground mt-2.5">
+                                  Tracking Number: <span className="font-medium text-foreground">{order.trackingNumber}</span>
+                                  {/* Add link to carrier if available */}
+                              </p>
+                          )}
+                          {order.status === 'Delivered' && (
+                              <p className="text-xs text-green-600 dark:text-green-400 mt-2.5 flex items-center gap-1">
+                                <CheckCircle className="h-3.5 w-3.5"/> Delivered successfully.
+                              </p>
+                          )}
+                      </div>
                     )}
+                      {order.status === 'Cancelled' && (
+                          <div className="text-sm text-destructive flex items-center gap-2">
+                              <XCircle className="h-4 w-4"/>
+                              <span>This order was cancelled.</span>
+                          </div>
+                      )}
 
-                   <Separator />
+                    <Separator />
 
-                   {/* Address */}
-                   <div className="flex items-start gap-2 text-sm">
-                        <Home className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
-                        <div>
-                            <span className="font-medium block text-foreground">Delivery Address</span>
-                            <span className="text-muted-foreground">{order.deliveryAddress}</span>
-                        </div>
-                    </div>
-                </CardContent>
-                 <CardFooter className="bg-muted/20 p-4 flex justify-end gap-2"> {/* Slightly lighter footer */}
-                    <Button variant="outline" size="sm">
-                        <Eye className="mr-1.5 h-3.5 w-3.5" /> View Invoice
-                    </Button>
-                    {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
-                        <Button variant="ghost" size="sm">Contact Store</Button>
-                    )}
-                     {order.status === 'Delivered' && (
-                        <Button variant="secondary" size="sm">Leave Review</Button>
-                    )}
-                 </CardFooter>
-              </Card>
+                    {/* Address */}
+                    <div className="flex items-start gap-2 text-sm">
+                          <Home className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
+                          <div>
+                              <span className="font-medium block text-foreground">Delivery Address</span>
+                              <span className="text-muted-foreground">{order.deliveryAddress}</span>
+                          </div>
+                      </div>
+                  </CardContent>
+                  <CardFooter className="bg-muted/20 p-4 flex justify-end gap-2"> {/* Slightly lighter footer */}
+                      <Button variant="outline" size="sm">
+                          <Eye className="mr-1.5 h-3.5 w-3.5" /> View Invoice
+                      </Button>
+                      {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
+                          <Button variant="ghost" size="sm">Contact Store</Button>
+                      )}
+                      {order.status === 'Delivered' && (
+                          <Button variant="secondary" size="sm">Leave Review</Button>
+                      )}
+                  </CardFooter>
+                </Card>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       ) : (
         <Card>
            <CardContent className="p-10 text-center text-muted-foreground">
@@ -253,48 +275,7 @@ export default function OrdersPage() {
 
 // Helper to add class to Progress indicator
 declare module 'react' {
-  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+  interface HTMLAttributes<T> extends React.AriaAttributes, React.DOMAttributes<T> {
     indicatorClassName?: string;
   }
 }
-
-// Update Progress component to accept indicatorClassName
-const OriginalProgress = Progress; // Keep original reference if needed elsewhere
-
-const CustomProgress = React.forwardRef<
-  React.ElementRef<typeof OriginalProgress>,
-  React.ComponentPropsWithoutRef<typeof OriginalProgress> & { indicatorClassName?: string }
->(({ className, value, indicatorClassName, ...props }, ref) => (
-  <ProgressPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative h-1.5 w-full overflow-hidden rounded-full bg-secondary", // Adjusted height
-      className
-    )}
-    {...props}
-  >
-    <ProgressPrimitive.Indicator
-      className={cn("h-full w-full flex-1 bg-primary transition-all", indicatorClassName)} // Apply indicator class
-      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-    />
-  </ProgressPrimitive.Root>
-));
-CustomProgress.displayName = 'Progress';
-
-// Re-assign Progress to our custom component if needed globally, or use CustomProgress directly
-// For this example, let's assume we use the custom one directly where needed:
-import * as ProgressPrimitive from "@radix-ui/react-progress"; // Need primitive for custom component
-
-// ... rest of the OrdersPage component ...
-
-// Usage inside map function:
-// <Progress value={details.value} className="h-1.5" indicatorClassName={details.progressColor} />
-// This redefinition might cause issues if Progress is imported directly elsewhere expecting the original.
-// A safer approach is to rename the custom one, e.g., `StyledProgress`, and use that.
-// For simplicity here, we replace the export from ui/progress temporarily.
-// Let's revert the redefinition and just use the prop directly.
-
-// Remove the custom progress definition above and ensure the Progress component from ui/progress
-// is correctly used with the indicatorClassName prop.
-// The 'declare module' already extends the props for the original component.
-

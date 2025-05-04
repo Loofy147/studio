@@ -16,6 +16,7 @@ import { cn, formatCurrency } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { DeliveryAddress, UserProfile, getUserProfile } from '@/services/store'; // Import necessary types/functions
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 
 // Mock cart items (replace with actual cart state management)
 interface CartItem {
@@ -149,6 +150,12 @@ export default function CartPage() {
          </div>
      )
 
+    // Animation variants
+    const itemVariants = {
+      hidden: { opacity: 0, x: -20 },
+      visible: { opacity: 1, x: 0 },
+      exit: { opacity: 0, x: 20, transition: { duration: 0.2 } },
+    };
 
     return (
         <div className="container mx-auto px-4 py-12 space-y-10">
@@ -166,33 +173,43 @@ export default function CartPage() {
                         </CardHeader>
                         <CardContent className="p-0">
                             {cartItems.length > 0 ? (
-                                <div className="divide-y">
-                                    {cartItems.map(item => (
-                                        <div key={item.productId} className="flex items-center gap-4 px-4 py-4 hover:bg-muted/30 transition-colors duration-150">
-                                            <Image
-                                                src={item.imageUrl || `https://picsum.photos/seed/${item.productId}/100/100`}
-                                                alt={item.name}
-                                                width={64}
-                                                height={64}
-                                                className="rounded-md object-cover border bg-muted"
-                                                 data-ai-hint={`${item.category} product`}
-                                            />
-                                            <div className="flex-grow">
-                                                <Link href={`/store/${item.storeId}?product=${item.productId}`} className="font-semibold text-base hover:text-primary hover:underline line-clamp-1">{item.name}</Link>
-                                                <p className="text-sm text-muted-foreground">From: <Link href={`/store/${item.storeId}`} className="hover:underline">{item.storeName}</Link></p>
-                                                <p className="text-sm font-medium">{formatCurrency(item.price)}</p>
-                                            </div>
-                                            <div className="flex items-center gap-2 border rounded-md p-1">
-                                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleQuantityChange(item.productId, -1)}> - </Button>
-                                                <span className="text-sm font-medium w-5 text-center">{item.quantity}</span>
-                                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleQuantityChange(item.productId, 1)}> + </Button>
-                                            </div>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => handleRemoveItem(item.productId)} title="Remove Item">
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
+                                <motion.div layout className="divide-y"> {/* Add layout animation */}
+                                    <AnimatePresence initial={false}> {/* Animate add/remove */}
+                                        {cartItems.map(item => (
+                                            <motion.div
+                                                key={item.productId}
+                                                layout // Enable layout animation for quantity changes etc.
+                                                variants={itemVariants}
+                                                initial="hidden"
+                                                animate="visible"
+                                                exit="exit"
+                                                className="flex items-center gap-4 px-4 py-4 hover:bg-muted/30 transition-colors duration-150"
+                                            >
+                                                <Image
+                                                    src={item.imageUrl || `https://picsum.photos/seed/${item.productId}/100/100`}
+                                                    alt={item.name}
+                                                    width={64}
+                                                    height={64}
+                                                    className="rounded-md object-cover border bg-muted"
+                                                    data-ai-hint={`${item.category} product`}
+                                                />
+                                                <div className="flex-grow">
+                                                    <Link href={`/store/${item.storeId}?product=${item.productId}`} className="font-semibold text-base hover:text-primary hover:underline line-clamp-1">{item.name}</Link>
+                                                    <p className="text-sm text-muted-foreground">From: <Link href={`/store/${item.storeId}`} className="hover:underline">{item.storeName}</Link></p>
+                                                    <p className="text-sm font-medium">{formatCurrency(item.price)}</p>
+                                                </div>
+                                                <div className="flex items-center gap-2 border rounded-md p-1">
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleQuantityChange(item.productId, -1)}> - </Button>
+                                                    <span className="text-sm font-medium w-5 text-center">{item.quantity}</span>
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleQuantityChange(item.productId, 1)}> + </Button>
+                                                </div>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => handleRemoveItem(item.productId)} title="Remove Item">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
+                                </motion.div>
                             ) : (
                                 <div className="p-10 text-center text-muted-foreground">
                                      <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
@@ -321,4 +338,3 @@ export default function CartPage() {
         </div>
     );
 }
-
