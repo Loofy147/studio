@@ -1,0 +1,128 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { LayoutDashboard, Truck, UserCircle, Settings, LogOut, Bell, MessageSquare } from 'lucide-react';
+import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; // Assuming user info available
+
+// Driver specific navigation items
+const driverNavItems = [
+  { href: "/driver/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/driver/orders", label: "Available Orders", icon: Bell },
+  { href: "/driver/route", label: "Current Route", icon: Truck },
+  { href: "/driver/earnings", label: "Earnings", icon: MessageSquare }, // Placeholder icon
+  { href: "/driver/profile", label: "Profile", icon: UserCircle },
+];
+
+export default function DriverLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  // Mock driver info (replace with actual data from auth/state)
+  const driverName = "Driver Dan";
+  const driverEmail = "dan.driver@dispatch.com";
+
+  return (
+     <SidebarProvider>
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+        {/* Driver Sidebar */}
+        <Sidebar collapsible="icon" side="left" variant="sidebar" className="bg-slate-800 text-slate-100 border-r border-slate-700">
+          <SidebarHeader className="p-2 border-b border-slate-700">
+             <div className="flex items-center justify-between p-2">
+                 <Link href="/driver/dashboard" className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
+                     <Truck className="h-6 w-6 text-teal-400" />
+                     <span className="font-bold text-lg group-data-[collapsible=icon]:hidden text-slate-50">SwiftDispatch Driver</span>
+                 </Link>
+             </div>
+              {/* Driver Avatar/Info */}
+               <div className="flex items-center gap-3 p-2 border-t border-slate-700 mt-2 group-data-[collapsible=icon]:hidden">
+                    <Avatar className="h-9 w-9">
+                        <AvatarImage src={`https://avatar.vercel.sh/${driverEmail}?size=36`} alt={driverName} />
+                        <AvatarFallback>{driverName.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="text-sm font-medium text-slate-50">{driverName}</p>
+                        <p className="text-xs text-slate-400">{driverEmail}</p>
+                    </div>
+               </div>
+               <div className="flex justify-center p-2 border-t border-slate-700 mt-2 group-data-[collapsible=icon]:flex hidden">
+                   <Avatar className="h-8 w-8">
+                        <AvatarImage src={`https://avatar.vercel.sh/${driverEmail}?size=32`} alt={driverName} />
+                        <AvatarFallback>{driverName.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
+                    </Avatar>
+               </div>
+          </SidebarHeader>
+          <SidebarContent className="flex-1 overflow-y-auto">
+            <SidebarMenu className="px-2 py-4">
+              {driverNavItems.map(item => (
+                <SidebarMenuItem key={item.href}>
+                  <Link href={item.href} passHref legacyBehavior>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href || (item.href !== '/driver/dashboard' && pathname.startsWith(item.href))}
+                      tooltip={item.label}
+                      className="capitalize focus:bg-slate-700 focus:text-white data-[active=true]:bg-teal-600 data-[active=true]:text-white hover:bg-slate-700 hover:text-white"
+                      variant="ghost"
+                    >
+                      <a>
+                        <item.icon className="h-4 w-4" />
+                        <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarContent>
+           <SidebarHeader className="p-2 border-t border-slate-700 mt-auto">
+                <SidebarMenu className="px-0">
+                    <SidebarMenuItem>
+                         <SidebarMenuButton
+                            tooltip="Settings"
+                            className="capitalize focus:bg-slate-700 focus:text-white hover:bg-slate-700 hover:text-white"
+                            variant="ghost"
+                        >
+                             <a>
+                                <Settings className="h-4 w-4" />
+                                <span className="group-data-[collapsible=icon]:hidden">Settings</span>
+                            </a>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                     <SidebarMenuItem>
+                         <SidebarMenuButton
+                            tooltip="Logout"
+                            className="capitalize focus:bg-red-900/50 focus:text-white hover:bg-red-900/50 hover:text-white text-red-300"
+                            variant="ghost"
+                        >
+                             <a>
+                                <LogOut className="h-4 w-4" />
+                                <span className="group-data-[collapsible=icon]:hidden">Logout</span>
+                            </a>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+           </SidebarHeader>
+        </Sidebar>
+
+        {/* Main Content Area for Driver Pages */}
+        <SidebarInset className="flex-1 flex flex-col">
+           {/* Optional Driver Header */}
+           <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur px-6 shadow-sm">
+                <SidebarTrigger className="md:hidden" /> {/* Mobile Trigger */}
+                <h1 className="text-xl font-semibold md:text-2xl flex-1 text-gray-800 dark:text-gray-200">
+                     {driverNavItems.find(item => pathname.startsWith(item.href))?.label || 'Driver Portal'}
+                </h1>
+                {/* Add any header actions: e.g., Notifications Bell, Quick Status Toggle? */}
+           </header>
+           {/* Page Content */}
+          <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 dark:bg-slate-950">
+            {children}
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
+  );
+}
+```
