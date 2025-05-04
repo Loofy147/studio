@@ -5,7 +5,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header'; // Import Header
 import { cn } from '@/lib/utils'; // Import cn utility
-import Sidebar from "@/components/Sidebar";
+// Removed Sidebar import as it's used within page.tsx now
 import { LayoutAnimator } from '@/components/LayoutAnimator'; // Import LayoutAnimator
 
 // Initialize Inter font
