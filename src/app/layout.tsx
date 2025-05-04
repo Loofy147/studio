@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google'; // Import Inter font
+// Removed Inter font import, font stack defined in globals.css
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header'; // Import Header
 import { cn } from '@/lib/utils'; // Import cn utility
-// Removed Sidebar import as it's used within page.tsx now
 import { LayoutAnimator } from '@/components/LayoutAnimator'; // Import LayoutAnimator
 
-// Initialize Inter font
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+// Removed font variable initialization
 
 export const metadata: Metadata = {
   title: 'SwiftDispatch Marketplace', // Updated Title
@@ -21,11 +19,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // Removed suppressHydrationWarning unless specifically needed later for theme switching issues
     <html lang="en">
       <body
         className={cn(
-          inter.variable, // Apply font variable
-          "font-sans antialiased flex flex-col min-h-screen bg-background" // Apply base font and background
+          // Removed font variable class
+          "antialiased flex flex-col min-h-screen bg-background" // Apply base font and background
         )}
       >
         {/* Header is persistent */}

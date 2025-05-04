@@ -50,12 +50,12 @@ export default function StoreManagePage() {
   const { toast } = useToast();
   const userId = "user123"; // Hardcoded owner ID for demo
 
-  const [store, setStore] = useState<Store | null>(null);
+  const [store, setStore] = useState<Store | null(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [dailyOffers, setDailyOffers] = useState<DailyOffer[]>([]);
   const [promotions, setPromotions] = useState<Promotion[]>([]); // Add state for promotions
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null(null);
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [showNewOfferForm, setShowNewOfferForm] = useState(false);
   const [showNewPromotionForm, setShowNewPromotionForm] = useState(false); // State for promotion form
@@ -74,7 +74,7 @@ export default function StoreManagePage() {
       try {
         // TODO: Add check to ensure the current user (userId) owns this store
         const storeData = await getStoreById(storeId);
-        if (storeData /* && storeData.ownerId === userId */) { // Uncomment owner check when auth is added
+        if (storeData && storeData.ownerId === userId ) { // Uncomment owner check when auth is added
           setStore(storeData);
           setProducts(storeData.products || []);
           setDailyOffers(storeData.dailyOffers || []);
@@ -226,8 +226,9 @@ export default function StoreManagePage() {
 
     // Animation Variants
     const formVariants = {
-        hidden: { opacity: 0, height: 0, marginTop: 0, marginBottom: 0 },
-        visible: { opacity: 1, height: 'auto', marginTop: '1.5rem', marginBottom: '1.5rem', transition: { duration: 0.3 } },
+        hidden: { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, padding: 0, border: 0 },
+        visible: { opacity: 1, height: 'auto', marginTop: '1.5rem', marginBottom: '1.5rem', padding: '1.5rem', border: '1px dashed hsl(var(--border))', transition: { duration: 0.3 } },
+        exit: { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, padding: 0, border: 0, transition: { duration: 0.2 } }
     };
     const listVariants = {
         hidden: { opacity: 0 },
@@ -236,29 +237,29 @@ export default function StoreManagePage() {
     const itemVariants = {
         hidden: { opacity: 0, y: 10 },
         visible: { opacity: 1, y: 0 },
+        exit: { opacity: 0 } // Added exit variant
     };
 
   // Loading State
   if (isLoading) {
     return (
       <div className="container mx-auto py-10 space-y-8 animate-pulse">
-        <Skeleton className="h-8 w-40" /> {/* Back button */}
-        <Skeleton className="h-10 w-1/2" /> {/* Title */}
-        <Skeleton className="h-6 w-1/4 mb-6" /> {/* Subtitle */}
+        <Skeleton className="h-8 w-40 bg-muted/50" /> {/* Back button */}
+        <Skeleton className="h-10 w-1/2 bg-muted/50" /> {/* Title */}
+        <Skeleton className="h-6 w-1/4 mb-6 bg-muted/50" /> {/* Subtitle */}
          <Card>
-           <CardHeader><Skeleton className="h-6 w-1/3" /></CardHeader>
-           <CardContent><Skeleton className="h-32 w-full" /></CardContent>
-           <CardFooter><Skeleton className="h-10 w-32" /></CardFooter>
+           <CardHeader><Skeleton className="h-6 w-1/3 bg-muted/50" /></CardHeader>
+           <CardContent><Skeleton className="h-32 w-full bg-muted/50" /></CardContent>
+           <CardFooter><Skeleton className="h-10 w-32 bg-muted/50" /></CardFooter>
          </Card>
         <Card>
-           <CardHeader><Skeleton className="h-6 w-1/3" /></CardHeader>
-           <CardContent><Skeleton className="h-32 w-full" /></CardContent>
-           <CardFooter><Skeleton className="h-10 w-32" /></CardFooter>
-         </Card>
+           <CardHeader><Skeleton className="h-6 w-1/3 bg-muted/50" /></CardHeader>
+           <CardContent><Skeleton className="h-32 w-full bg-muted/50" /></CardContent>
+        </Card>
          <Card> {/* Skeleton for promotions */}
-           <CardHeader><Skeleton className="h-6 w-1/3" /></CardHeader>
-           <CardContent><Skeleton className="h-24 w-full" /></CardContent>
-           <CardFooter><Skeleton className="h-10 w-32" /></CardFooter>
+           <CardHeader><Skeleton className="h-6 w-1/3 bg-muted/50" /></CardHeader>
+           <CardContent><Skeleton className="h-24 w-full bg-muted/50" /></CardContent>
+           <CardFooter><Skeleton className="h-10 w-32 bg-muted/50" /></CardFooter>
          </Card>
       </div>
     );
@@ -286,15 +287,15 @@ export default function StoreManagePage() {
     );
   }
 
-  // Store Not Found State (Redundant if error state handles it, but good practice)
+  // Store Not Found or Access Denied State
   if (!store) {
      return (
         <div className="container mx-auto py-10 flex flex-col items-center">
            <Card className="w-full max-w-md text-center border-dashed">
                <CardContent className="p-10">
                    <Building className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
-                   <p className="text-lg font-medium text-muted-foreground">Store Not Found</p>
-                   <p className="text-sm text-muted-foreground mt-1">We couldn't find the store you're trying to manage.</p>
+                   <p className="text-lg font-medium text-muted-foreground">Store Not Found or Access Denied</p>
+                   <p className="text-sm text-muted-foreground mt-1">We couldn't find the store you're trying to manage, or you don't have permission.</p>
                    <Link href="/stores" passHref legacyBehavior>
                       <Button variant="outline" size="sm" className="mt-6">
                            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Your Stores
@@ -317,9 +318,9 @@ export default function StoreManagePage() {
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Your Stores
                 </Button>
             </Link>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Manage Store: {store.name}</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Manage: {store.name}</h1>
                     <p className="text-muted-foreground max-w-2xl">Add products, create offers, manage promotions, and control your store's availability.</p>
                 </div>
                  {/* Open/Close Store Button */}
@@ -327,10 +328,9 @@ export default function StoreManagePage() {
                     size="lg"
                     variant={store.isOpen ? "destructive" : "default"}
                     onClick={handleToggleStoreStatus}
-                    disabled={isTogglingOpenStatus || !store.isActive}
+                    disabled={isTogglingOpenStatus || !store.isActive} // Disable if not admin-approved
                     className={cn(
-                      "w-full sm:w-auto text-base px-6 py-3 transition-all duration-300 transform hover:scale-105",
-                      store.isOpen ? "shadow-md hover:shadow-lg" : "shadow-md hover:shadow-lg"
+                      "w-full sm:w-auto text-base px-6 py-3 transition-all duration-300 transform hover:scale-105 font-semibold shadow-md hover:shadow-lg", // Make button bolder and larger
                     )}
                     title={!store.isActive ? "Store must be approved by admin first" : ""}
                   >
@@ -364,26 +364,26 @@ export default function StoreManagePage() {
              )}
         </div>
 
-         {/* Disable content sections if store is closed */}
+         {/* Main Content Wrapper - Apply dimming if store is closed */}
          <motion.div
             initial={{ opacity: 1 }}
-            animate={{ opacity: (!store.isOpen && store.isActive) ? 0.6 : 1 }}
+            animate={{ opacity: (!store.isOpen && store.isActive) ? 0.5 : 1 }} // Dim if closed but active
             transition={{ duration: 0.3 }}
-            className={cn((!store.isOpen && store.isActive) && "pointer-events-none")}
+            className={cn((!store.isOpen && store.isActive) ? "pointer-events-none cursor-not-allowed" : "")} // Prevent interaction when closed
           >
             <div className="space-y-10"> {/* Wrapper div for sections */}
                 {/* Product Management Section */}
-                <Card className="border shadow-sm">
-                    <CardHeader className="flex flex-row justify-between items-center">
+                <Card className="border shadow-lg overflow-hidden"> {/* Added shadow */}
+                    <CardHeader className="flex flex-row justify-between items-center bg-muted/50 p-4 border-b">
                         <div>
-                            <CardTitle className="flex items-center gap-2"><Package className="h-5 w-5 text-primary"/>Products</CardTitle>
+                            <CardTitle className="text-xl flex items-center gap-2"><Package className="h-5 w-5 text-primary"/>Products</CardTitle>
                             <CardDescription>Manage the items available in your store.</CardDescription>
                         </div>
                         <Button size="sm" onClick={() => setShowNewProductForm(!showNewProductForm)} variant={showNewProductForm ? 'secondary' : 'default'} disabled={!store.isOpen && store.isActive}>
                             <PlusCircle className="mr-2 h-4 w-4" /> {showNewProductForm ? 'Cancel' : 'Add Product'}
                         </Button>
                     </CardHeader>
-                    <CardContent className="space-y-6">
+                    <CardContent className="p-0"> {/* Remove padding for form/table */}
                         <AnimatePresence>
                             {showNewProductForm && (
                                 <motion.div
@@ -391,16 +391,16 @@ export default function StoreManagePage() {
                                     variants={formVariants}
                                     initial="hidden"
                                     animate="visible"
-                                    exit="hidden"
+                                    exit="exit"
                                 >
-                                    <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
-                                        <h3 className="text-lg font-medium mb-4">New Product Details</h3>
+                                    <div className="bg-background p-4 sm:p-6"> {/* Added padding inside animated div */}
+                                        <h3 className="text-lg font-semibold mb-4 text-primary">New Product Details</h3>
                                         <ProductForm
                                             onProductCreated={handleProductCreated}
                                             storeId={store.id}
                                             storeCategory={store.category}
                                         />
-                                    </Card>
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -409,19 +409,18 @@ export default function StoreManagePage() {
                         {products.length > 0 ? (
                             <Accordion type="multiple" defaultValue={productCategories.slice(0, 1)} className="w-full">
                             {productCategories.map((category) => (
-                                <AccordionItem value={category} key={category}>
-                                    <AccordionTrigger className="text-lg font-medium capitalize hover:no-underline px-1">
-                                        {category} ({productsByCategory[category].length})
+                                <AccordionItem value={category} key={category} className="border-b-0 last:border-b-0"> {/* Remove internal borders */}
+                                    <AccordionTrigger className="text-base font-medium capitalize hover:no-underline px-4 py-3 bg-secondary/50 hover:bg-secondary/70 border-b"> {/* Styled trigger */}
+                                        {category === 'uncategorized' ? 'Uncategorized' : category} ({productsByCategory[category].length})
                                     </AccordionTrigger>
-                                    <AccordionContent className="pt-0 pb-0">
-                                        <motion.div variants={listVariants} initial="hidden" animate="visible" className="border rounded-md overflow-hidden mt-2 mb-4">
+                                    <AccordionContent className="pt-0 pb-0 data-[state=open]:border-t"> {/* Add border only when open */}
+                                        <motion.div variants={listVariants} initial="hidden" animate="visible" className="overflow-x-auto">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
                                                         <TableHead className="w-[60px] sm:w-[80px]">Image</TableHead>
                                                         <TableHead>Name</TableHead>
-                                                        {/* <TableHead className="hidden sm:table-cell">Category</TableHead> */}
-                                                        <TableHead className="hidden md:table-cell">Description</TableHead>
+                                                        <TableHead className="hidden md:table-cell min-w-[200px]">Description</TableHead>
                                                         <TableHead className="text-right">Price</TableHead>
                                                         <TableHead className="text-right pr-4">Actions</TableHead>
                                                     </TableRow>
@@ -434,7 +433,7 @@ export default function StoreManagePage() {
                                                                 variants={itemVariants}
                                                                 initial="hidden"
                                                                 animate="visible"
-                                                                exit="hidden"
+                                                                exit="exit" // Apply exit animation
                                                                 className="hover:bg-muted/50"
                                                                 layout // Animate layout changes (like removal)
                                                             >
@@ -448,7 +447,6 @@ export default function StoreManagePage() {
                                                                     />
                                                                 </TableCell>
                                                                 <TableCell className="font-medium">{product.name}</TableCell>
-                                                                {/* <TableCell className="capitalize text-muted-foreground hidden sm:table-cell">{product.category}</TableCell> */}
                                                                 <TableCell className="text-xs text-muted-foreground hidden md:table-cell max-w-[250px] truncate">{product.description}</TableCell>
                                                                 <TableCell className="text-right">{formatCurrency(product.price)}</TableCell>
                                                                 <TableCell className="text-right space-x-1 pr-4">
@@ -491,7 +489,7 @@ export default function StoreManagePage() {
                             ))}
                             </Accordion>
                         ) : !showNewProductForm && (
-                            <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
+                            <div className="text-center text-muted-foreground py-10 px-4">
                                 <Package className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
                                 <p>No products added yet.</p>
                                 <p className="text-sm">Click "Add Product" to get started.</p>
@@ -502,17 +500,17 @@ export default function StoreManagePage() {
 
                 {/* Daily Offers Management Section (Conditional) */}
                 {isEligibleForOffers && (
-                    <Card className="border shadow-sm">
-                        <CardHeader className="flex flex-row justify-between items-center">
+                    <Card className="border shadow-lg overflow-hidden">
+                        <CardHeader className="flex flex-row justify-between items-center bg-muted/50 p-4 border-b">
                             <div>
-                                <CardTitle className="flex items-center gap-2"><CalendarClock className="h-5 w-5 text-amber-500"/>Daily/Weekly Offers</CardTitle>
+                                <CardTitle className="text-xl flex items-center gap-2"><CalendarClock className="h-5 w-5 text-amber-500"/>Daily/Weekly Offers</CardTitle>
                                 <CardDescription>Manage subscription offers for recurring deliveries.</CardDescription>
                             </div>
                             <Button size="sm" onClick={() => setShowNewOfferForm(!showNewOfferForm)} variant={showNewOfferForm ? 'secondary' : 'default'} disabled={!store.isOpen && store.isActive}>
                             <PlusCircle className="mr-2 h-4 w-4" /> {showNewOfferForm ? 'Cancel' : 'Add Offer'}
                             </Button>
                         </CardHeader>
-                        <CardContent className="space-y-6">
+                        <CardContent className="p-0">
                            <AnimatePresence>
                                 {showNewOfferForm && (
                                     <motion.div
@@ -520,21 +518,21 @@ export default function StoreManagePage() {
                                         variants={formVariants}
                                         initial="hidden"
                                         animate="visible"
-                                        exit="hidden"
+                                        exit="exit"
                                     >
-                                        <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
-                                            <h3 className="text-lg font-medium mb-4">New Subscription Offer</h3>
+                                        <div className="bg-background p-4 sm:p-6">
+                                            <h3 className="text-lg font-semibold mb-4 text-amber-600 dark:text-amber-400">New Subscription Offer</h3>
                                             <DailyOfferForm
                                                 onOfferCreated={handleOfferCreated}
                                                 storeId={store.id}
                                                 availableProducts={products} // Pass products to select from
                                             />
-                                        </Card>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
                             {dailyOffers.length > 0 ? (
-                                <motion.div variants={listVariants} initial="hidden" animate="visible" className="border rounded-md overflow-hidden">
+                                <motion.div variants={listVariants} initial="hidden" animate="visible" className="overflow-x-auto">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
@@ -553,7 +551,7 @@ export default function StoreManagePage() {
                                                         variants={itemVariants}
                                                         initial="hidden"
                                                         animate="visible"
-                                                        exit="hidden"
+                                                        exit="exit"
                                                         layout
                                                         className="hover:bg-muted/50"
                                                     >
@@ -601,7 +599,7 @@ export default function StoreManagePage() {
                                     </Table>
                                 </motion.div>
                             ) : !showNewOfferForm && (
-                                <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
+                                <div className="text-center text-muted-foreground py-10 px-4">
                                     <CalendarClock className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
                                     <p>No daily or weekly offers created yet.</p>
                                     <p className="text-sm">Click "Add Offer" to create subscription options.</p>
@@ -612,17 +610,17 @@ export default function StoreManagePage() {
                 )}
 
                 {/* Promotions Management Section */}
-                <Card className="border shadow-sm">
-                    <CardHeader className="flex flex-row justify-between items-center">
+                <Card className="border shadow-lg overflow-hidden">
+                    <CardHeader className="flex flex-row justify-between items-center bg-muted/50 p-4 border-b">
                         <div>
-                            <CardTitle className="flex items-center gap-2"><Ticket className="h-5 w-5 text-purple-500"/>Promotions</CardTitle>
+                            <CardTitle className="text-xl flex items-center gap-2"><Ticket className="h-5 w-5 text-purple-500"/>Promotions</CardTitle>
                             <CardDescription>Manage discounts and special promotions for your store.</CardDescription>
                         </div>
                         <Button size="sm" onClick={() => setShowNewPromotionForm(!showNewPromotionForm)} variant={showNewPromotionForm ? 'secondary' : 'default'} disabled={!store.isOpen && store.isActive}>
                             <PlusCircle className="mr-2 h-4 w-4" /> {showNewPromotionForm ? 'Cancel' : 'Add Promotion'}
                         </Button>
                     </CardHeader>
-                    <CardContent className="space-y-6">
+                    <CardContent className="p-0">
                         <AnimatePresence>
                             {showNewPromotionForm && (
                                 <motion.div
@@ -630,22 +628,22 @@ export default function StoreManagePage() {
                                     variants={formVariants}
                                     initial="hidden"
                                     animate="visible"
-                                    exit="hidden"
+                                    exit="exit"
                                 >
-                                    <Card className="bg-muted/30 p-4 sm:p-6 border border-dashed">
-                                        <h3 className="text-lg font-medium mb-4">New Promotion Details</h3>
+                                     <div className="bg-background p-4 sm:p-6">
+                                        <h3 className="text-lg font-semibold mb-4 text-purple-600 dark:text-purple-400">New Promotion Details</h3>
                                         <PromotionForm
                                         onPromotionCreated={handlePromotionCreated}
                                         storeId={store.id}
                                         availableProducts={products}
                                         availableCategories={productCategories.filter(c => c !== 'uncategorized')} // Pass available categories
                                         />
-                                    </Card>
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
                         {promotions.length > 0 ? (
-                            <motion.div variants={listVariants} initial="hidden" animate="visible" className="border rounded-md overflow-hidden">
+                            <motion.div variants={listVariants} initial="hidden" animate="visible" className="overflow-x-auto">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -665,7 +663,7 @@ export default function StoreManagePage() {
                                                     variants={itemVariants}
                                                     initial="hidden"
                                                     animate="visible"
-                                                    exit="hidden"
+                                                    exit="exit"
                                                     layout
                                                     className="hover:bg-muted/50"
                                                 >
@@ -716,7 +714,7 @@ export default function StoreManagePage() {
                                 </Table>
                             </motion.div>
                         ) : !showNewPromotionForm && (
-                            <div className="text-center text-muted-foreground py-8 border border-dashed rounded-md">
+                            <div className="text-center text-muted-foreground py-10 px-4">
                                 <Ticket className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30"/>
                                 <p>No promotions created yet.</p>
                                 <p className="text-sm">Click "Add Promotion" to create discounts.</p>

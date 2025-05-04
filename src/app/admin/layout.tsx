@@ -27,10 +27,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   return (
+    // Apply admin-layout class for scoping admin theme variables
     <SidebarProvider>
-      <div className="flex min-h-screen bg-background">
+      <div className={cn("flex min-h-screen bg-background", "admin-layout")}>
         {/* Admin Sidebar */}
-        <Sidebar collapsible="icon" side="left" variant="sidebar" className="bg-[--admin-sidebar-background] text-[--admin-sidebar-foreground] border-r border-[--admin-sidebar-border]">
+        {/* Added admin-sidebar class for specific sidebar theme overrides */}
+        <Sidebar collapsible="icon" side="left" variant="sidebar" className={cn("bg-[--admin-sidebar-background] text-[--admin-sidebar-foreground] border-r border-[--admin-sidebar-border]", "admin-sidebar")}>
           <SidebarHeader className="p-2 border-b border-[--admin-sidebar-border]">
              <div className="flex items-center justify-between">
                 {/* Simplified Logo for Admin */}
@@ -51,7 +53,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       asChild
                       isActive={pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))}
                       tooltip={item.label}
-                      className="capitalize focus:bg-[--admin-sidebar-accent] focus:text-[--admin-sidebar-accent-foreground] data-[active=true]:bg-[--admin-sidebar-accent] data-[active=true]:text-[--admin-sidebar-accent-foreground] hover:bg-[--admin-sidebar-accent] hover:text-[--admin-sidebar-accent-foreground]"
+                      // Use admin theme variables for sidebar buttons
+                      className="capitalize focus:bg-[--admin-sidebar-accent] focus:text-[--admin-sidebar-accent-foreground] data-[active=true]:bg-[--admin-sidebar-accent] data-[active=true]:text-[--admin-sidebar-accent-foreground] hover:bg-[--admin-sidebar-accent]/80 hover:text-[--admin-sidebar-accent-foreground]"
                       variant="ghost"
                     >
                       <a>
@@ -89,4 +92,3 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </SidebarProvider>
   );
 }
-```

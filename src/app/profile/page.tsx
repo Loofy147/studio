@@ -36,7 +36,10 @@ import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 
 
 // Helper to format currency
-const formatCurrency = (amount: number) => {
+const formatCurrency = (amount: number | undefined | null) => {
+  if (amount === undefined || amount === null) {
+    return 'N/A'; // Or return a default value like '$0.00' or ''
+  }
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 };
 
@@ -88,10 +91,10 @@ export default function ProfilePage() {
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [isLoadingSubs, setIsLoadingSubs] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [updatingSubId, setUpdatingSubId] = useState<string | null>(null);
+  const [updatingSubId, setUpdatingSubId] = useState<string | null(null);
 
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState<AddressFormData | null>(null);
+  const [currentAddress, setCurrentAddress] = useState<AddressFormData | null(null);
 
 
   useEffect(() => {
@@ -194,7 +197,7 @@ export default function ProfilePage() {
         if (!profile) return;
         // Logic moved from AddressDialog to here
         try {
-            let updatedProfile: UserProfile | null = null;
+            let updatedProfile: UserProfile | null(null;
             if (addressFormData.id) { // Editing existing address
                 updatedProfile = await updateUserAddress(userId, addressFormData.id, addressFormData);
             } else { // Adding new address
@@ -236,14 +239,14 @@ export default function ProfilePage() {
   const ProfileInfoSkeleton = () => (
      <Card>
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6">
-             <Skeleton className="h-24 w-24 rounded-full" />
+             <Skeleton className="h-24 w-24 rounded-full bg-muted/50" />
              <div className="space-y-2 flex-grow">
-                <Skeleton className="h-7 w-48" />
-                <Skeleton className="h-5 w-64" />
+                <Skeleton className="h-7 w-48 bg-muted/50" />
+                <Skeleton className="h-5 w-64 bg-muted/50" />
              </div>
             <div className="flex gap-2 self-start sm:self-center">
-                <Skeleton className="h-9 w-28" />
-                <Skeleton className="h-9 w-28" />
+                <Skeleton className="h-9 w-28 bg-muted/50" />
+                <Skeleton className="h-9 w-28 bg-muted/50" />
             </div>
         </CardHeader>
         <CardContent className="space-y-6 p-6 pt-0">
@@ -251,32 +254,32 @@ export default function ProfilePage() {
              {/* Address Skeleton */}
               <div className="space-y-4">
                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-6 w-32" />
-                    <Skeleton className="h-9 w-24" />
+                    <Skeleton className="h-6 w-32 bg-muted/50" />
+                    <Skeleton className="h-9 w-24 bg-muted/50" />
                  </div>
                  <div className="space-y-3">
-                     <Skeleton className="h-16 w-full" />
-                     <Skeleton className="h-16 w-full" />
+                     <Skeleton className="h-16 w-full bg-muted/50" />
+                     <Skeleton className="h-16 w-full bg-muted/50" />
                  </div>
              </div>
              <Separator />
              {/* Friends/Followed Stores Skeleton */}
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
-                     <Skeleton className="h-7 w-7 rounded" />
-                     <Skeleton className="h-5 w-32" />
+                     <Skeleton className="h-7 w-7 rounded bg-muted/50" />
+                     <Skeleton className="h-5 w-32 bg-muted/50" />
                   </div>
                    <div className="flex items-center gap-3">
-                     <Skeleton className="h-7 w-7 rounded" />
-                     <Skeleton className="h-5 w-36" />
+                     <Skeleton className="h-7 w-7 rounded bg-muted/50" />
+                     <Skeleton className="h-5 w-36 bg-muted/50" />
                   </div>
              </div>
              <Separator />
              <div className="flex items-center gap-3">
-                 <Skeleton className="h-6 w-6 rounded" />
+                 <Skeleton className="h-6 w-6 rounded bg-muted/50" />
                  <div className="space-y-1">
-                    <Skeleton className="h-4 w-28" />
-                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-4 w-28 bg-muted/50" />
+                    <Skeleton className="h-6 w-20 bg-muted/50" />
                  </div>
             </div>
         </CardContent>
@@ -287,32 +290,32 @@ export default function ProfilePage() {
     <Card>
         <CardHeader className="flex flex-row justify-between items-center p-4">
             <div className="space-y-1">
-                <Skeleton className="h-7 w-40" />
-                <Skeleton className="h-4 w-56" />
+                <Skeleton className="h-7 w-40 bg-muted/50" />
+                <Skeleton className="h-4 w-56 bg-muted/50" />
             </div>
-            <Skeleton className="h-9 w-32" />
+            <Skeleton className="h-9 w-32 bg-muted/50" />
         </CardHeader>
         <CardContent className="p-0">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[100px] pl-4"><Skeleton className="h-4 w-16" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-32" /></TableHead>
-                        <TableHead className="hidden md:table-cell text-right"><Skeleton className="h-4 w-20" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-16" /></TableHead>
+                        <TableHead className="w-[100px] pl-4"><Skeleton className="h-4 w-16 bg-muted/50" /></TableHead>
+                        <TableHead><Skeleton className="h-4 w-24 bg-muted/50" /></TableHead>
+                        <TableHead><Skeleton className="h-4 w-32 bg-muted/50" /></TableHead>
+                        <TableHead className="hidden md:table-cell text-right"><Skeleton className="h-4 w-20 bg-muted/50" /></TableHead>
+                        <TableHead><Skeleton className="h-4 w-24 bg-muted/50" /></TableHead>
+                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-16 bg-muted/50" /></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {Array.from({ length: 3 }).map((_, i) => (
                         <TableRow key={i} className="hover:bg-muted/20">
-                            <TableCell className="pl-4"><Skeleton className="h-4 w-16" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                             <TableCell className="hidden md:table-cell text-right"><Skeleton className="h-4 w-20" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                            <TableCell className="text-right pr-4"><Skeleton className="h-4 w-16" /></TableCell>
+                            <TableCell className="pl-4"><Skeleton className="h-4 w-16 bg-muted/50" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-24 bg-muted/50" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-32 bg-muted/50" /></TableCell>
+                             <TableCell className="hidden md:table-cell text-right"><Skeleton className="h-4 w-20 bg-muted/50" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-24 bg-muted/50" /></TableCell>
+                            <TableCell className="text-right pr-4"><Skeleton className="h-4 w-16 bg-muted/50" /></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -325,31 +328,31 @@ export default function ProfilePage() {
      <Card>
         <CardHeader className="flex flex-row justify-between items-center p-4">
             <div className="space-y-1">
-                <Skeleton className="h-7 w-44" />
-                <Skeleton className="h-4 w-60" />
+                <Skeleton className="h-7 w-44 bg-muted/50" />
+                <Skeleton className="h-4 w-60 bg-muted/50" />
             </div>
         </CardHeader>
         <CardContent className="p-0">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="pl-4"><Skeleton className="h-4 w-32" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                        <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-28" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-20" /></TableHead>
-                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-28" /></TableHead>
+                        <TableHead className="pl-4"><Skeleton className="h-4 w-32 bg-muted/50" /></TableHead>
+                        <TableHead><Skeleton className="h-4 w-24 bg-muted/50" /></TableHead>
+                        <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-28 bg-muted/50" /></TableHead>
+                        <TableHead><Skeleton className="h-4 w-20 bg-muted/50" /></TableHead>
+                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-28 bg-muted/50" /></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                      {Array.from({ length: 2 }).map((_, i) => (
                         <TableRow key={i} className="hover:bg-muted/20">
-                            <TableCell className="pl-4"><Skeleton className="h-4 w-32" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-28" /></TableCell>
-                             <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                            <TableCell className="pl-4"><Skeleton className="h-4 w-32 bg-muted/50" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-24 bg-muted/50" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-28 bg-muted/50" /></TableCell>
+                             <TableCell><Skeleton className="h-4 w-20 bg-muted/50" /></TableCell>
                             <TableCell className="text-right pr-4 space-x-1">
-                                <Skeleton className="h-8 w-8 inline-block" />
-                                <Skeleton className="h-8 w-8 inline-block" />
+                                <Skeleton className="h-8 w-8 inline-block bg-muted/50" />
+                                <Skeleton className="h-8 w-8 inline-block bg-muted/50" />
                             </TableCell>
                         </TableRow>
                     ))}
@@ -377,7 +380,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 space-y-12"> {/* Added container and padding */}
+    <div className="container mx-auto px-4 py-12 space-y-12">
         {/* Profile Header */}
        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6">
             <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
@@ -400,16 +403,16 @@ export default function ProfilePage() {
 
        {/* Profile Information Section */}
       {isLoadingProfile ? <ProfileInfoSkeleton /> : profile ? (
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200 border">
-          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6">
-             <Avatar className="h-24 w-24 border-2 border-primary/30">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border border-primary/10">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 bg-gradient-to-r from-primary/5 via-background to-accent/5">
+             <Avatar className="h-24 w-24 border-4 border-background shadow-md">
                 <AvatarImage src={`https://avatar.vercel.sh/${profile.email}?size=96`} alt={profile.name} />
                 <AvatarFallback className="text-3xl bg-muted">
                     {profile.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
              </Avatar>
             <div className="flex-grow mt-2 sm:mt-0">
-                <CardTitle className="text-2xl font-semibold">{profile.name}</CardTitle>
+                <CardTitle className="text-2xl font-bold text-primary">{profile.name}</CardTitle>
                 <CardDescription className="flex items-center gap-1.5 text-base mt-1 text-muted-foreground">
                     <Mail className="h-4 w-4"/>{profile.email}
                 </CardDescription>
@@ -428,37 +431,37 @@ export default function ProfilePage() {
           </CardHeader>
 
           {/* Addresses */}
-          <CardContent className="space-y-6 p-6 pt-2">
+          <CardContent className="space-y-6 p-6 pt-4"> {/* Adjusted padding */}
              <Separator />
              <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium flex items-center gap-2"><MapPin className="h-5 w-5 text-primary"/>Delivery Addresses</h3>
+                    <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground/90"><MapPin className="h-5 w-5 text-primary"/>Delivery Addresses</h3>
                       <Button variant="outline" size="sm" onClick={() => handleOpenAddressDialog()}>
                           <Plus className="mr-2 h-4 w-4" /> Add Address
                       </Button>
                 </div>
                 {profile.addresses.length > 0 ? (
-                    <motion.div layout className="space-y-3"> {/* Add layout animation */}
+                    <motion.div layout className="space-y-3">
                          <AnimatePresence>
                             {profile.addresses.map((address) => (
                                 <motion.div
                                     key={address.id}
-                                    layout // Enable layout animation for add/remove
+                                    layout
                                     variants={itemVariants}
                                     initial="hidden"
                                     animate="visible"
                                     exit="exit"
-                                    className="flex items-start justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/50 transition-colors"
+                                    className="flex items-center justify-between p-3 border rounded-md bg-muted/30 hover:shadow-sm hover:border-primary/20 transition-all duration-150"
                                 >
-                                    <div className="flex items-start gap-3 text-sm">
-                                        {address.label === 'Home' ? <Home className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> :
-                                        address.label === 'Work' ? <Briefcase className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" /> :
-                                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />}
+                                    <div className="flex items-center gap-3 text-sm">
+                                        {address.label === 'Home' ? <Home className="h-4 w-4 text-primary/80 shrink-0" /> :
+                                        address.label === 'Work' ? <Briefcase className="h-4 w-4 text-primary/80 shrink-0" /> :
+                                        <MapPin className="h-4 w-4 text-primary/80 shrink-0" />}
                                         <div>
                                             <span className="font-medium block text-foreground">
-                                                {address.label} {address.isDefault && <Badge variant="secondary" className="ml-1 text-xs">Default</Badge>}
+                                                {address.label} {address.isDefault && <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0 h-5">Default</Badge>}
                                             </span>
-                                            <span className="text-muted-foreground">{address.street}, {address.city}, {address.state} {address.zipCode}</span>
+                                            <span className="text-muted-foreground text-xs">{address.street}, {address.city}, {address.state} {address.zipCode}</span>
                                         </div>
                                     </div>
                                     <div className="flex gap-1">
@@ -472,7 +475,7 @@ export default function ProfilePage() {
                                                 size="icon"
                                                 className="h-7 w-7 text-destructive hover:bg-destructive/10"
                                                 title="Delete Address"
-                                                disabled={profile.addresses.length === 1 || address.isDefault} // Disable deleting the only or default address
+                                                disabled={profile.addresses.length === 1 || (address.isDefault && profile.addresses.length > 1)} // Disable if only 1 or if default & > 1 address
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5"/>
                                                 </Button>
@@ -512,27 +515,27 @@ export default function ProfilePage() {
              <Separator />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Link href="/profile/friends" passHref legacyBehavior>
-                         <Card className="hover:bg-muted/40 transition-colors cursor-pointer h-full">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                         <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4"> {/* Adjusted padding */}
                                 <CardTitle className="text-base font-medium flex items-center gap-2">
                                     <UsersIcon className="h-5 w-5 text-primary"/> My Friends
                                 </CardTitle>
-                                <span className="text-sm text-muted-foreground">({profile.friendIds?.length || 0})</span>
+                                <span className="text-sm font-semibold text-primary">({profile.friendIds?.length || 0})</span>
                             </CardHeader>
-                             <CardContent>
+                             <CardContent className="p-4 pt-0">
                                 <p className="text-xs text-muted-foreground">View and manage your friends list.</p>
                              </CardContent>
                         </Card>
                      </Link>
                     <Link href="/profile/followed-stores" passHref legacyBehavior>
-                         <Card className="hover:bg-muted/40 transition-colors cursor-pointer h-full">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                         <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4"> {/* Adjusted padding */}
                                 <CardTitle className="text-base font-medium flex items-center gap-2">
                                     <StoreIcon className="h-5 w-5 text-primary"/> Followed Stores
                                 </CardTitle>
-                                 <span className="text-sm text-muted-foreground">({profile.followedStoreIds?.length || 0})</span>
+                                 <span className="text-sm font-semibold text-primary">({profile.followedStoreIds?.length || 0})</span>
                             </CardHeader>
-                             <CardContent>
+                             <CardContent className="p-4 pt-0">
                                 <p className="text-xs text-muted-foreground">See updates from stores you follow.</p>
                              </CardContent>
                         </Card>
@@ -542,11 +545,11 @@ export default function ProfilePage() {
             <Separator />
 
             {/* Loyalty Points */}
-            <div className="flex items-center gap-3 bg-primary/5 rounded-md p-4 border border-primary/10">
-                 <Award className="h-7 w-7 text-primary shrink-0" />
+            <div className="flex items-center gap-3 bg-gradient-to-r from-yellow-100 via-amber-50 to-orange-100 dark:from-yellow-900/30 dark:via-amber-950/30 dark:to-orange-950/30 rounded-lg p-4 border border-amber-300/50 dark:border-amber-700/50 shadow-inner">
+                 <Award className="h-8 w-8 text-amber-500 dark:text-amber-400 shrink-0" />
                  <div>
-                     <span className="font-medium block text-foreground">Loyalty Points</span>
-                     <span className="text-2xl font-bold text-primary">{profile.loyaltyPoints}</span>
+                     <span className="font-medium block text-foreground/90">Loyalty Points</span>
+                     <span className="text-3xl font-bold text-amber-600 dark:text-amber-400">{profile.loyaltyPoints}</span>
                      <span className="text-muted-foreground text-sm"> points earned</span>
                  </div>
             </div>
@@ -556,10 +559,10 @@ export default function ProfilePage() {
              {profile.role === 'store_owner' && (
                 <>
                     <Separator />
-                     <div className="space-y-3">
-                        <h3 className="text-lg font-medium flex items-center gap-2"><Building className="h-5 w-5 text-primary"/>Store Management</h3>
+                     <div className="space-y-3 border p-4 rounded-md bg-muted/30">
+                        <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3>
                          <p className="text-sm text-muted-foreground">Manage your stores, products, and orders.</p>
-                         <Link href="/stores" passHref>
+                         <Link href="/stores" passHref legacyBehavior>
                             <Button variant="default">Go to Store Management</Button>
                          </Link>
                     </div>
@@ -585,7 +588,7 @@ export default function ProfilePage() {
              />
         )}
 
-        <Separator />
+        <Separator className="my-8 border-border/50"/>
 
        {/* Subscriptions Section */}
         <div className="space-y-4">
@@ -724,7 +727,7 @@ export default function ProfilePage() {
              ) : null}
         </div>
 
-      <Separator />
+      <Separator className="my-8 border-border/50"/>
 
       {/* Order History Section */}
       <div className="space-y-4">

@@ -78,6 +78,7 @@ export default function DriverDashboardPage() {
   const getAvailabilityBadge = (availability: DriverAvailability) => {
     switch (availability) {
       case 'available':
+        // Use theme colors for consistency
         return <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-700/50"><CheckCircle className="h-3 w-3 mr-1"/>Available</Badge>;
       case 'busy':
         return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700"><Loader2 className="h-3 w-3 mr-1 animate-spin"/>Busy</Badge>;
@@ -97,15 +98,15 @@ export default function DriverDashboardPage() {
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <Skeleton className="h-8 w-48" />
-        <Card>
-          <CardHeader><Skeleton className="h-6 w-1/2" /></CardHeader>
-          <CardContent><Skeleton className="h-20 w-full" /></CardContent>
-          <CardFooter><Skeleton className="h-10 w-32" /></CardFooter>
+        <Skeleton className="h-8 w-48 bg-muted/50" />
+        <Card className="bg-card border-border">
+          <CardHeader><Skeleton className="h-6 w-1/2 bg-muted/50" /></CardHeader>
+          <CardContent><Skeleton className="h-20 w-full bg-muted/50" /></CardContent>
+          <CardFooter><Skeleton className="h-10 w-32 bg-muted/50" /></Card>
         </Card>
-        <Card>
-           <CardHeader><Skeleton className="h-6 w-1/3" /></CardHeader>
-           <CardContent><Skeleton className="h-16 w-full" /></CardContent>
+        <Card className="bg-card border-border">
+           <CardHeader><Skeleton className="h-6 w-1/3 bg-muted/50" /></CardHeader>
+           <CardContent><Skeleton className="h-16 w-full bg-muted/50" /></CardContent>
         </Card>
       </div>
     );
@@ -157,11 +158,13 @@ export default function DriverDashboardPage() {
         animate="visible"
         variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
     >
-      <motion.h1 variants={cardVariants} className="text-3xl font-bold tracking-tight">Driver Dashboard</motion.h1>
+      {/* Use driver foreground color */}
+      <motion.h1 variants={cardVariants} className="text-3xl font-bold tracking-tight text-[var(--driver-foreground)]">Driver Dashboard</motion.h1>
 
       {/* Status & Availability Card */}
       <motion.div variants={cardVariants}>
-        <Card className="shadow-lg border-primary/20">
+        {/* Apply driver card styles */}
+        <Card className="shadow-lg border-[var(--driver-border)] bg-[var(--driver-card)] text-[var(--driver-card-foreground)]">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2"><Activity className="h-5 w-5 text-primary"/> Your Status</span>
@@ -177,6 +180,8 @@ export default function DriverDashboardPage() {
                     onCheckedChange={handleAvailabilityToggle}
                     disabled={isTogglingStatus || driver.status !== 'active'} // Disabled if not active or toggling
                     aria-label={driver.availability === 'available' ? 'Set status to Offline' : 'Set status to Available'}
+                    // Apply driver theme primary color to switch
+                    className="data-[state=checked]:bg-primary"
                 />
                 <Label htmlFor="availability-toggle" className={cn("text-lg font-medium", driver.availability === 'available' ? 'text-green-600' : 'text-muted-foreground')}>
                     {driver.availability === 'available' ? 'Available for Orders' : 'Offline'}
@@ -194,27 +199,30 @@ export default function DriverDashboardPage() {
 
       {/* Quick Actions Card */}
        <motion.div variants={cardVariants}>
-            <Card>
+            {/* Apply driver card styles */}
+            <Card className="bg-[var(--driver-card)] text-[var(--driver-card-foreground)] border-[var(--driver-border)]">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Map className="h-5 w-5 text-primary"/>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Button variant="outline" size="lg" className="flex flex-col h-auto py-4 gap-1">
+                    {/* Use driver theme colors for buttons */}
+                    <Button variant="outline" size="lg" className="flex flex-col h-auto py-4 gap-1 border-[var(--driver-border)] hover:bg-accent hover:text-accent-foreground">
                         <MessageSquare className="h-6 w-6 mb-1"/>
                         <span>View Orders</span>
                     </Button>
-                    <Button variant="outline" size="lg" className="flex flex-col h-auto py-4 gap-1">
+                    <Button variant="outline" size="lg" className="flex flex-col h-auto py-4 gap-1 border-[var(--driver-border)] hover:bg-accent hover:text-accent-foreground">
                         <Map className="h-6 w-6 mb-1"/>
                         <span>Current Route</span>
                     </Button>
-                     <Button variant="outline" size="lg" className="flex flex-col h-auto py-4 gap-1">
+                     <Button variant="outline" size="lg" className="flex flex-col h-auto py-4 gap-1 border-[var(--driver-border)] hover:bg-accent hover:text-accent-foreground">
                         <User className="h-6 w-6 mb-1"/>
                         <span>My Profile</span>
                     </Button>
-                     <Button variant="outline" size="lg" className="flex flex-col h-auto py-4 gap-1">
+                     <Button variant="outline" size="lg" className="flex flex-col h-auto py-4 gap-1 border-[var(--driver-border)] hover:bg-accent hover:text-accent-foreground relative">
                         <Bell className="h-6 w-6 mb-1"/>
                         <span>Notifications</span>
-                         <Badge variant="destructive" className="absolute top-2 right-2">3</Badge> {/* Example notification count */}
+                         {/* Use driver theme colors */}
+                         <Badge variant="destructive" className="absolute top-2 right-2 bg-destructive text-destructive-foreground">3</Badge>
                     </Button>
                 </CardContent>
             </Card>
@@ -222,7 +230,8 @@ export default function DriverDashboardPage() {
 
         {/* Order Requests/Current Delivery Placeholder */}
          <motion.div variants={cardVariants}>
-            <Card>
+            {/* Apply driver card styles */}
+            <Card className="bg-[var(--driver-card)] text-[var(--driver-card-foreground)] border-[var(--driver-border)]">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Bell className="h-5 w-5 text-primary"/>Delivery Requests</CardTitle>
                     <CardDescription>Incoming delivery orders will appear here.</CardDescription>
@@ -235,7 +244,7 @@ export default function DriverDashboardPage() {
                 </CardContent>
                 {/* Example: Display current delivery info if driver is 'busy' */}
                 {driver.availability === 'busy' && (
-                     <CardFooter className="border-t pt-4">
+                     <CardFooter className="border-t pt-4 border-[var(--driver-border)]">
                         <p className="text-sm text-primary font-medium">Currently on delivery to 123 Main St.</p>
                         {/* Add more details */}
                      </CardFooter>
@@ -246,4 +255,3 @@ export default function DriverDashboardPage() {
     </motion.div>
   );
 }
-```

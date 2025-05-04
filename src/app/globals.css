@@ -3,13 +3,15 @@
 @tailwind utilities;
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  /* Use a standard sans-serif stack */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Lighter Gray */
-    --foreground: 224 71.4% 4.1%;
+    /* General Theme (Customer Default) - Teal & Orange */
+    --background: 0 0% 100%; /* White */
+    --foreground: 224 71.4% 4.1%; /* Dark Gray/Almost Black */
 
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
@@ -18,23 +20,23 @@ body {
     --popover-foreground: 224 71.4% 4.1%;
 
     --primary: 180 65% 35%; /* Teal */
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 210 15% 90%; /* Light Gray */
+    --secondary: 210 15% 94%; /* Lighter Gray */
     --secondary-foreground: 224 7.1% 20.1%; /* Darker Gray */
 
-    --muted: 210 15% 94%; /* Lighter Muted */
-    --muted-foreground: 224 7.1% 45.1%;
+    --muted: 210 20% 96.5%; /* Very Light Gray */
+    --muted-foreground: 224 7.1% 45.1%; /* Medium Gray */
 
     --accent: 30 90% 55%; /* Vibrant Orange */
-    --accent-foreground: 224 71.4% 4.1%;
+    --accent-foreground: 0 0% 100%; /* White text on accent */
 
     --destructive: 0 75% 55%; /* Brighter Red */
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 98%; /* Light text on destructive */
 
-    --border: 210 10% 88%; /* Subtle Border */
-    --input: 210 10% 92%; /* Slightly darker input */
-    --ring: 180 60% 55%; /* Lighter Teal for focus ring */
+    --border: 210 15% 88%; /* Subtle Border */
+    --input: 210 15% 92%; /* Slightly darker input */
+    --ring: 180 60% 55%; /* Teal for focus ring */
 
     --chart-1: 180 65% 35%; /* Teal */
     --chart-2: 30 90% 55%;  /* Orange */
@@ -42,9 +44,9 @@ body {
     --chart-4: 180 50% 55%; /* Lighter Teal */
     --chart-5: 30 80% 70%;  /* Lighter Orange */
 
-    --radius: 0.5rem; /* Slightly less rounded */
+    --radius: 0.5rem; /* Standard radius */
 
-    /* General Sidebar (Customer Facing) */
+    /* Sidebar Theme (Used by Customer Homepage Sidebar & Potentially Others) */
     --sidebar-background: 220 10% 97%; /* Slightly off-white */
     --sidebar-foreground: 224 71.4% 10.1%;
     --sidebar-primary: 180 65% 35%; /* Teal */
@@ -53,6 +55,20 @@ body {
     --sidebar-accent-foreground: 180 70% 25%; /* Darker teal text */
     --sidebar-border: 210 10% 88%;
     --sidebar-ring: 180 60% 55%;
+
+    /* Admin Theme Variables */
+    --admin-background: 220 10% 98%; /* Light Gray */
+    --admin-foreground: 220 15% 10%; /* Very Dark Gray */
+    --admin-card: 0 0% 100%; /* White Card */
+    --admin-card-foreground: 220 15% 10%;
+    --admin-primary: 220 60% 50%; /* Strong Blue */
+    --admin-primary-foreground: 0 0% 100%;
+    --admin-secondary: 220 10% 92%; /* Lighter Gray */
+    --admin-secondary-foreground: 220 10% 30%;
+    --admin-accent: 220 50% 96%; /* Very Light Blue */
+    --admin-accent-foreground: 220 60% 40%; /* Blue Text */
+    --admin-border: 220 10% 85%;
+    --admin-ring: 220 60% 60%;
 
     /* Admin Sidebar Theme */
     --admin-sidebar-background: 220 15% 20%; /* Dark Slate */
@@ -63,26 +79,52 @@ body {
     --admin-sidebar-accent-foreground: 0 0% 100%; /* White */
     --admin-sidebar-border: 220 10% 35%; /* Subtle Dark Border */
     --admin-sidebar-ring: 180 60% 55%;
+
+    /* Driver Theme Variables */
+    --driver-background: 215 20% 95%; /* Light Slate Gray */
+    --driver-foreground: 220 20% 15%; /* Dark Slate */
+    --driver-card: 0 0% 100%; /* White */
+    --driver-card-foreground: 220 20% 15%;
+    --driver-primary: 190 60% 40%; /* Muted Teal/Blue */
+    --driver-primary-foreground: 0 0% 100%;
+    --driver-secondary: 215 15% 88%; /* Mid Slate Gray */
+    --driver-secondary-foreground: 220 15% 25%;
+    --driver-accent: 190 50% 94%; /* Very Light Teal/Blue */
+    --driver-accent-foreground: 190 60% 30%;
+    --driver-border: 215 15% 80%;
+    --driver-ring: 190 60% 50%;
+
+     /* Driver Sidebar Theme */
+    --driver-sidebar-background: 220 25% 30%; /* Darker Slate Blue */
+    --driver-sidebar-foreground: 210 30% 95%; /* Light Text */
+    --driver-sidebar-primary: 190 60% 60%; /* Brighter Teal/Blue */
+    --driver-sidebar-primary-foreground: 220 25% 10%;
+    --driver-sidebar-accent: 220 20% 40%; /* Muted Blue */
+    --driver-sidebar-accent-foreground: 0 0% 100%;
+    --driver-sidebar-border: 220 15% 45%;
+    --driver-sidebar-ring: 190 60% 60%;
+
   }
 
   .dark {
-    --background: 220 15% 12%; /* Darker Background */
-    --foreground: 210 20% 96%;
+    /* Dark General Theme */
+    --background: 224 71.4% 4.1%; /* Near Black */
+    --foreground: 210 20% 96%; /* Light Gray */
 
-    --card: 220 15% 18%; /* Dark Card */
+    --card: 220 15% 12%; /* Very Dark Gray/Blue */
     --card-foreground: 210 20% 96%;
 
-    --popover: 220 15% 15%; /* Dark Popover */
+    --popover: 220 15% 9%; /* Even Darker */
     --popover-foreground: 210 20% 96%;
 
     --primary: 180 60% 55%; /* Lighter Teal */
     --primary-foreground: 220 15% 10%; /* Very Dark for contrast */
 
-    --secondary: 220 15% 25%; /* Darker Gray */
+    --secondary: 220 15% 20%; /* Dark Gray */
     --secondary-foreground: 210 15% 85%; /* Lighter Gray */
 
-    --muted: 220 15% 22%; /* Darker Muted */
-    --muted-foreground: 210 15% 65%;
+    --muted: 220 15% 15%; /* Darker Muted */
+    --muted-foreground: 210 15% 65%; /* Medium Gray */
 
     --accent: 30 85% 65%; /* Darker Orange */
     --accent-foreground: 0 0% 10%; /* Dark text on accent */
@@ -90,8 +132,8 @@ body {
     --destructive: 0 65% 60%; /* Adjusted Dark Red */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 10% 30%; /* Darker Border */
-    --input: 220 10% 25%; /* Darker Input */
+    --border: 220 10% 25%; /* Darker Border */
+    --input: 220 10% 20%; /* Darker Input */
     --ring: 180 60% 55%; /* Ring uses dark primary */
 
     --chart-1: 180 60% 55%; /* Lighter Teal */
@@ -100,9 +142,7 @@ body {
     --chart-4: 180 45% 70%; /* Even Lighter Teal */
     --chart-5: 30 75% 75%;  /* Even Lighter Orange */
 
-    --radius: 0.5rem;
-
-    /* General Sidebar Dark */
+    /* Dark Sidebar Theme */
     --sidebar-background: 220 15% 15%;
     --sidebar-foreground: 210 20% 94%;
     --sidebar-primary: 180 60% 55%; /* Lighter Teal */
@@ -112,37 +152,81 @@ body {
     --sidebar-border: 220 10% 30%;
     --sidebar-ring: 180 60% 55%;
 
-    /* Admin Sidebar Dark */
-    --admin-sidebar-background: 220 15% 20%; /* Stays the same */
-    --admin-sidebar-foreground: 210 20% 90%; /* Stays the same */
-    --admin-sidebar-primary: 180 60% 55%; /* Stays the same */
-    --admin-sidebar-primary-foreground: 220 15% 10%; /* Stays the same */
-    --admin-sidebar-accent: 220 15% 30%; /* Stays the same */
-    --admin-sidebar-accent-foreground: 0 0% 100%; /* Stays the same */
-    --admin-sidebar-border: 220 10% 35%; /* Stays the same */
-    --admin-sidebar-ring: 180 60% 55%; /* Stays the same */
+     /* Dark Admin Theme Variables */
+    --admin-background: 220 15% 10%; /* Very Dark Blue/Gray */
+    --admin-foreground: 210 20% 95%; /* Light Gray */
+    --admin-card: 220 15% 15%; /* Dark Card */
+    --admin-card-foreground: 210 20% 95%;
+    --admin-primary: 220 60% 60%; /* Brighter Blue */
+    --admin-primary-foreground: 0 0% 100%;
+    --admin-secondary: 220 15% 25%; /* Darker Gray */
+    --admin-secondary-foreground: 210 15% 80%;
+    --admin-accent: 220 15% 22%; /* Slightly Lighter Dark */
+    --admin-accent-foreground: 220 60% 70%; /* Light Blue Text */
+    --admin-border: 220 10% 30%;
+    --admin-ring: 220 60% 70%;
+
+    /* Dark Admin Sidebar Theme (Stays dark) */
+    --admin-sidebar-background: 220 15% 20%;
+    --admin-sidebar-foreground: 210 20% 90%;
+    --admin-sidebar-primary: 180 60% 55%;
+    --admin-sidebar-primary-foreground: 220 15% 10%;
+    --admin-sidebar-accent: 220 15% 30%;
+    --admin-sidebar-accent-foreground: 0 0% 100%;
+    --admin-sidebar-border: 220 10% 35%;
+    --admin-sidebar-ring: 180 60% 55%;
+
+    /* Dark Driver Theme Variables */
+    --driver-background: 220 20% 12%; /* Darker Slate */
+    --driver-foreground: 210 30% 90%; /* Light Gray */
+    --driver-card: 220 15% 18%; /* Dark Card */
+    --driver-card-foreground: 210 30% 90%;
+    --driver-primary: 190 60% 60%; /* Brighter Teal/Blue */
+    --driver-primary-foreground: 220 20% 5%;
+    --driver-secondary: 220 15% 28%; /* Mid Dark Slate */
+    --driver-secondary-foreground: 210 25% 85%;
+    --driver-accent: 220 15% 22%; /* Darker Muted Teal/Blue */
+    --driver-accent-foreground: 190 60% 70%; /* Light Teal/Blue Text */
+    --driver-border: 220 15% 35%;
+    --driver-ring: 190 60% 70%;
+
+    /* Dark Driver Sidebar Theme (Stays dark) */
+    --driver-sidebar-background: 220 25% 30%;
+    --driver-sidebar-foreground: 210 30% 95%;
+    --driver-sidebar-primary: 190 60% 60%;
+    --driver-sidebar-primary-foreground: 220 25% 10%;
+    --driver-sidebar-accent: 220 20% 40%;
+    --driver-sidebar-accent-foreground: 0 0% 100%;
+    --driver-sidebar-border: 220 15% 45%;
+    --driver-sidebar-ring: 190 60% 60%;
   }
 
-  /* Category Specific Themes (Using Store Accent) */
+  /* Store Category Themes */
+  /* Base category theme variable definition */
+  :root {
+    --store-accent: 240 10% 50%; /* Neutral Gray as default */
+    --store-accent-foreground: white;
+  }
   .theme-category-electronics { --store-accent: 210 80% 50%; --store-accent-foreground: white; }
   .theme-category-clothing { --store-accent: 330 80% 60%; --store-accent-foreground: white; }
   .theme-category-groceries { --store-accent: 120 60% 45%; --store-accent-foreground: white; }
   .theme-category-books { --store-accent: 30 70% 50%; --store-accent-foreground: white; }
-  .theme-category-home-goods { --store-accent: 190 50% 55%; --store-accent-foreground: white; } /* Fixed: home.goods -> home-goods */
+  .theme-category-home-goods { --store-accent: 190 50% 55%; --store-accent-foreground: white; }
   .theme-category-toys { --store-accent: 50 100% 60%; --store-accent-foreground: 224 71.4% 4.1%; }
-  .theme-category-restaurants { --store-accent: 15 85% 55%; --store-accent-foreground: white; } /* Example: Warm Red/Orange */
-  .theme-category-coffee-shops { --store-accent: 35 40% 45%; --store-accent-foreground: white; } /* Fixed: coffee.shops -> coffee-shops */
-  .theme-category-other { --store-accent: 240 10% 50%; --store-accent-foreground: white; } /* Example: Neutral Gray */
+  .theme-category-restaurants { --store-accent: 15 85% 55%; --store-accent-foreground: white; }
+  .theme-category-coffee-shops { --store-accent: 35 40% 45%; --store-accent-foreground: white; }
+  .theme-category-other { --store-accent: 240 10% 50%; --store-accent-foreground: white; }
 
-  .dark .theme-category-electronics { --store-accent: 210 70% 60%; }
-  .dark .theme-category-clothing { --store-accent: 330 70% 70%; }
-  .dark .theme-category-groceries { --store-accent: 120 50% 55%; }
-  .dark .theme-category-books { --store-accent: 30 60% 60%; }
-  .dark .theme-category-home-goods { --store-accent: 190 40% 65%; } /* Fixed: home.goods -> home-goods */
-  .dark .theme-category-toys { --store-accent: 50 90% 70%; }
-  .dark .theme-category-restaurants { --store-accent: 15 75% 65%; }
-  .dark .theme-category-coffee-shops { --store-accent: 35 35% 55%; } /* Fixed: coffee.shops -> coffee-shops */
-  .dark .theme-category-other { --store-accent: 240 10% 60%; }
+  /* Dark versions of category themes */
+  .dark .theme-category-electronics { --store-accent: 210 70% 60%; --store-accent-foreground: white; }
+  .dark .theme-category-clothing { --store-accent: 330 70% 70%; --store-accent-foreground: white; }
+  .dark .theme-category-groceries { --store-accent: 120 50% 55%; --store-accent-foreground: white; }
+  .dark .theme-category-books { --store-accent: 30 60% 60%; --store-accent-foreground: white; }
+  .dark .theme-category-home-goods { --store-accent: 190 40% 65%; --store-accent-foreground: white; }
+  .dark .theme-category-toys { --store-accent: 50 90% 70%; --store-accent-foreground: 224 71.4% 4.1%; }
+  .dark .theme-category-restaurants { --store-accent: 15 75% 65%; --store-accent-foreground: white; }
+  .dark .theme-category-coffee-shops { --store-accent: 35 35% 55%; --store-accent-foreground: white; }
+  .dark .theme-category-other { --store-accent: 240 10% 60%; --store-accent-foreground: white; }
 }
 
 @layer base {
@@ -151,21 +235,80 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1; /* Enable nice font features */
-    @apply antialiased; /* Smoother font rendering */
+    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight; /* Consistent heading styles */
+    @apply font-semibold tracking-tight;
   }
-  h1 { @apply text-3xl; }
-  h2 { @apply text-2xl; }
-  h3 { @apply text-xl; }
-  h4 { @apply text-lg; }
+  h1 { @apply text-3xl md:text-4xl; }
+  h2 { @apply text-2xl md:text-3xl; }
+  h3 { @apply text-xl md:text-2xl; }
+  h4 { @apply text-lg md:text-xl; }
 }
 
-/* Improve focus states */
+/* Improve focus states globally */
 @layer utilities {
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background;
   }
+}
+
+/* Apply admin theme within admin layout */
+.admin-layout {
+    --background: var(--admin-background);
+    --foreground: var(--admin-foreground);
+    --card: var(--admin-card);
+    --card-foreground: var(--admin-card-foreground);
+    --primary: var(--admin-primary);
+    --primary-foreground: var(--admin-primary-foreground);
+    --secondary: var(--admin-secondary);
+    --secondary-foreground: var(--admin-secondary-foreground);
+    --accent: var(--admin-accent);
+    --accent-foreground: var(--admin-accent-foreground);
+    --border: var(--admin-border);
+    --ring: var(--admin-ring);
+    /* ... other admin specific overrides if needed */
+    @apply bg-background text-foreground;
+}
+
+/* Apply driver theme within driver layout */
+.driver-layout {
+    --background: var(--driver-background);
+    --foreground: var(--driver-foreground);
+    --card: var(--driver-card);
+    --card-foreground: var(--driver-card-foreground);
+    --primary: var(--driver-primary);
+    --primary-foreground: var(--driver-primary-foreground);
+    --secondary: var(--driver-secondary);
+    --secondary-foreground: var(--driver-secondary-foreground);
+    --accent: var(--driver-accent);
+    --accent-foreground: var(--driver-accent-foreground);
+    --border: var(--driver-border);
+    --ring: var(--driver-ring);
+     /* ... other driver specific overrides if needed */
+    @apply bg-background text-foreground;
+}
+
+/* Override sidebar variables within admin/driver layouts */
+.admin-layout .admin-sidebar {
+     --sidebar-background: var(--admin-sidebar-background);
+    --sidebar-foreground: var(--admin-sidebar-foreground);
+    --sidebar-primary: var(--admin-sidebar-primary);
+    --sidebar-primary-foreground: var(--admin-sidebar-primary-foreground);
+    --sidebar-accent: var(--admin-sidebar-accent);
+    --sidebar-accent-foreground: var(--admin-sidebar-accent-foreground);
+    --sidebar-border: var(--admin-sidebar-border);
+    --sidebar-ring: var(--admin-sidebar-ring);
+}
+
+.driver-layout .driver-sidebar {
+     --sidebar-background: var(--driver-sidebar-background);
+    --sidebar-foreground: var(--driver-sidebar-foreground);
+    --sidebar-primary: var(--driver-sidebar-primary);
+    --sidebar-primary-foreground: var(--driver-sidebar-primary-foreground);
+    --sidebar-accent: var(--driver-sidebar-accent);
+    --sidebar-accent-foreground: var(--driver-sidebar-accent-foreground);
+    --sidebar-border: var(--driver-sidebar-border);
+    --sidebar-ring: var(--driver-sidebar-ring);
 }

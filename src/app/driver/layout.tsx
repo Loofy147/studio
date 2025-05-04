@@ -26,28 +26,30 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
 
   return (
      <SidebarProvider>
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      {/* Apply driver-layout class for scoping driver theme variables */}
+      <div className={cn("flex min-h-screen bg-background", "driver-layout")}>
         {/* Driver Sidebar */}
-        <Sidebar collapsible="icon" side="left" variant="sidebar" className="bg-slate-800 text-slate-100 border-r border-slate-700">
-          <SidebarHeader className="p-2 border-b border-slate-700">
+        {/* Added driver-sidebar class for specific sidebar theme overrides */}
+        <Sidebar collapsible="icon" side="left" variant="sidebar" className={cn("bg-[--driver-sidebar-background] text-[--driver-sidebar-foreground] border-r border-[--driver-sidebar-border]", "driver-sidebar")}>
+          <SidebarHeader className="p-2 border-b border-[--driver-sidebar-border]">
              <div className="flex items-center justify-between p-2">
                  <Link href="/driver/dashboard" className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
-                     <Truck className="h-6 w-6 text-teal-400" />
-                     <span className="font-bold text-lg group-data-[collapsible=icon]:hidden text-slate-50">SwiftDispatch Driver</span>
+                     <Truck className="h-6 w-6 text-[--driver-sidebar-primary]" />
+                     <span className="font-bold text-lg group-data-[collapsible=icon]:hidden text-[--driver-sidebar-foreground]">SwiftDispatch Driver</span>
                  </Link>
              </div>
               {/* Driver Avatar/Info */}
-               <div className="flex items-center gap-3 p-2 border-t border-slate-700 mt-2 group-data-[collapsible=icon]:hidden">
+               <div className="flex items-center gap-3 p-2 border-t border-[--driver-sidebar-border] mt-2 group-data-[collapsible=icon]:hidden">
                     <Avatar className="h-9 w-9">
                         <AvatarImage src={`https://avatar.vercel.sh/${driverEmail}?size=36`} alt={driverName} />
                         <AvatarFallback>{driverName.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div>
-                        <p className="text-sm font-medium text-slate-50">{driverName}</p>
-                        <p className="text-xs text-slate-400">{driverEmail}</p>
+                        <p className="text-sm font-medium text-[--driver-sidebar-foreground]">{driverName}</p>
+                        <p className="text-xs text-[--driver-sidebar-foreground]/70">{driverEmail}</p>
                     </div>
                </div>
-               <div className="flex justify-center p-2 border-t border-slate-700 mt-2 group-data-[collapsible=icon]:flex hidden">
+               <div className="flex justify-center p-2 border-t border-[--driver-sidebar-border] mt-2 group-data-[collapsible=icon]:flex hidden">
                    <Avatar className="h-8 w-8">
                         <AvatarImage src={`https://avatar.vercel.sh/${driverEmail}?size=32`} alt={driverName} />
                         <AvatarFallback>{driverName.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
@@ -63,7 +65,8 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
                       asChild
                       isActive={pathname === item.href || (item.href !== '/driver/dashboard' && pathname.startsWith(item.href))}
                       tooltip={item.label}
-                      className="capitalize focus:bg-slate-700 focus:text-white data-[active=true]:bg-teal-600 data-[active=true]:text-white hover:bg-slate-700 hover:text-white"
+                      // Use driver theme variables for sidebar buttons
+                      className="capitalize focus:bg-[--driver-sidebar-accent] focus:text-[--driver-sidebar-accent-foreground] data-[active=true]:bg-[--driver-sidebar-primary] data-[active=true]:text-[--driver-sidebar-primary-foreground] hover:bg-[--driver-sidebar-accent]/80 hover:text-[--driver-sidebar-accent-foreground]"
                       variant="ghost"
                     >
                       <a>
@@ -76,12 +79,12 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
               ))}
             </SidebarMenu>
           </SidebarContent>
-           <SidebarHeader className="p-2 border-t border-slate-700 mt-auto">
+           <SidebarHeader className="p-2 border-t border-[--driver-sidebar-border] mt-auto">
                 <SidebarMenu className="px-0">
                     <SidebarMenuItem>
                          <SidebarMenuButton
                             tooltip="Settings"
-                            className="capitalize focus:bg-slate-700 focus:text-white hover:bg-slate-700 hover:text-white"
+                             className="capitalize focus:bg-[--driver-sidebar-accent] focus:text-[--driver-sidebar-accent-foreground] hover:bg-[--driver-sidebar-accent]/80 hover:text-[--driver-sidebar-accent-foreground]"
                             variant="ghost"
                         >
                              <a>
@@ -93,7 +96,7 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
                      <SidebarMenuItem>
                          <SidebarMenuButton
                             tooltip="Logout"
-                            className="capitalize focus:bg-red-900/50 focus:text-white hover:bg-red-900/50 hover:text-white text-red-300"
+                            className="capitalize focus:bg-red-900/50 focus:text-white hover:bg-red-900/50 hover:text-white text-red-300 hover:!text-red-100"
                             variant="ghost"
                         >
                              <a>
@@ -111,13 +114,13 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
            {/* Optional Driver Header */}
            <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur px-6 shadow-sm">
                 <SidebarTrigger className="md:hidden" /> {/* Mobile Trigger */}
-                <h1 className="text-xl font-semibold md:text-2xl flex-1 text-gray-800 dark:text-gray-200">
+                <h1 className="text-xl font-semibold md:text-2xl flex-1 text-foreground">
                      {driverNavItems.find(item => pathname.startsWith(item.href))?.label || 'Driver Portal'}
                 </h1>
                 {/* Add any header actions: e.g., Notifications Bell, Quick Status Toggle? */}
            </header>
            {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50 dark:bg-slate-950">
+          <main className="flex-1 overflow-y-auto p-6 lg:p-8"> {/* Removed background color, inherits from layout */}
             {children}
           </main>
         </SidebarInset>

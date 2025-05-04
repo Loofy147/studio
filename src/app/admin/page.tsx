@@ -38,7 +38,7 @@ export default function AdminDashboardPage() {
 
   // Mock chart data (replace with actual data fetching and charting library)
     const chartConfig = {
-        revenue: { label: "Revenue", color: "hsl(var(--chart-1))" },
+        revenue: { label: "Revenue", color: "hsl(var(--admin-primary))" }, // Use admin primary color
     } satisfies ChartConfig; // Assuming ChartConfig is defined if using shadcn charts
 
     const chartData = [
@@ -53,21 +53,23 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+      {/* Use admin foreground color */}
+      <h1 className="text-3xl font-bold tracking-tight text-[var(--admin-foreground)]">Dashboard Overview</h1>
 
       {/* KPI Cards Section */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        {/* Apply admin card styles indirectly via globals.css */}
         <KpiCard title="Total Stores" value={kpiData.totalStores} icon={Store} change="+3 Today" />
         <KpiCard title="Total Products" value={kpiData.totalProducts} icon={Package} change="+15 Pending" changeColor="text-orange-500" />
         <KpiCard title="Total Users" value={kpiData.totalUsers} icon={Users} />
         <KpiCard title="Active Drivers" value={kpiData.activeDrivers} icon={Truck} />
-        <KpiCard title="Total Revenue" value={`$${kpiData.totalRevenue.toLocaleString()}`} icon={DollarSign} change="+2.5% This Month" />
-        {/* Add more cards for Orders, etc. */}
+        <KpiCard title="Total Revenue" value={`$${kpiData.totalRevenue.toLocaleString()}`} icon={DollarSign} change="+2.5% This Month" changeColor="text-green-600" />
       </section>
 
       {/* Charts Section (Placeholder) */}
        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-         <Card className="lg:col-span-2">
+         {/* Apply admin card styles */}
+         <Card className="lg:col-span-2 bg-card text-card-foreground border-border">
            <CardHeader>
              <CardTitle>Revenue Overview (Last 6 Months)</CardTitle>
              <CardDescription>Visualizing monthly revenue trends.</CardDescription>
@@ -96,7 +98,8 @@ export default function AdminDashboardPage() {
              </div>
            </CardContent>
          </Card>
-         <Card>
+          {/* Apply admin card styles */}
+         <Card className="bg-card text-card-foreground border-border">
            <CardHeader>
              <CardTitle>Platform Distribution</CardTitle>
               <CardDescription>Stores vs Users vs Drivers.</CardDescription>
@@ -114,14 +117,16 @@ export default function AdminDashboardPage() {
 
       {/* Recent Activity & Alerts Section */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        {/* Apply admin card styles */}
+        <Card className="bg-card text-card-foreground border-border">
           <CardHeader>
+             {/* Use admin primary color */}
             <CardTitle className="flex items-center gap-2"><Activity className="h-5 w-5 text-primary"/> Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
               {recentActivity.map((activity, index) => (
-                <li key={index} className="flex items-center justify-between text-sm border-b pb-2 last:border-b-0">
+                <li key={index} className="flex items-center justify-between text-sm border-b border-border pb-2 last:border-b-0">
                   <span>{activity.text}</span>
                   <span className="text-xs text-muted-foreground">{activity.time}</span>
                 </li>
@@ -130,7 +135,8 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Apply admin card styles */}
+        <Card className="bg-card text-card-foreground border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><AlertCircle className="h-5 w-5 text-destructive"/> System Alerts</CardTitle>
           </CardHeader>
@@ -154,7 +160,7 @@ export default function AdminDashboardPage() {
   );
 }
 
-// Reusable KPI Card Component
+// Reusable KPI Card Component - Inherits styles from context
 interface KpiCardProps {
   title: string;
   value: string | number;
@@ -165,7 +171,7 @@ interface KpiCardProps {
 
 function KpiCard({ title, value, icon: Icon, change, changeColor = "text-green-600" }: KpiCardProps) {
   return (
-    <Card>
+    <Card className="bg-card text-card-foreground border-border">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
         <Icon className="h-4 w-4 text-muted-foreground" />
@@ -190,4 +196,3 @@ type ChartConfig = {
     icon?: React.ComponentType;
   };
 };
-```
