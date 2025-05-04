@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { getStores, Store, StoreCategory } from '@/services/store'; // Assuming getStores exists
+import { getStores, Store, StoreCategory, getAllStoresForAdmin } from '@/services/store'; // Use getAllStoresForAdmin
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,8 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ArrowUpDown, Search, Store as StoreIcon, Eye, Edit, ToggleLeft, ToggleRight, Trash2, XCircle } from 'lucide-react';
-import { format } from 'date-fns'; // Assuming stores have a creation date
+import { ArrowUpDown, Search, Store as StoreIcon, Eye, Edit, ToggleLeft, ToggleRight, Trash2, XCircle, Filter, CheckCircle, Hourglass } from 'lucide-react'; // Added CheckCircle, Hourglass
+import { format } from 'date-fns';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,11 +29,11 @@ import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
-// Mock function to toggle store status (replace with actual API call)
-async function toggleStoreStatus(storeId: string, currentStatus: boolean): Promise<boolean> {
-    console.log(`Toggling status for store ${storeId} from ${currentStatus}`);
+// Mock function to toggle store approval status (replace with actual API call)
+async function toggleStoreApprovalStatus(storeId: string, currentStatus: boolean): Promise<boolean> {
+    console.log(`Toggling approval status for store ${storeId} from ${currentStatus}`);
     await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API delay
-    return !currentStatus; // Return the new status
+    return !currentStatus; // Return the new status (isActive)
 }
 
 // Mock function to delete a store (replace with actual API call)
@@ -49,9 +49,9 @@ export default function AdminStoresPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all'); // Example filter
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'pending'>('all'); // Added pending status
   const [categoryFilter, setCategoryFilter] = useState<StoreCategory | 'all'>('all');
-  const [sortField, setSortField] = useState<keyof Store | 'rating' | 'name' | 'category'>('name'); // Default sort
+  const [sortField, setSortField] = useState<keyof Store | 'rating' | 'name' | 'category' | 'isActive' | 'createdAt'>('name'); // Default sort
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [updatingStoreId, setUpdatingStoreId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -61,14 +61,15 @@ export default function AdminStoresPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const storeData = await getStores();
-        // Add mock status and creation date if they don't exist
-        const storesWithStatus = storeData.map(s => ({
+        const storeData = await getAllStoresForAdmin(); // Fetch ALL stores for admin view
+        // Ensure required fields exist
+        const storesWithDefaults = storeData.map(s => ({
             ...s,
-            isActive: s.isActive ?? Math.random() > 0.15, // Mock status (85% active)
+            isActive: s.isActive ?? false, // Default to inactive if missing (pending approval)
+            isOpen: s.isOpen ?? false, // Default to closed if missing
             createdAt: s.createdAt ?? new Date(Date.now() - Math.random() * 30 * 86400000) // Mock creation date within last 30 days
-        })) as (Store & { isActive: boolean; createdAt: Date })[];
-        setStores(storesWithStatus);
+        })) as (Store & { isActive: boolean; createdAt: Date, isOpen: boolean })[]; // Add isOpen
+        setStores(storesWithDefaults);
       } catch (err) {
         console.error("Failed to fetch stores:", err);
         setError("Could not load stores. Please try again later.");
@@ -79,7 +80,7 @@ export default function AdminStoresPage() {
     fetchStores();
   }, []);
 
-  const handleSort = (field: keyof Store | 'rating' | 'name' | 'category') => {
+  const handleSort = (field: keyof Store | 'rating' | 'name' | 'category' | 'isActive' | 'createdAt') => {
     const newDirection = (sortField === field && sortDirection === 'asc') ? 'desc' : 'asc';
     setSortField(field);
     setSortDirection(newDirection);
@@ -90,7 +91,10 @@ export default function AdminStoresPage() {
       const matchesSearch = store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             store.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             (store.ownerId && store.ownerId.toLowerCase().includes(searchTerm.toLowerCase())); // Search by ID or Owner ID too
-      const matchesStatus = statusFilter === 'all' || (statusFilter === 'active' && store.isActive) || (statusFilter === 'inactive' && !store.isActive);
+      const matchesStatus = statusFilter === 'all' ||
+                            (statusFilter === 'active' && store.isActive && store.isOpen) || // Active means approved AND open
+                            (statusFilter === 'inactive' && store.isActive && !store.isOpen) || // Inactive means approved but closed
+                            (statusFilter === 'pending' && !store.isActive); // Pending means not approved yet
       const matchesCategory = categoryFilter === 'all' || store.category === categoryFilter;
       return matchesSearch && matchesStatus && matchesCategory;
     });
@@ -110,6 +114,11 @@ export default function AdminStoresPage() {
           valA = valA.getTime();
           valB = valB.getTime();
       }
+      // Handle boolean sort for isActive
+       else if (typeof valA === 'boolean') {
+         valA = valA ? 1 : 0;
+         valB = valB ? 1 : 0;
+      }
 
 
       if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
@@ -126,20 +135,20 @@ export default function AdminStoresPage() {
   }, [stores]);
 
 
-  const handleToggleStatus = async (store: Store & { isActive: boolean }) => {
+  const handleToggleApproval = async (store: Store & { isActive: boolean }) => {
         setUpdatingStoreId(store.id);
         try {
-            const newStatus = await toggleStoreStatus(store.id, store.isActive);
+            const newStatus = await toggleStoreApprovalStatus(store.id, store.isActive);
             setStores(prevStores => prevStores.map(s => s.id === store.id ? { ...s, isActive: newStatus } : s));
              toast({
-                title: `Store ${newStatus ? 'Enabled' : 'Disabled'}`,
-                description: `${store.name} has been ${newStatus ? 'enabled' : 'disabled'}.`,
+                title: `Store ${newStatus ? 'Approved' : 'Disabled'}`,
+                description: `${store.name} has been ${newStatus ? 'approved and enabled' : 'disabled by admin'}.`,
              });
         } catch (err) {
             console.error("Failed to toggle store status:", err);
             toast({
                 title: "Update Failed",
-                description: `Could not change the status for ${store.name}.`,
+                description: `Could not change the approval status for ${store.name}.`,
                 variant: "destructive",
             });
         } finally {
@@ -171,6 +180,38 @@ export default function AdminStoresPage() {
         }
     };
 
+    // Combined Status Badge Component
+    const StatusBadge = ({ isActive, isOpen }: { isActive: boolean; isOpen: boolean }) => {
+        let variant: BadgeProps['variant'] = 'default';
+        let className = '';
+        let Icon = CheckCircle;
+        let text = 'Unknown';
+
+         if (!isActive) { // Pending or Disabled by admin
+            variant = 'outline';
+            className = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700';
+            Icon = Hourglass;
+            text = 'Pending Approval';
+        } else if (isOpen) { // Active and Open
+             variant = 'secondary';
+             className = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-700/50';
+             Icon = CheckCircle;
+             text = 'Active (Open)';
+        } else { // Active but Closed by owner
+             variant = 'outline';
+             className = 'bg-gray-100 text-gray-600 dark:bg-gray-800/30 dark:text-gray-400 border-gray-300 dark:border-gray-700';
+             Icon = XCircle;
+             text = 'Active (Closed)';
+        }
+
+        return (
+            <Badge variant={variant} className={cn("text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit", className)}>
+                <Icon className="h-3 w-3" />
+                <span>{text}</span>
+            </Badge>
+        );
+    };
+
 
   const TableSkeleton = () => (
     <Table>
@@ -178,11 +219,11 @@ export default function AdminStoresPage() {
         <TableRow>
           <TableHead className="w-[50px]"><Skeleton className="h-4 w-full" /></TableHead>
           <TableHead className="w-[150px]"><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead><Skeleton className="h-4 w-full" /></TableHead>
-           <TableHead className="text-right"><Skeleton className="h-4 w-full" /></TableHead>
+          <TableHead className="hidden sm:table-cell"><Skeleton className="h-4 w-full" /></TableHead> {/* Category */}
+          <TableHead className="hidden lg:table-cell"><Skeleton className="h-4 w-full" /></TableHead> {/* Rating */}
+          <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-full" /></TableHead> {/* Created */}
+          <TableHead><Skeleton className="h-4 w-full" /></TableHead> {/* Status */}
+           <TableHead className="text-right"><Skeleton className="h-4 w-full" /></TableHead> {/* Actions */}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -190,10 +231,10 @@ export default function AdminStoresPage() {
           <TableRow key={i}>
             <TableCell><Skeleton className="h-10 w-10 rounded-sm" /></TableCell>
             <TableCell><Skeleton className="h-4 w-3/4" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-1/2" /></TableCell>
+             <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-full" /></TableCell>
+            <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-1/2" /></TableCell>
             <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-3/4" /></TableCell>
-            <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+            <TableCell><Skeleton className="h-6 w-24 rounded-full" /></TableCell> {/* Status Badge */}
             <TableCell className="text-right space-x-1">
                 <Skeleton className="h-8 w-8 inline-block" />
                 <Skeleton className="h-8 w-8 inline-block" />
@@ -209,10 +250,10 @@ export default function AdminStoresPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-[var(--admin-primary)]"> {/* Use admin theme color */}
             <StoreIcon className="h-6 w-6" /> Store Management
           </CardTitle>
-          <CardDescription>View, filter, and manage all stores on the platform.</CardDescription>
+          <CardDescription>View, filter, approve, and manage all stores on the platform.</CardDescription>
         </CardHeader>
         <CardContent>
           {/* Filters and Search */}
@@ -228,6 +269,7 @@ export default function AdminStoresPage() {
             </div>
             <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as StoreCategory | 'all')}>
               <SelectTrigger className="w-full md:w-[180px]">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground"/> {/* Added Filter Icon */}
                 <SelectValue placeholder="Filter by Category" />
               </SelectTrigger>
               <SelectContent>
@@ -238,18 +280,19 @@ export default function AdminStoresPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'inactive')}>
-              <SelectTrigger className="w-full md:w-[150px]">
+            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'inactive' | 'pending')}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                 <Filter className="h-4 w-4 mr-2 text-muted-foreground"/> {/* Added Filter Icon */}
                 <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="active">Active (Open)</SelectItem>
+                <SelectItem value="inactive">Active (Closed)</SelectItem>
+                <SelectItem value="pending">Pending Approval</SelectItem>
               </SelectContent>
             </Select>
-             {/* Optional: Add "Create New Store" button here */}
-             {/* <Button><PlusCircle className="mr-2 h-4 w-4" /> Add Store</Button> */}
+             {/* Optional: Add "Create New Store" button here (maybe not needed if signup flow exists) */}
           </div>
 
           {/* Store Table */}
@@ -261,7 +304,7 @@ export default function AdminStoresPage() {
             </Alert>
            )}
 
-          <div className="rounded-md border overflow-hidden">
+          <div className="rounded-md border overflow-hidden shadow-sm"> {/* Added shadow */}
             {isLoading ? <TableSkeleton /> : (
               <Table>
                 <TableHeader>
@@ -279,14 +322,16 @@ export default function AdminStoresPage() {
                      <TableHead onClick={() => handleSort('createdAt')} className="cursor-pointer hover:bg-muted hidden md:table-cell">
                       Created <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortField === 'createdAt' ? 'opacity-100' : 'opacity-30'}`} />
                     </TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead onClick={() => handleSort('isActive')} className="cursor-pointer hover:bg-muted"> {/* Sortable Status */}
+                      Status <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortField === 'isActive' ? 'opacity-100' : 'opacity-30'}`} />
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredAndSortedStores.length > 0 ? (
                     filteredAndSortedStores.map((store) => (
-                      <TableRow key={store.id} className={cn(!store.isActive && 'bg-muted/50 opacity-70')}>
+                      <TableRow key={store.id} className={cn(!store.isActive && 'bg-yellow-500/10 dark:bg-yellow-900/20', !store.isOpen && store.isActive && 'bg-gray-500/10 dark:bg-gray-900/20')}> {/* Highlight pending/closed stores */}
                          <TableCell>
                             <Image
                                 src={store.imageUrl || `https://picsum.photos/seed/${store.id}/100/100`}
@@ -302,35 +347,37 @@ export default function AdminStoresPage() {
                          <TableCell className="hidden lg:table-cell">{store.rating ? store.rating.toFixed(1) : 'N/A'}</TableCell>
                         <TableCell className="hidden md:table-cell">{format(store.createdAt, 'MMM d, yyyy')}</TableCell>
                         <TableCell>
-                          <Badge variant={store.isActive ? 'secondary' : 'outline'} className={cn(store.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-700/50' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-700/50')}>
-                            {store.isActive ? 'Active' : 'Inactive'}
-                          </Badge>
+                          <StatusBadge isActive={store.isActive} isOpen={store.isOpen} />
                         </TableCell>
                         <TableCell className="text-right space-x-1">
+                           {/* View Button - Link to store front or admin detail view */}
                            <Link href={`/store/${store.id}`} target="_blank" legacyBehavior>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" title="View Storefront">
-                                    <Eye className="h-4 w-4" />
+                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10" title="View Storefront">
+                                    <Eye className="h-4 w-4 text-primary/80" />
                                 </Button>
                            </Link>
+                           {/* Edit Button - Link to store edit page */}
                            <Link href={`/admin/stores/edit/${store.id}`} legacyBehavior>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Store Details">
-                                    <Edit className="h-4 w-4" />
+                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="Edit Store Details">
+                                    <Edit className="h-4 w-4 text-foreground/70" />
                                 </Button>
                            </Link>
+                           {/* Approve/Disable Button */}
                            <Button
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8"
-                                onClick={() => handleToggleStatus(store)}
+                                onClick={() => handleToggleApproval(store)}
                                 disabled={updatingStoreId === store.id}
-                                title={store.isActive ? 'Disable Store' : 'Enable Store'}
+                                title={store.isActive ? 'Disable Store (Admin)' : 'Approve Store'}
                             >
                                 {updatingStoreId === store.id
-                                    ? <Skeleton className="h-4 w-4 rounded-full" /> // Show spinner/skeleton when updating
+                                    ? <Skeleton className="h-4 w-4 rounded-full" />
                                     : store.isActive
-                                        ? <ToggleRight className="h-4 w-4 text-green-600" />
-                                        : <ToggleLeft className="h-4 w-4 text-red-600" />}
+                                        ? <XCircle className="h-4 w-4 text-destructive" />
+                                        : <CheckCircle className="h-4 w-4 text-green-600" />}
                            </Button>
+                           {/* Delete Button */}
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete Store">
@@ -376,11 +423,19 @@ export default function AdminStoresPage() {
   );
 }
 
+// Define BadgeProps type locally if needed
+import { type VariantProps } from "class-variance-authority";
+import { badgeVariants } from "@/components/ui/badge";
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
 // Extend Store type for client-side state
-declare module '@/services/store' {
-    interface Store {
-        isActive?: boolean; // Add optional status
-        createdAt?: Date; // Add optional creation date
-    }
-}
-```
+// We already ensured these fields have defaults in useEffect
+// declare module '@/services/store' {
+//     interface Store {
+//         isActive: boolean; // Ensure isActive exists
+//         isOpen: boolean; // Ensure isOpen exists
+//         createdAt: Date; // Ensure createdAt exists
+//     }
+// }

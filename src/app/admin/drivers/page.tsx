@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowUpDown, Search, Truck as TruckIcon, Eye, Edit, Ban, CheckCircle, XCircle, Filter, MapPin } from 'lucide-react';
+import { ArrowUpDown, Search, Truck as TruckIcon, Eye, Edit, Ban, CheckCircle, XCircle, Filter, MapPin, Hourglass, Loader2 } from 'lucide-react'; // Added Hourglass, Loader2
 import { format } from 'date-fns'; // Assuming drivers have a join date
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -30,20 +30,45 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
 
+// Define BadgeProps type locally if needed
+import { type VariantProps } from "class-variance-authority";
+import { badgeVariants } from "@/components/ui/badge";
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
 // Mock function to toggle driver status (replace with actual API call)
-async function toggleDriverStatus(driverId: string, currentStatus: 'active' | 'inactive' | 'pending'): Promise<'active' | 'inactive'> {
+async function toggleDriverStatus(driverId: string, currentStatus: Driver['status']): Promise<Driver['status']> {
     console.log(`Toggling status for driver ${driverId} from ${currentStatus}`);
     await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API delay
     // Simplified toggle logic for mock
-    return currentStatus === 'active' ? 'inactive' : 'active';
+    if (currentStatus === 'active') return 'inactive';
+    if (currentStatus === 'inactive') return 'active';
+    // Pending status requires specific approval/rejection, cannot be simply toggled
+    return 'pending'; // Return pending if it was pending
 }
+
+// Mock function to approve driver (replace with actual API call)
+async function approveDriver(driverId: string): Promise<Driver['status']> {
+    console.log(`Approving driver ${driverId}`);
+    await new Promise(resolve => setTimeout(resolve, 400));
+    return 'active';
+}
+
+// Mock function to reject driver (replace with actual API call)
+async function rejectDriver(driverId: string): Promise<Driver['status']> {
+    console.log(`Rejecting driver ${driverId}`);
+    await new Promise(resolve => setTimeout(resolve, 400));
+    return 'inactive'; // Rejected drivers become inactive
+}
+
 
 export default function AdminDriversPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'pending'>('all');
+  const [statusFilter, setStatusFilter] = useState<Driver['status'] | 'all'>('all');
   const [sortField, setSortField] = useState<keyof Driver | 'name' | 'vehicleType' | 'rating' | 'joinedAt'>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [updatingDriverId, setUpdatingDriverId] = useState<string | null>(null);
@@ -55,10 +80,10 @@ export default function AdminDriversPage() {
       setError(null);
       try {
         const driverData = await getDrivers(); // Fetch drivers
-        // Add mock join date if needed
+        // Ensure join date exists
         const driversWithDate = driverData.map(d => ({
             ...d,
-            joinedAt: d.joinedAt ?? new Date(Date.now() - Math.random() * 365 * 86400000) // Mock join date
+            joinedAt: d.joinedAt ?? new Date(Date.now() - Math.random() * 365 * 86400000) // Mock join date if missing
         })) as (Driver & { joinedAt: Date })[];
         setDrivers(driversWithDate);
       } catch (err) {
@@ -116,7 +141,7 @@ export default function AdminDriversPage() {
         try {
             // For simplicity, mock toggles between active/inactive. Pending requires specific actions.
             if (driver.status === 'pending') {
-                 toast({ title: "Action Required", description: "Approve or reject pending drivers manually.", variant: "default" });
+                 toast({ title: "Action Required", description: "Approve or reject pending drivers manually using the dedicated actions.", variant: "default" });
                  setUpdatingDriverId(null);
                  return;
             }
@@ -138,7 +163,49 @@ export default function AdminDriversPage() {
         }
     };
 
-  // Add Approve/Reject functions for 'pending' status if needed
+  const handleApprove = async (driver: Driver) => {
+        setUpdatingDriverId(driver.id);
+        try {
+            const newStatus = await approveDriver(driver.id);
+             setDrivers(prevDrivers => prevDrivers.map(d => d.id === driver.id ? { ...d, status: newStatus } : d));
+             toast({
+                title: `Driver Approved`,
+                description: `${driver.name}'s account has been approved and set to active.`,
+             });
+        } catch (err) {
+             console.error("Failed to approve driver:", err);
+            toast({
+                title: "Approval Failed",
+                description: `Could not approve ${driver.name}.`,
+                variant: "destructive",
+            });
+        } finally {
+            setUpdatingDriverId(null);
+        }
+  }
+
+    const handleReject = async (driver: Driver) => {
+        setUpdatingDriverId(driver.id);
+        try {
+            const newStatus = await rejectDriver(driver.id);
+             setDrivers(prevDrivers => prevDrivers.map(d => d.id === driver.id ? { ...d, status: newStatus } : d));
+             toast({
+                title: `Driver Rejected`,
+                description: `${driver.name}'s application has been rejected.`,
+                variant: "destructive"
+             });
+        } catch (err) {
+             console.error("Failed to reject driver:", err);
+            toast({
+                title: "Rejection Failed",
+                description: `Could not reject ${driver.name}.`,
+                variant: "destructive",
+            });
+        } finally {
+            setUpdatingDriverId(null);
+        }
+    }
+
 
   const TableSkeleton = () => (
     <Table>
@@ -150,6 +217,7 @@ export default function AdminDriversPage() {
           <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-full" /></TableHead>
           <TableHead className="hidden lg:table-cell"><Skeleton className="h-4 w-full" /></TableHead>
           <TableHead><Skeleton className="h-4 w-full" /></TableHead>
+          <TableHead className="hidden xl:table-cell"><Skeleton className="h-4 w-full" /></TableHead> {/* Joined Date */}
           <TableHead className="text-right"><Skeleton className="h-4 w-full" /></TableHead>
         </TableRow>
       </TableHeader>
@@ -161,7 +229,8 @@ export default function AdminDriversPage() {
             <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-full" /></TableCell>
             <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-1/2" /></TableCell>
             <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-3/4" /></TableCell>
-             <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+            <TableCell><Skeleton className="h-6 w-24 rounded-full" /></TableCell> {/* Status Badge */}
+            <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-full" /></TableCell> {/* Joined Date */}
             <TableCell className="text-right space-x-1">
                 <Skeleton className="h-8 w-8 inline-block" />
                 <Skeleton className="h-8 w-8 inline-block" />
@@ -210,7 +279,7 @@ export default function AdminDriversPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-[var(--admin-primary)]"> {/* Use admin theme color */}
             <TruckIcon className="h-6 w-6" /> Driver Management
           </CardTitle>
           <CardDescription>View, filter, and manage all drivers on the platform.</CardDescription>
@@ -227,7 +296,7 @@ export default function AdminDriversPage() {
                 className="pl-10 w-full"
               />
             </div>
-             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'inactive' | 'pending')}>
+             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as Driver['status'] | 'all')}> {/* Corrected type */}
               <SelectTrigger className="w-full md:w-[180px]">
                 <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
                 <SelectValue placeholder="Filter by Status" />
@@ -240,6 +309,7 @@ export default function AdminDriversPage() {
               </SelectContent>
             </Select>
              {/* Optional: Add "Add New Driver" button here */}
+             {/* <Button><PlusCircle className="mr-2 h-4 w-4"/> Add Driver</Button> */}
           </div>
 
           {/* Driver Table */}
@@ -251,7 +321,7 @@ export default function AdminDriversPage() {
             </Alert>
            )}
 
-          <div className="rounded-md border overflow-hidden">
+          <div className="rounded-md border overflow-hidden shadow-sm"> {/* Added shadow */}
             {isLoading ? <TableSkeleton /> : (
               <Table>
                 <TableHeader>
@@ -267,7 +337,9 @@ export default function AdminDriversPage() {
                      <TableHead onClick={() => handleSort('rating')} className="cursor-pointer hover:bg-muted hidden lg:table-cell">
                       Rating <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortField === 'rating' ? 'opacity-100' : 'opacity-30'}`} />
                     </TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead onClick={() => handleSort('status')} className="cursor-pointer hover:bg-muted"> {/* Sortable Status */}
+                      Status <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortField === 'status' ? 'opacity-100' : 'opacity-30'}`} />
+                    </TableHead>
                      <TableHead onClick={() => handleSort('joinedAt')} className="cursor-pointer hover:bg-muted hidden xl:table-cell">
                       Joined <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortField === 'joinedAt' ? 'opacity-100' : 'opacity-30'}`} />
                     </TableHead>
@@ -280,7 +352,8 @@ export default function AdminDriversPage() {
                       <TableRow key={driver.id} className={cn(driver.status === 'inactive' && 'opacity-60')}>
                          <TableCell>
                              <Avatar className="h-9 w-9">
-                                {/* Placeholder avatar - replace with actual image if available */}
+                                {/* Use email for avatar generation */}
+                                <AvatarImage src={`https://avatar.vercel.sh/${driver.email}?size=36`} alt={driver.name} />
                                 <AvatarFallback>{driver.name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                             </Avatar>
                         </TableCell>
@@ -293,13 +366,27 @@ export default function AdminDriversPage() {
                         </TableCell>
                          <TableCell className="hidden xl:table-cell">{format(driver.joinedAt, 'MMM d, yyyy')}</TableCell>
                         <TableCell className="text-right space-x-1">
-                             <Button variant="ghost" size="icon" className="h-8 w-8" title="View Driver Details (Not Implemented)">
-                                    <Eye className="h-4 w-4 opacity-50" />
+                             {/* View Driver Details Button (Placeholder) */}
+                             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="View Driver Details (Not Implemented)">
+                                    <Eye className="h-4 w-4 text-foreground/70" />
                             </Button>
-                             <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit Driver (Not Implemented)">
-                                    <Edit className="h-4 w-4 opacity-50" />
+                             {/* Edit Driver Button (Placeholder) */}
+                             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="Edit Driver (Not Implemented)">
+                                    <Edit className="h-4 w-4 text-foreground/70" />
                              </Button>
-                             {driver.status !== 'pending' ? (
+                             {/* Actions based on status */}
+                             {driver.status === 'pending' ? (
+                                // Actions for pending status: Approve/Reject
+                                <div className="inline-flex gap-1">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30" title="Approve Driver" onClick={() => handleApprove(driver)} disabled={updatingDriverId === driver.id}>
+                                        {updatingDriverId === driver.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <CheckCircle className="h-4 w-4"/>}
+                                    </Button>
+                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Reject Driver" onClick={() => handleReject(driver)} disabled={updatingDriverId === driver.id}>
+                                        {updatingDriverId === driver.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <XCircle className="h-4 w-4"/>}
+                                    </Button>
+                                </div>
+                             ) : (
+                                // Action for active/inactive: Toggle Status
                                  <Button
                                     variant="ghost"
                                     size="icon"
@@ -309,24 +396,15 @@ export default function AdminDriversPage() {
                                     title={driver.status === 'active' ? 'Disable Driver' : 'Enable Driver'}
                                 >
                                     {updatingDriverId === driver.id
-                                        ? <Skeleton className="h-4 w-4 rounded-full" />
+                                        ? <Loader2 className="h-4 w-4 animate-spin" />
                                         : driver.status === 'active'
                                             ? <Ban className="h-4 w-4 text-red-600" />
                                             : <CheckCircle className="h-4 w-4 text-green-600" />}
                                 </Button>
-                             ) : (
-                                // Actions for pending status
-                                <div className="inline-flex gap-1">
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:bg-green-100" title="Approve Driver (Not Implemented)">
-                                        <CheckCircle className="h-4 w-4"/>
-                                    </Button>
-                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Reject Driver (Not Implemented)">
-                                        <XCircle className="h-4 w-4"/>
-                                    </Button>
-                                </div>
                              )}
-                              <Button variant="ghost" size="icon" className="h-8 w-8" title="View Live Location (Not Implemented)">
-                                    <MapPin className="h-4 w-4 opacity-50" />
+                             {/* View Live Location Button (Placeholder) */}
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="View Live Location (Not Implemented)">
+                                    <MapPin className="h-4 w-4 text-foreground/70" />
                             </Button>
                         </TableCell>
                       </TableRow>
@@ -350,9 +428,9 @@ export default function AdminDriversPage() {
 }
 
 // Extend Driver type for client-side state if needed
-declare module '@/services/driver' {
-    interface Driver {
-        joinedAt?: Date; // Add optional join date
-    }
-}
-```
+// Ensure required fields have defaults in useEffect, so declaration merging isn't strictly necessary here
+// declare module '@/services/driver' {
+//     interface Driver {
+//         joinedAt: Date; // Ensure joinedAt exists
+//     }
+// }

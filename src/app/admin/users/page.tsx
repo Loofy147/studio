@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-// Assume a service function getUserProfiles exists, similar to getStores/getProducts
-import { getUserProfile, UserProfile } from '@/services/store'; // Using existing profile type for now
+// Assume a service function getAllUserProfiles exists
+import { UserProfile, getAllUserProfiles } from '@/services/store'; // Use getAllUserProfiles
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowUpDown, Search, Users as UsersIcon, Eye, Edit, UserCog, Ban, UserCheck, XCircle } from 'lucide-react';
-import { format } from 'date-fns'; // Assuming users have a join date
+import { ArrowUpDown, Search, Users as UsersIcon, Eye, Edit, UserCog, Ban, UserCheck, XCircle, Filter, Loader2 } from 'lucide-react'; // Added Filter, Loader2
+import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -30,49 +30,12 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
 
-// Mock function to fetch all users (replace with actual API call)
-async function getAllUserProfiles(): Promise<UserProfile[]> {
-    console.log("Fetching all user profiles...");
-    // Simulate fetching multiple profiles. In a real app, fetch from your user DB.
-    // Using the existing getUserProfile logic just for demonstration structure.
-    const userIds = ["user123", "user456", "user789", "user101", "user112"]; // Mock IDs
-    const profiles: UserProfile[] = [];
-    for (const id of userIds) {
-        // Mock different user data
-        const profile = await getUserProfile(id); // Reuse existing mock logic for now
-        if (profile) {
-             // Add mock roles and status
-             const roles = ['customer', 'store_owner', 'driver'];
-             const status = Math.random() > 0.1 ? 'active' : 'disabled';
-             profiles.push({
-                ...profile,
-                role: profile.role || roles[Math.floor(Math.random() * roles.length)], // Assign random role if none exists
-                status: profile.status || status, // Assign random status if none exists
-                joinedAt: profile.joinedAt || new Date(Date.now() - Math.random() * 365 * 86400000) // Mock join date within last year
-             });
-        } else {
-             // Create placeholder mock user if getUserProfile returns null for other IDs
-             const roles = ['customer', 'store_owner', 'driver'];
-             const status = Math.random() > 0.1 ? 'active' : 'disabled';
-             profiles.push({
-                id: id,
-                name: `User ${id.slice(-3)}`,
-                email: `user.${id.slice(-3)}@example.com`,
-                loyaltyPoints: Math.floor(Math.random() * 500),
-                role: roles[Math.floor(Math.random() * roles.length)],
-                status: status,
-                joinedAt: new Date(Date.now() - Math.random() * 365 * 86400000)
-            });
-        }
-    }
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log("User profiles fetched:", profiles.length);
-            resolve(profiles);
-        }, 400);
-    });
-}
-
+// Define BadgeProps type locally if needed
+import { type VariantProps } from "class-variance-authority";
+import { badgeVariants } from "@/components/ui/badge";
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
 
 // Mock function to toggle user status (replace with actual API call)
 async function toggleUserStatus(userId: string, currentStatus: string): Promise<string> {
@@ -88,8 +51,8 @@ export default function AdminUsersPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'disabled'>('all');
-  const [sortField, setSortField] = useState<keyof UserProfile | 'name' | 'email' | 'role' | 'joinedAt'>('name');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'disabled' | 'pending'>('all'); // Added pending
+  const [sortField, setSortField] = useState<keyof UserProfile | 'name' | 'email' | 'role' | 'joinedAt' | 'status'>('name'); // Added status sort
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -100,7 +63,15 @@ export default function AdminUsersPage() {
       setError(null);
       try {
         const userData = await getAllUserProfiles(); // Fetch all users
-        setUsers(userData);
+        // Ensure required fields have defaults
+        const usersWithDefaults = userData.map(u => ({
+            ...u,
+            role: u.role || 'customer',
+            status: u.status || 'pending',
+            joinedAt: u.joinedAt || new Date(Date.now() - Math.random() * 365 * 86400000),
+            addresses: u.addresses || [] // Ensure addresses array exists
+        })) as (UserProfile & { role: string; status: string; joinedAt: Date; addresses: any[] })[]; // Add types for default values
+        setUsers(usersWithDefaults);
       } catch (err) {
         console.error("Failed to fetch users:", err);
         setError("Could not load user data. Please try again later.");
@@ -111,7 +82,7 @@ export default function AdminUsersPage() {
     fetchUsers();
   }, []);
 
-  const handleSort = (field: keyof UserProfile | 'name' | 'email' | 'role' | 'joinedAt') => {
+  const handleSort = (field: keyof UserProfile | 'name' | 'email' | 'role' | 'joinedAt' | 'status') => {
     const newDirection = (sortField === field && sortDirection === 'asc') ? 'desc' : 'asc';
     setSortField(field);
     setSortDirection(newDirection);
@@ -174,6 +145,55 @@ export default function AdminUsersPage() {
         }
     };
 
+    // Status Badge Component
+    const StatusBadge = ({ status }: { status: string }) => {
+        let variant: BadgeProps['variant'] = 'default';
+        let className = '';
+        let Icon = CheckCircle;
+
+        switch (status) {
+            case 'active':
+                variant = 'secondary';
+                className = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-700/50';
+                Icon = CheckCircle;
+                break;
+            case 'disabled':
+                variant = 'outline';
+                 className = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-700/50'; // Changed to red
+                Icon = Ban;
+                break;
+            case 'pending':
+                 variant = 'outline';
+                 className = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700';
+                Icon = Hourglass;
+                break;
+        }
+
+        return (
+            <Badge variant={variant} className={cn("capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit", className)}>
+                <Icon className="h-3 w-3" />
+                <span>{status}</span>
+            </Badge>
+        );
+    };
+
+    // Role Badge Component
+    const RoleBadge = ({ role }: { role: string }) => {
+         let className = 'bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'; // Default customer
+        switch (role) {
+             case 'admin':
+                className = 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900 dark:text-purple-300 dark:border-purple-700';
+                break;
+            case 'store_owner':
+                 className = 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-700';
+                break;
+            case 'driver':
+                className = 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900 dark:text-orange-300 dark:border-orange-700';
+                break;
+         }
+         return <Badge variant="outline" className={cn("capitalize text-xs px-1.5 py-0.5 border", className)}>{role.replace('_', ' ')}</Badge>;
+    };
+
 
   const TableSkeleton = () => (
     <Table>
@@ -194,9 +214,9 @@ export default function AdminUsersPage() {
             <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
             <TableCell><Skeleton className="h-4 w-3/4" /></TableCell>
             <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-            <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-1/2" /></TableCell>
+            <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-16 rounded-full" /></TableCell> {/* Role Badge */}
             <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-3/4" /></TableCell>
-             <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+             <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell> {/* Status Badge */}
             <TableCell className="text-right space-x-1">
                 <Skeleton className="h-8 w-8 inline-block" />
                 <Skeleton className="h-8 w-8 inline-block" />
@@ -212,7 +232,7 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-[var(--admin-primary)]"> {/* Use admin theme color */}
             <UsersIcon className="h-6 w-6" /> User Management
           </CardTitle>
           <CardDescription>View, filter, and manage all users on the platform.</CardDescription>
@@ -242,17 +262,20 @@ export default function AdminUsersPage() {
                 ))}
               </SelectContent>
             </Select>
-             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'disabled')}>
-              <SelectTrigger className="w-full md:w-[150px]">
+             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'disabled' | 'pending')}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                 <Filter className="h-4 w-4 mr-2 text-muted-foreground"/> {/* Added Filter Icon */}
                 <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="disabled">Disabled</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
               </SelectContent>
             </Select>
              {/* Optional: Add "Create New User" button here */}
+             {/* <Button><PlusCircle className="mr-2 h-4 w-4"/> Add User</Button> */}
           </div>
 
           {/* User Table */}
@@ -264,7 +287,7 @@ export default function AdminUsersPage() {
             </Alert>
            )}
 
-          <div className="rounded-md border overflow-hidden">
+          <div className="rounded-md border overflow-hidden shadow-sm"> {/* Added shadow */}
             {isLoading ? <TableSkeleton /> : (
               <Table>
                 <TableHeader>
@@ -282,7 +305,9 @@ export default function AdminUsersPage() {
                     <TableHead onClick={() => handleSort('joinedAt')} className="cursor-pointer hover:bg-muted hidden md:table-cell">
                       Joined <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortField === 'joinedAt' ? 'opacity-100' : 'opacity-30'}`} />
                     </TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead onClick={() => handleSort('status')} className="cursor-pointer hover:bg-muted">
+                      Status <ArrowUpDown className={`ml-1 h-3 w-3 inline ${sortField === 'status' ? 'opacity-100' : 'opacity-30'}`} />
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -298,46 +323,39 @@ export default function AdminUsersPage() {
                         </TableCell>
                         <TableCell className="font-medium">{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
-                        <TableCell className="capitalize hidden sm:table-cell">{user.role?.replace('_', ' ')}</TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                           <RoleBadge role={user.role!} />
+                        </TableCell>
                         <TableCell className="hidden md:table-cell">{format(user.joinedAt!, 'MMM d, yyyy')}</TableCell>
                          <TableCell>
-                          <Badge variant={user.status === 'active' ? 'secondary' : 'outline'} className={cn(user.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-700/50' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-700/50')}>
-                            {user.status === 'active' ? 'Active' : 'Disabled'}
-                          </Badge>
+                          <StatusBadge status={user.status!} />
                         </TableCell>
                         <TableCell className="text-right space-x-1">
-                            {/* Link to view user profile/details page */}
-                            {/* <Link href={`/admin/users/${user.id}`} legacyBehavior>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" title="View User Details">
-                                    <Eye className="h-4 w-4" />
-                                </Button>
-                            </Link> */}
-                             <Button variant="ghost" size="icon" className="h-8 w-8" title="View User (Not Implemented)">
-                                    <Eye className="h-4 w-4 opacity-50" />
+                            {/* View User Button (Placeholder) */}
+                             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="View User Details (Not Implemented)">
+                                    <Eye className="h-4 w-4 text-foreground/70" />
                             </Button>
-                            {/* Link to edit user page */}
-                             {/* <Link href={`/admin/users/edit/${user.id}`} legacyBehavior>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit User">
-                                    <Edit className="h-4 w-4" />
-                                </Button>
-                             </Link> */}
-                             <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit User (Not Implemented)">
-                                    <Edit className="h-4 w-4 opacity-50" />
+                            {/* Edit User Button (Placeholder) */}
+                             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="Edit User (Not Implemented)">
+                                    <Edit className="h-4 w-4 text-foreground/70" />
                              </Button>
-                             <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => handleToggleStatus(user)}
-                                disabled={updatingUserId === user.id}
-                                title={user.status === 'active' ? 'Disable User' : 'Enable User'}
-                            >
-                                {updatingUserId === user.id
-                                    ? <Skeleton className="h-4 w-4 rounded-full" />
-                                    : user.status === 'active'
-                                        ? <Ban className="h-4 w-4 text-red-600" />
-                                        : <UserCheck className="h-4 w-4 text-green-600" />}
-                           </Button>
+                             {/* Toggle Status Button */}
+                              {user.status !== 'pending' && ( // Don't show toggle for pending, use approve/reject flow
+                                 <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handleToggleStatus(user)}
+                                    disabled={updatingUserId === user.id}
+                                    title={user.status === 'active' ? 'Disable User' : 'Enable User'}
+                                >
+                                    {updatingUserId === user.id
+                                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                                        : user.status === 'active'
+                                            ? <Ban className="h-4 w-4 text-red-600" />
+                                            : <UserCheck className="h-4 w-4 text-green-600" />}
+                                </Button>
+                             )}
                         </TableCell>
                       </TableRow>
                     ))
@@ -358,13 +376,3 @@ export default function AdminUsersPage() {
     </div>
   );
 }
-
-// Extend UserProfile type for client-side state
-declare module '@/services/store' {
-    interface UserProfile {
-        role?: string; // Add optional role
-        status?: 'active' | 'disabled' | string; // Add optional status
-        joinedAt?: Date; // Add optional join date
-    }
-}
-```
