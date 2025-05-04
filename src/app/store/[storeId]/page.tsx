@@ -141,7 +141,7 @@ export default function StorePage() {
            <span>{product.name} added to your cart.</span>
          </div>
        ),
-       variant: "default",
+       variant: "default", // Use default (teal) or accent (orange) for success
      });
    };
 
@@ -163,11 +163,11 @@ export default function StorePage() {
                 title: "Subscription Successful!",
                 description: (
                  <div className="flex items-center gap-2">
-                   <CheckCircle className="h-4 w-4 text-green-500" />
+                   <CheckCircle className="h-4 w-4 text-accent" /> {/* Use accent color for success icon */}
                    <span>You've subscribed to {offer.name}. Check 'My Subscriptions' in your profile.</span>
                  </div>
                 ),
-                variant: "default", // Or a success variant
+                variant: "default", // Use accent color for success background? Or keep default.
             });
         } catch (err: any) { // Explicitly type error
              console.error("Subscription failed:", err);
@@ -196,7 +196,7 @@ export default function StorePage() {
                 toast({
                     title: isFollowing ? "Store Unfollowed" : "Store Followed",
                     description: `You are now ${isFollowing ? 'no longer following' : 'following'} ${store.name}.`,
-                    variant: isFollowing ? "destructive" : "default",
+                    variant: isFollowing ? "destructive" : "default", // Use accent for follow success?
                 });
             } else {
                 throw new Error("Failed to update profile after follow/unfollow.");
@@ -223,10 +223,10 @@ export default function StorePage() {
       transition={{ duration: 0.2, delay: delay * 0.04 }}
       className="h-full"
     >
-        {/* Use p-3 for consistency */}
+        {/* Use p-4 for consistency */}
         <Card className={cn(
-             "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border hover:border-[hsl(var(--store-accent))] group bg-card p-0", // Adjusted padding
-             !store?.isOpen && "opacity-60" // Dim closed store products
+             "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border hover:border-[hsl(var(--store-accent))] group bg-card p-0",
+             !store?.isOpen && "opacity-60"
              )}>
             <CardHeader className="p-0">
                 <div className="relative w-full h-40 overflow-hidden">
@@ -240,32 +240,39 @@ export default function StorePage() {
                     />
                      {product.size && <Badge variant="secondary" className="absolute bottom-1 right-1 text-[10px] px-1.5 py-0.5 bg-black/50 text-white border-none">{product.size}</Badge>}
                 </div>
-                {/* Use p-3 pb-1 */}
-                <div className="p-3 pb-1">
-                    <CardTitle className="h2">{product.name}</CardTitle> {/* Use h2 class */}
-                    <Badge variant="secondary" className="mt-1 capitalize text-[10px] font-normal px-1.5 py-0.5 tracking-wide">{product.category}</Badge>
+                {/* Use p-4 pb-1 */}
+                <div className="p-4 pb-1">
+                    {/* Apply Heading 2 */}
+                    <CardTitle className="h2 line-clamp-1">{product.name}</CardTitle>
+                    {/* Apply Caption */}
+                    <Badge variant="secondary" className="mt-1 capitalize caption font-normal px-1.5 py-0.5 tracking-wide">{product.category}</Badge>
                 </div>
             </CardHeader>
-            {/* Use p-3 pt-1 */}
-            <CardContent className="flex-grow p-3 pt-1 space-y-1">
-                <p className="h2 font-bold text-[hsl(var(--store-accent))]">{formatCurrency(product.price)}</p> {/* Use h2 class and themed color */}
-                <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
+            {/* Use p-4 pt-1 */}
+            <CardContent className="flex-grow p-4 pt-1 space-y-1">
+                {/* Apply Heading 2 */}
+                <p className="h2 font-bold text-[hsl(var(--store-accent))]">{formatCurrency(product.price)}</p>
+                {/* Apply Body 2 */}
+                <p className="text-body2 text-muted-foreground line-clamp-2">{product.description}</p>
                  {product.ingredients && (
-                     <p className="text-xs text-muted-foreground/80 pt-1">Ingredients: {product.ingredients.join(', ')}</p>
+                      /* Apply Caption */
+                     <p className="caption pt-1">Ingredients: {product.ingredients.join(', ')}</p>
                  )}
             </CardContent>
-            {/* Use p-3 pt-0 */}
-            <CardFooter className="p-3 pt-0 mt-auto">
+            {/* Use p-4 pt-0 */}
+            <CardFooter className="p-4 pt-0 mt-auto">
+                {/* Use solid primary button */}
                 <Button
                     size="sm"
-                    variant="default" // Use solid primary button
+                    variant="default"
                     className={cn(
-                        "w-full group/button", // Removed uppercase override
-                         !store?.isOpen && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed" // Style for closed store button
+                        "w-full group/button",
+                         !store?.isOpen && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
                     )}
                     onClick={() => handleAddToCart(product)}
                     style={{ '--store-accent': 'hsl(var(--store-accent))' } as React.CSSProperties}
-                    disabled={!store?.isOpen || !store?.isActive} // Disable button if store is closed OR inactive
+                    disabled={!store?.isOpen || !store?.isActive}
+                    withRipple // Enable ripple effect
                     >
                      {store?.isOpen && store?.isActive ? (
                          <>
@@ -293,9 +300,10 @@ export default function StorePage() {
         transition={{ duration: 0.2, delay: delay * 0.05 }}
         className="h-full"
     >
+        {/* Use p-4 */}
         <Card className={cn(
-             "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-amber-400/50 hover:border-amber-500 group bg-amber-50/30 dark:bg-amber-950/20", // Kept existing style
-             !store?.isOpen && "opacity-60 cursor-not-allowed" // Dim if store closed
+             "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-amber-400/50 hover:border-amber-500 group bg-amber-50/30 dark:bg-amber-950/20 p-0",
+             !store?.isOpen && "opacity-60 cursor-not-allowed"
              )}>
             <CardHeader className="p-0">
                  <div className="relative w-full h-32 overflow-hidden">
@@ -307,28 +315,37 @@ export default function StorePage() {
                          className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 bg-muted"
                          data-ai-hint={`${offer.frequency} ${store?.category} offer`}
                      />
-                     <Badge variant="secondary" className="absolute top-1 left-1 text-[10px] px-1.5 py-0.5 bg-black/50 text-white border-none capitalize flex items-center gap-1">
+                      {/* Apply Caption */}
+                     <Badge variant="secondary" className="absolute top-1 left-1 caption px-1.5 py-0.5 bg-black/50 text-white border-none capitalize flex items-center gap-1">
                          <Repeat className="w-2.5 h-2.5"/> {offer.frequency}
                      </Badge>
                  </div>
-                 <div className="p-3 pb-1">
-                     <CardTitle className="text-base font-semibold line-clamp-1 text-amber-700 dark:text-amber-400 group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">{offer.name}</CardTitle>
+                 {/* Use p-4 pb-1 */}
+                 <div className="p-4 pb-1">
+                      {/* Use Heading 3 */}
+                     <CardTitle className="h3 line-clamp-1 text-amber-700 dark:text-amber-400 group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">{offer.name}</CardTitle>
                  </div>
             </CardHeader>
-            <CardContent className="flex-grow p-3 pt-1 space-y-1">
-                 <p className="font-bold text-lg text-amber-600 dark:text-amber-400">{formatCurrency(offer.price)} <span className="text-xs font-normal text-muted-foreground">per {offer.frequency === 'daily' ? 'day' : 'week'}</span></p>
-                 <p className="text-xs text-muted-foreground line-clamp-3">{offer.description}</p>
+            {/* Use p-4 pt-1 */}
+            <CardContent className="flex-grow p-4 pt-1 space-y-1">
+                 {/* Use Heading 3 for price */}
+                 <p className="h3 font-bold text-amber-600 dark:text-amber-400">{formatCurrency(offer.price)} <span className="caption text-muted-foreground">per {offer.frequency === 'daily' ? 'day' : 'week'}</span></p>
+                 {/* Use Body 2 */}
+                 <p className="text-body2 text-muted-foreground line-clamp-3">{offer.description}</p>
             </CardContent>
-            <CardFooter className="p-3 pt-1 mt-auto">
+            {/* Use p-4 pt-1 */}
+            <CardFooter className="p-4 pt-1 mt-auto">
+                 {/* Use Accent button */}
                  <Button
                     size="sm"
-                    variant="default" // Using default variant
+                    variant="accent"
                     className={cn(
-                        "w-full group/button bg-amber-500 hover:bg-amber-600 text-white", // Kept custom color for offers
+                        "w-full group/button",
                         !store?.isOpen && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
                     )}
                     onClick={() => handleSubscribe(offer)}
                     disabled={isSubscribing === offer.id || !store?.isOpen || !store?.isActive}
+                    withRipple // Enable ripple
                     >
                      {isSubscribing === offer.id ? (
                         <Repeat className="mr-1 h-4 w-4 animate-spin" />
@@ -347,33 +364,39 @@ export default function StorePage() {
      // Adjusted padding for skeleton to match card padding
      <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50 p-0">
         <Skeleton className="h-40 w-full bg-muted/50" />
-        <CardHeader className="p-3 pb-1">
+        {/* Use p-4 pb-1 */}
+        <CardHeader className="p-4 pb-1">
             <Skeleton className="h-6 w-3/4 mb-1 bg-muted/50" />
             <Skeleton className="h-3 w-1/3 bg-muted/50" />
         </CardHeader>
-        <CardContent className="p-3 pt-1 space-y-1">
+        {/* Use p-4 pt-1 */}
+        <CardContent className="p-4 pt-1 space-y-1">
             <Skeleton className="h-6 w-1/4 bg-muted/50" />
             <Skeleton className="h-3 w-full bg-muted/50" />
             <Skeleton className="h-3 w-5/6 bg-muted/50" />
         </CardContent>
-        <CardFooter className="p-3 pt-1">
+        {/* Use p-4 pt-1 */}
+        <CardFooter className="p-4 pt-0">
             <Skeleton className="h-9 w-full bg-muted/50" />
         </CardFooter>
     </Card>
    )
 
     const DailyOfferSkeleton = () => (
-     <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50 p-0"> {/* Adjusted padding */}
+     <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50 p-0"> {/* Use p-0 */}
         <Skeleton className="h-32 w-full bg-muted/50" />
-        <CardHeader className="p-3 pb-1">
+        {/* Use p-4 pb-1 */}
+        <CardHeader className="p-4 pb-1">
             <Skeleton className="h-5 w-3/4 mb-1 bg-muted/50" />
         </CardHeader>
-        <CardContent className="p-3 pt-1 space-y-1">
+        {/* Use p-4 pt-1 */}
+        <CardContent className="p-4 pt-1 space-y-1">
             <Skeleton className="h-6 w-1/3 bg-muted/50" />
             <Skeleton className="h-3 w-full bg-muted/50" />
             <Skeleton className="h-3 w-4/5 bg-muted/50" />
         </CardContent>
-        <CardFooter className="p-3 pt-1">
+        {/* Use p-4 pt-1 */}
+        <CardFooter className="p-4 pt-1">
             <Skeleton className="h-9 w-full bg-muted/50" />
         </CardFooter>
     </Card>
@@ -395,7 +418,8 @@ export default function StorePage() {
                          <Skeleton className="w-36 h-36 rounded-full border-4 border-background bg-background/50 z-10"/>
                     </div>
                 </CardHeader>
-                <CardContent className="pt-16 text-center -mt-14 relative z-0 space-y-2 pb-6">
+                 {/* Use p-4 */}
+                <CardContent className="pt-16 text-center -mt-14 relative z-0 space-y-2 pb-6 p-4">
                     <Skeleton className="h-8 w-1/2 mx-auto bg-muted/50" />
                     <Skeleton className="h-6 w-1/4 mx-auto bg-muted/50" />
                     <Skeleton className="h-4 w-3/4 mx-auto bg-muted/50" />
@@ -452,10 +476,12 @@ export default function StorePage() {
         // Use p-6/p-8 spacing
        <div className="container mx-auto px-6 md:px-8 py-10 flex flex-col items-center justify-center h-[60vh]">
            <Card className="w-full max-w-md">
+                {/* Use p-4 */}
                <CardContent className="p-10 text-center text-muted-foreground">
                    <StoreIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
                    <p className="text-lg font-medium">Store Not Found</p>
-                   <p className="text-sm mt-2">We couldn't find the store you were looking for.</p>
+                    {/* Use Body 2 */}
+                   <p className="text-body2 mt-2">We couldn't find the store you were looking for.</p>
                     <Link href="/" passHref legacyBehavior>
                        <Button variant="outline" size="sm" className="mt-6">
                            <ArrowLeft className="mr-2 h-4 w-4" /> Back to All Stores
@@ -469,6 +495,7 @@ export default function StorePage() {
 
   return (
      <LayoutAnimator>
+        {/* Use space-y-10 */}
         <div className={cn("container mx-auto px-6 md:px-8 py-10 space-y-10", themeClass)}>
           <Link href="/" passHref legacyBehavior>
               <Button variant="ghost" size="sm" className="mb-0 text-muted-foreground hover:text-foreground">
@@ -503,7 +530,8 @@ export default function StorePage() {
                                <Badge variant="destructive" className="text-lg px-4 py-1 font-semibold">
                                     Currently Closed
                                </Badge>
-                               <p className="text-white/80 text-sm mt-2">Pre-orders may be available.</p>
+                                {/* Use Body 2 */}
+                               <p className="text-body2 text-white/80 mt-2">Pre-orders may be available.</p>
                             </div>
                          )}
                          {!store.isActive && (
@@ -512,22 +540,28 @@ export default function StorePage() {
                                 <Badge variant="destructive" className="text-lg px-4 py-1 font-semibold bg-white text-red-700">
                                      Store Disabled
                                 </Badge>
-                                <p className="text-white/90 text-sm mt-2">This store is temporarily unavailable.</p>
+                                {/* Use Body 2 */}
+                                <p className="text-body2 text-white/90 mt-2">This store is temporarily unavailable.</p>
                              </div>
                          )}
                      </div>
                 </CardHeader>
-                <CardContent className={cn("pt-16 text-center -mt-14 relative z-0 pb-6 space-y-2", (!store.isOpen || !store.isActive) && "opacity-70")}>
-                     <h1 className="h1">{store.name}</h1> {/* Use h1 class */}
+                 {/* Use p-4 */}
+                <CardContent className={cn("pt-16 text-center -mt-14 relative z-0 pb-6 space-y-2 p-4", (!store.isOpen || !store.isActive) && "opacity-70")}>
+                     {/* Use Heading 1 */}
+                     <h1 className="h1">{store.name}</h1>
+                     {/* Use Caption */}
                      <Badge
                          variant="outline"
-                         className="capitalize text-sm py-0.5 px-3 border-[hsl(var(--store-accent))] text-[hsl(var(--store-accent))] bg-[hsl(var(--store-accent))]/10"
+                         className="capitalize caption py-0.5 px-3 border-[hsl(var(--store-accent))] text-[hsl(var(--store-accent))] bg-[hsl(var(--store-accent))]/10"
                      >
                         {store.category}
                      </Badge>
-                     <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto text-sm">{store.description}</p>
+                      {/* Use Body 2 */}
+                     <p className="text-body2 text-muted-foreground leading-relaxed max-w-2xl mx-auto">{store.description}</p>
 
-                     <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-2 pt-2 text-sm text-muted-foreground">
+                     {/* Use Caption */}
+                     <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-2 pt-2 caption">
                         {store.rating && (
                             <div className="flex items-center gap-1 font-medium">
                                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
@@ -552,6 +586,7 @@ export default function StorePage() {
                             onClick={handleToggleFollow}
                             disabled={isTogglingFollow}
                             className="mt-4"
+                            withRipple
                         >
                             {isTogglingFollow ? (
                                  <Repeat className="mr-2 h-4 w-4 animate-spin" />
@@ -575,9 +610,11 @@ export default function StorePage() {
                  transition={{ delay: 0.2 }}
                  className="pt-0"
               >
+                 {/* Use Heading 2 */}
                 <h2 className="h2 flex items-center gap-2 mb-6">
                    <CalendarClock className="text-amber-500"/> Daily & Weekly Offers
                 </h2>
+                 {/* Use space-x-6 gutter */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                      <AnimatePresence>
                         {activeDailyOffers.map((offer, index) => (
@@ -585,6 +622,7 @@ export default function StorePage() {
                         ))}
                     </AnimatePresence>
                 </div>
+                 {/* Use my-10 spacing */}
                  <Separator className="mt-10 border-[hsl(var(--store-accent))] opacity-30"/>
               </motion.section>
            )}
@@ -598,6 +636,7 @@ export default function StorePage() {
                 className="pt-0"
            >
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    {/* Use Heading 2 */}
                     <h2 className="h2 flex items-center gap-2">
                        <Tag className="text-[hsl(var(--store-accent))]"/> Products
                     </h2>
@@ -624,6 +663,7 @@ export default function StorePage() {
 
                 {store.products && store.products.length > 0 && store.isActive ? (
                      filteredProducts.length > 0 ? (
+                         {/* Use space-x-6 gutter */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                             <AnimatePresence>
                                 {filteredProducts.map((product, index) => (
@@ -633,10 +673,12 @@ export default function StorePage() {
                         </div>
                      ) : (
                          <Card className="border-dashed border-muted-foreground/50 col-span-full">
+                           {/* Use p-4 */}
                            <CardContent className="p-10 text-center text-muted-foreground">
                                 <Tag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
                                <p className="text-lg font-medium">No products found in '{selectedProductCategory}'</p>
-                               <p className="text-sm mt-1">Try selecting a different category.</p>
+                               {/* Use Body 2 */}
+                               <p className="text-body2 mt-1">Try selecting a different category.</p>
                                 <Button variant="link" onClick={() => setSelectedProductCategory('all')} className="mt-4 text-[hsl(var(--store-accent))]">
                                     Show All Products
                                 </Button>
@@ -646,10 +688,12 @@ export default function StorePage() {
                 ) : !store.isActive ? null
                 : (
                     <Card className="border-dashed border-muted-foreground/50 col-span-full">
+                       {/* Use p-4 */}
                        <CardContent className="p-10 text-center text-muted-foreground">
                             <Tag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
                            <p className="text-lg font-medium">No products found in this store yet.</p>
-                           <p className="text-sm mt-2">Check back later for new items!</p>
+                           {/* Use Body 2 */}
+                           <p className="text-body2 mt-2">Check back later for new items!</p>
                        </CardContent>
                     </Card>
                 )}
@@ -658,47 +702,3 @@ export default function StorePage() {
      </LayoutAnimator>
   );
 }
-
-```
-- src/components/ui/badge.tsx</file>
-    <description>Add success variant to badge component using accent color.</description>
-    <content><![CDATA[import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-
-import { cn } from "@/lib/utils"
-
-// Updated badge variants to align with SDP theme
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default: // Use primary color
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary: // Use secondary color
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground border-current", // Use current text color for border
-        subtle: "border-transparent bg-muted text-muted-foreground hover:bg-muted/80", // Added subtle variant
-        // Updated success variant to use accent color
-        success: "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
-}
-
-export { Badge, badgeVariants }

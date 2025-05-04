@@ -11,83 +11,90 @@ body {
 }
 
 @layer base {
-  /* Default Theme (MUI-Inspired) */
+  /* --- SwiftDispatch Theme --- */
   :root {
-    --background: 0 0% 96%; /* MUI #f5f5f5 */
-    --foreground: 224 71.4% 4.1%; /* Default dark text */
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 210 69% 46%; /* MUI #1976d2 */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 337 100% 43%; /* MUI #dc004e */
-    --secondary-foreground: 337 100% 98%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 180 100% 25.1%; /* Kept original Teal as accent */
-    --accent-foreground: 180 100% 96.1%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 210 69% 56%; /* Lighter primary */
-    --radius: 0.5rem; /* MUI 8px */
+    /* Color Palette */
+    --teal-base: 180; /* H value for Teal #008080 */
+    --gray-base: 0; /* H value for Gray #F0F0F0 */
+    --orange-base: 39; /* H value for Orange #FFA500 */
+
+    /* Light Mode Theme */
+    --background: var(--gray-base) 0% 98%; /* Slightly off-white #FAFAFA (derived from F0F0F0) */
+    --foreground: var(--teal-base) 20% 15%; /* Dark Teal text */
+    --card: var(--gray-base) 0% 100%; /* White cards */
+    --card-foreground: var(--teal-base) 20% 15%;
+    --popover: var(--gray-base) 0% 100%; /* White popovers */
+    --popover-foreground: var(--teal-base) 20% 15%;
+    --primary: var(--teal-base) 100% 25.1%; /* Teal #008080 */
+    --primary-foreground: var(--gray-base) 0% 100%; /* White */
+    --secondary: var(--gray-base) 0% 94.1%; /* Light Gray #F0F0F0 */
+    --secondary-foreground: var(--teal-base) 20% 15%; /* Dark Teal text on light gray */
+    --muted: var(--gray-base) 0% 94.1%; /* Light Gray #F0F0F0 */
+    --muted-foreground: var(--teal-base) 15% 45%; /* Muted Teal text */
+    --accent: var(--orange-base) 100% 50%; /* Orange #FFA500 */
+    --accent-foreground: var(--gray-base) 0% 10%; /* Dark text for Orange */
+    --destructive: 0 84.2% 60.2%; /* Default Red */
+    --destructive-foreground: 0 0% 98%; /* White */
+    --border: var(--gray-base) 0% 87.1%; /* Slightly darker gray border #DEDEDE */
+    --input: var(--gray-base) 0% 90.1%; /* Input border #E6E6E6 */
+    --ring: var(--teal-base) 80% 60%; /* Lighter Teal for focus rings */
+
+    --radius: 0.5rem;
 
     /* Chart Colors (Example) */
     --chart-1: hsl(var(--primary));
-    --chart-2: hsl(var(--secondary)); /* Use secondary for charts */
+    --chart-2: hsl(var(--accent)); /* Orange */
     --chart-3: hsl(120, 70%, 45%); /* Green */
-    --chart-4: hsl(var(--accent)); /* Use accent */
-    --chart-5: hsl(50 80% 55%); /* Gold */
+    --chart-4: hsl(210, 70%, 55%); /* Blue */
+    --chart-5: hsl(330, 70%, 55%); /* Pink */
 
-    /* Sidebar Theme Variables (Unified - matching light theme) */
-    --sidebar-background: hsl(210 20% 98%); /* Light Gray */
-    --sidebar-foreground: hsl(224 71.4% 4.1%);
+    /* Sidebar Theme Variables (Using new theme) */
+    --sidebar-background: hsl(var(--gray-base) 0% 96%); /* Slightly darker gray than main bg */
+    --sidebar-foreground: hsl(var(--foreground));
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: hsl(210 40% 96.1%); /* Muted as accent */
-    --sidebar-accent-foreground: hsl(224 71.4% 4.1%);
+    --sidebar-accent: hsl(var(--secondary)); /* Use secondary gray for accent */
+    --sidebar-accent-foreground: hsl(var(--secondary-foreground));
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
   }
 
   .dark {
-    /* Dark Mode Theme (MUI-Inspired) */
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 75% 55%; /* Brighter Blue */
-    --primary-foreground: 210 75% 5%;
-    --secondary: 337 95% 55%; /* Brighter Pink */
-    --secondary-foreground: 337 95% 5%;
-    --muted: 215 20% 25%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 180 90% 45%; /* Brighter Teal accent */
-    --accent-foreground: 180 90% 5%;
-    --destructive: 0 62.8% 30.6%;
+    /* Dark Mode Theme */
+    --background: var(--teal-base) 10% 12%; /* Very dark desaturated teal */
+    --foreground: var(--gray-base) 0% 90%; /* Light gray text */
+    --card: var(--teal-base) 10% 16%; /* Slightly lighter card bg */
+    --card-foreground: var(--gray-base) 0% 90%;
+    --popover: var(--teal-base) 10% 14%; /* Dark popover */
+    --popover-foreground: var(--gray-base) 0% 90%;
+    --primary: var(--teal-base) 80% 55%; /* Brighter Teal */
+    --primary-foreground: var(--teal-base) 10% 10%; /* Very dark text */
+    --secondary: var(--gray-base) 0% 20%; /* Dark Gray */
+    --secondary-foreground: var(--gray-base) 0% 85%; /* Lighter gray text */
+    --muted: var(--gray-base) 0% 25%; /* Slightly lighter dark gray */
+    --muted-foreground: var(--gray-base) 0% 60%; /* Muted gray text */
+    --accent: var(--orange-base) 90% 55%; /* Brighter Orange */
+    --accent-foreground: var(--gray-base) 0% 10%; /* Dark text */
+    --destructive: 0 70% 50%; /* Slightly muted red */
     --destructive-foreground: 0 0% 98%;
-    --border: 215 15% 35%;
-    --input: 215 15% 30%;
-    --ring: 210 75% 65%; /* Even brighter blue for focus rings */
+    --border: var(--gray-base) 0% 30%; /* Darker gray border */
+    --input: var(--gray-base) 0% 25%; /* Input border matches muted */
+    --ring: var(--teal-base) 70% 65%; /* Bright teal focus */
 
     /* Sidebar Dark */
-    --sidebar-background: hsl(224 71.4% 4.1%);
-    --sidebar-foreground: hsl(210 20% 98%);
+    --sidebar-background: hsl(var(--teal-base) 10% 10%); /* Darkest */
+    --sidebar-foreground: hsl(var(--foreground));
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: hsl(215 25% 16.7%);
-    --sidebar-accent-foreground: hsl(210 20% 98%);
+    --sidebar-accent: hsl(var(--gray-base) 0% 20%); /* Dark Gray accent */
+    --sidebar-accent-foreground: hsl(var(--secondary-foreground));
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
   }
 
-  /* --- REMOVED PER-ROLE THEMES --- */
-
-  /* Define themed variables for Store Categories (using original logic) */
+  /* --- Category Theme --- */
+  /* Define themed variables for Store Categories */
+  /* Base category theme using Secondary color */
   .theme-category-electronics,
   .theme-category-clothing,
   .theme-category-groceries,
@@ -97,26 +104,31 @@ body {
   .theme-category-restaurants,
   .theme-category-coffee-shops,
   .theme-category-other {
-    /* Default accent color */
-    --store-accent: hsl(var(--accent));
-    --store-accent-foreground: hsl(var(--accent-foreground));
+    --store-accent: hsl(var(--secondary)); /* Default to secondary gray */
+    --store-accent-foreground: hsl(var(--secondary-foreground));
   }
 
-  .theme-category-electronics { --store-accent: hsl(var(--primary)); --store-accent-foreground: hsl(var(--primary-foreground)); }
-  .theme-category-clothing { --store-accent: hsl(330, 60%, 60%); --store-accent-foreground: white; }
-  .theme-category-groceries { --store-accent: hsl(90, 50%, 50%); --store-accent-foreground: white; }
-  .theme-category-books { --store-accent: hsl(30, 60%, 55%); --store-accent-foreground: white; }
-  .theme-category-home-goods { --store-accent: hsl(190, 50%, 55%); --store-accent-foreground: white; }
-  .theme-category-toys { --store-accent: hsl(50, 100%, 60%); --store-accent-foreground: hsl(40, 80%, 10%); } /* Dark text for yellow */
-  .theme-category-restaurants { --store-accent: hsl(15, 75%, 55%); --store-accent-foreground: white; }
-  .theme-category-coffee-shops { --store-accent: hsl(35, 40%, 45%); --store-accent-foreground: white; }
-  .theme-category-other { --store-accent: hsl(240, 10%, 50%); --store-accent-foreground: white; }
+  /* Overrides for specific categories */
+  .theme-category-electronics { --store-accent: hsl(210, 80%, 55%); --store-accent-foreground: white; } /* Blue */
+  .theme-category-clothing { --store-accent: hsl(330, 60%, 60%); --store-accent-foreground: white; } /* Pink */
+  .theme-category-groceries { --store-accent: hsl(90, 50%, 50%); --store-accent-foreground: white; } /* Green */
+  .theme-category-books { --store-accent: hsl(30, 60%, 55%); --store-accent-foreground: white; } /* Brownish Orange */
+  .theme-category-home-goods { --store-accent: hsl(190, 50%, 55%); --store-accent-foreground: white; } /* Cyan */
+  .theme-category-toys { --store-accent: hsl(50, 100%, 60%); --store-accent-foreground: hsl(40, 80%, 10%); } /* Yellow (Dark Text) */
+  .theme-category-restaurants { --store-accent: hsl(15, 75%, 55%); --store-accent-foreground: white; } /* Reddish Orange */
+  .theme-category-coffee-shops { --store-accent: hsl(35, 40%, 45%); --store-accent-foreground: white; } /* Brown */
+  .theme-category-other { --store-accent: hsl(240, 10%, 50%); --store-accent-foreground: white; } /* Grayish Blue */
 
    /* Dark mode overrides for store accents */
+  .dark .theme-category-electronics { --store-accent: hsl(210, 80%, 65%); }
+  .dark .theme-category-clothing { --store-accent: hsl(330, 60%, 70%); }
+  .dark .theme-category-groceries { --store-accent: hsl(90, 50%, 60%); }
+  .dark .theme-category-books { --store-accent: hsl(30, 60%, 65%); }
+  .dark .theme-category-home-goods { --store-accent: hsl(190, 50%, 65%); }
   .dark .theme-category-toys { --store-accent: hsl(50, 100%, 65%); }
-  .dark .theme-category-groceries { --store-accent: hsl(90, 50%, 55%); }
-  /* Add others if needed */
-
+  .dark .theme-category-restaurants { --store-accent: hsl(15, 75%, 65%); }
+  .dark .theme-category-coffee-shops { --store-accent: hsl(35, 40%, 55%); }
+  .dark .theme-category-other { --store-accent: hsl(240, 10%, 60%); }
 }
 
 @layer base {
@@ -129,31 +141,59 @@ body {
   }
 }
 
-/* Typography Definitions */
+/* Typography Definitions - Based on Theme Spec */
 @layer base {
-    /* Base font size (e.g., 16px) */
     html {
-        font-size: 16px; /* Or use rem/em */
+        font-size: 16px;
     }
 
-    /* Heading Styles - inspired by spec */
-    h1, .h1 { @apply text-3xl font-extrabold tracking-tight lg:text-4xl; } /* Reduced size slightly */
-    h2, .h2 { @apply text-2xl font-bold tracking-tight lg:text-3xl; }
-    h3, .h3 { @apply text-xl font-semibold tracking-tight lg:text-2xl; }
-    h4, .h4 { @apply text-lg font-semibold tracking-tight lg:text-xl; }
+    /* Headings */
+    /* Heading 1: 32px, Bold */
+    h1, .h1 { @apply text-[2rem] font-bold leading-tight tracking-tighter; } /* 32px */
+    /* Heading 2: 24px, SemiBold */
+    h2, .h2 { @apply text-[1.5rem] font-semibold leading-snug tracking-tight; } /* 24px */
+    /* Heading 3: 20px, SemiBold */
+    h3, .h3 { @apply text-[1.25rem] font-semibold leading-normal tracking-tight; } /* 20px */
+    /* Heading 4: 18px, SemiBold */
+    h4, .h4 { @apply text-[1.125rem] font-semibold leading-normal tracking-tight; } /* 18px */
 
     /* Paragraph and Body Text */
-    p { @apply leading-relaxed [&:not(:first-child)]:mt-4 text-base; } /* Base text size */
-    .lead { @apply text-lg text-muted-foreground; } /* Adjusted size */
-    .large { @apply text-base font-semibold lg:text-lg; } /* Adjusted size */
-    .small { @apply text-sm font-medium leading-none; }
-    .muted { @apply text-sm text-muted-foreground; }
-    .extra-small { @apply text-xs tracking-wide; }
+    /* Body 1 (default): 16px, Regular */
+    p, body { @apply text-base font-normal leading-relaxed; } /* 16px */
+    /* Body 2: 14px, Regular */
+    .text-body2 { @apply text-sm font-normal leading-normal; } /* 14px */
+    /* Lead text: Larger muted text */
+    .lead { @apply text-lg font-normal text-muted-foreground; } /* 18px */
 
-    /* Button Text - Uppercase added via component */
-    .btn-text-uppercase-semibold {
-        @apply uppercase font-semibold tracking-wider text-xs;
+    /* Smaller text styles */
+    /* Caption: 12px, Regular */
+    .caption { @apply text-xs font-normal leading-none text-muted-foreground; } /* 12px */
+    /* Overline: 10px, SemiBold, Uppercase */
+    .overline { @apply text-[0.625rem] font-semibold uppercase tracking-wider text-muted-foreground; } /* 10px */
+
+
+    /* Link styles */
+    a {
+      @apply text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 rounded-sm;
     }
+
+     /* Lists */
+    ul, ol { @apply my-4 ml-6 [&>li]:mt-2; }
+    li>ul, li>ol { @apply my-2; } /* Nested lists */
+
+     /* Input/Label specific application */
+    label {
+      @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70; /* From spec */
+    }
+    /* Apply body2 to descriptions */
+    [id$="-form-item-description"] {
+       @apply text-body2 text-muted-foreground;
+    }
+    /* Apply body2 to form messages */
+    [id$="-form-item-message"] {
+        @apply text-body2 font-medium; /* Keep font-medium for errors */
+    }
+
 }
 
 
@@ -176,31 +216,34 @@ body {
    html {
      scroll-behavior: smooth;
    }
-   /* Removed duplicate .btn-text-uppercase-semibold */
+   /* Button Text */
+    .btn-text-uppercase-semibold {
+        @apply uppercase font-semibold tracking-wider text-xs; /* Use 12px/semibold instead of 14px */
+    }
 }
 
 /* Custom scrollbar styles */
 ::-webkit-scrollbar {
-  width: 6px; /* Narrower */
-  height: 6px;
+  width: 8px; /* Slightly wider */
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.05); /* Very subtle */
+  background: hsl(var(--muted) / 0.1); /* More subtle track */
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--border) / 0.5); /* Semi-transparent */
+  background-color: hsl(var(--border) / 0.6); /* Use border color, slightly transparent */
   border-radius: 10px;
-  border: 1px solid transparent;
+  border: 2px solid transparent; /* Create inset effect */
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--muted-foreground) / 0.5); /* Darker on hover */
+  background-color: hsl(var(--muted-foreground) / 0.6); /* Darker on hover */
 }
 
 /* Define the animations */
 @keyframes slide-in-from-bottom {
-  from { transform: translateY(10px); opacity: 0; }
+  from { transform: translateY(15px); opacity: 0; } /* Start slightly lower */
   to { transform: translateY(0); opacity: 1; }
 }
 @keyframes fade-in {
@@ -215,22 +258,56 @@ body {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-/* Wheel spinning animation */
+/* Wheel spinning animation - Keep */
 @keyframes spin-wheel {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+/* Subtle pulse for notification badges */
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.95); }
+}
+/* Ripple effect for buttons */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
 
 /* Apply animations */
-.animate-slide-in { animation: slide-in-from-bottom 0.3s ease-out; }
-.animate-fade-in { animation: fade-in 0.4s ease-in-out; }
+.animate-slide-in { animation: slide-in-from-bottom 0.4s ease-out; } /* Slightly longer */
+.animate-fade-in { animation: fade-in 0.5s ease-in-out; } /* Slightly longer */
 .animate-spin { animation: spin 1s linear infinite; }
-.animate-spin-wheel { animation: spin-wheel 0.8s linear infinite; } /* Added wheel animation */
+.animate-spin-wheel { animation: spin-wheel 1.5s linear infinite; } /* Slower wheel */
 .animate-shimmer {
+  /* Use theme colors for shimmer */
   background-image: linear-gradient(90deg, hsl(var(--muted)/0.5) 25%, hsl(var(--muted)/0.7) 50%, hsl(var(--muted)/0.5) 75%);
   background-size: 400% 100%;
-  animation: shimmer 1.2s infinite linear;
+  animation: shimmer 1.5s infinite linear; /* Slower shimmer */
 }
+.animate-pulse-badge {
+   animation: pulse-badge 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Utility for Ripple effect (apply to button parent) */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6); /* White ripple */
+  transform: scale(0);
+  animation: ripple 600ms linear;
+}
+.dark .ripple {
+   background-color: rgba(0, 0, 0, 0.4); /* Dark ripple */
+}
+
 
 /* Visually Hidden Utility */
 .visually-hidden {

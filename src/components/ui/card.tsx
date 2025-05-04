@@ -23,22 +23,24 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    // Reduced default vertical padding
-    className={cn("flex flex-col space-y-1.5 p-4", className)} // Changed to p-4 (16px)
+    // Reduced default vertical padding to 16px (p-4)
+    className={cn("flex flex-col space-y-1.5 p-4", className)}
     {...props}
   />
 ))
 CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<
-  HTMLParagraphElement, // Changed to h2 for semantics
+  HTMLParagraphElement, // Use h2 for semantics
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  // Changed component to <h2> but kept styles
-  <h2 // Changed from p to h2
+  // Use h2, apply spec styles (24px, semibold)
+  <h2
     ref={ref}
+    // Apply Heading 2 styles from globals.css via class or direct tailwind
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight", // Keep existing style classes
+      "h2", // Apply Heading 2 class defined in globals.css
+      // Or directly: "text-2xl font-semibold leading-snug tracking-tight"
       className
     )}
     {...props}
@@ -52,7 +54,9 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    // Apply Body 2 styles from globals.css via class or direct tailwind
+    className={cn("text-body2 text-muted-foreground", className)} // Use Body 2 class
+    // Or directly: "text-sm text-muted-foreground leading-normal"
     {...props}
   />
 ))
@@ -62,8 +66,8 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  // Adjusted default padding
-  <div ref={ref} className={cn("p-4 pt-0", className)} {...props} /> // Changed p-6 to p-4
+  // Adjusted default padding to 16px (p-4), removed top padding
+  <div ref={ref} className={cn("p-4 pt-0", className)} {...props} />
 ))
 CardContent.displayName = "CardContent"
 
@@ -71,10 +75,10 @@ const CardFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  // Adjusted default padding
+  // Adjusted default padding to 16px (p-4), removed top padding
   <div
     ref={ref}
-    className={cn("flex items-center p-4 pt-0", className)} // Changed p-6 to p-4
+    className={cn("flex items-center p-4 pt-0", className)}
     {...props}
   />
 ))

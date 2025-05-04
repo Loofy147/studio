@@ -8,11 +8,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Button, buttonVariants } from "@/components/ui/button"; // Import buttonVariants
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge, badgeVariants } from "@/components/ui/badge";
-import type { BadgeProps } from "@/components/ui/badge"; // Explicit type import
-import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat, Home, Briefcase, Plus, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon, Check } from 'lucide-react'; // Added Check icon
+import { Badge, badgeVariants, type BadgeProps } from "@/components/ui/badge"; // Import badgeVariants & type
+import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat, Home, Briefcase, Plus, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon, Check, Loader2 } from 'lucide-react'; // Added Check icon, Loader2
 import { format } from 'date-fns';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
 import Link from "next/link";
 import { cn, formatCurrency } from "@/lib/utils";
 import React from 'react';
@@ -33,7 +32,7 @@ import { Label } from "@/components/ui/label"; // For edit forms
 import { Checkbox } from "@/components/ui/checkbox"; // For default address
 import { AddressDialog } from './AddressDialog'; // Import AddressDialog component
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
-import { LayoutAnimator } from "@/components/LayoutAnimator"; // Correctly import LayoutAnimator
+import { LayoutAnimator } from "@/components/LayoutAnimator"; // Import LayoutAnimator
 
 
 // Map status to icon and variant for the order table
@@ -224,15 +223,15 @@ export default function ProfilePage() {
   const ProfileInfoSkeleton = () => (
      <Card>
         {/* Use p-6 for consistent padding */}
-        <CardHeader className="flex flex-row items-center gap-4 p-6">
-             <Skeleton className="h-20 w-20 rounded-full bg-muted/50" />
-             <div className="space-y-2 flex-grow">
-                <Skeleton className="h-7 w-48 bg-muted/50" />
-                <Skeleton className="h-5 w-64 bg-muted/50" />
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-accent/5">
+             <Skeleton className="h-24 w-24 rounded-full bg-muted/50" />
+             <div className="space-y-2 flex-grow mt-2 sm:mt-0">
+                <Skeleton className="h-8 w-56 bg-muted/50" />
+                <Skeleton className="h-6 w-64 bg-muted/50" />
+                <Skeleton className="h-5 w-40 bg-muted/50" />
              </div>
             <div className="flex gap-2 self-start sm:self-center">
-                <Skeleton className="h-9 w-28 bg-muted/50" />
-                <Skeleton className="h-9 w-28 bg-muted/50" />
+                <Skeleton className="h-9 w-32 bg-muted/50" />
             </div>
         </CardHeader>
         {/* Use p-6 for consistent padding */}
@@ -241,8 +240,11 @@ export default function ProfilePage() {
              {/* Address Skeleton */}
               <div className="space-y-4">
                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-6 w-32 bg-muted/50" />
-                    <Skeleton className="h-9 w-24 bg-muted/50" />
+                    <Skeleton className="h-6 w-36 bg-muted/50" />
+                    <div className="flex gap-2">
+                        <Skeleton className="h-9 w-28 bg-muted/50" />
+                        <Skeleton className="h-9 w-28 bg-muted/50" />
+                    </div>
                  </div>
                  <div className="space-y-3">
                      <Skeleton className="h-16 w-full bg-muted/50" />
@@ -252,21 +254,21 @@ export default function ProfilePage() {
              <Separator />
              {/* Friends/Followed Stores Skeleton */}
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 p-4 border rounded-md">
                      <Skeleton className="h-7 w-7 rounded bg-muted/50" />
                      <Skeleton className="h-5 w-32 bg-muted/50" />
                   </div>
-                   <div className="flex items-center gap-3">
+                   <div className="flex items-center gap-3 p-4 border rounded-md">
                      <Skeleton className="h-7 w-7 rounded bg-muted/50" />
                      <Skeleton className="h-5 w-36 bg-muted/50" />
                   </div>
              </div>
              <Separator />
-             <div className="flex items-center gap-3">
-                 <Skeleton className="h-6 w-6 rounded bg-muted/50" />
+             <div className="flex items-center gap-3 p-4 border rounded-lg bg-gradient-to-r from-yellow-100/20 via-amber-50/20 to-orange-100/20">
+                 <Skeleton className="h-10 w-10 rounded-full bg-muted/50" />
                  <div className="space-y-1">
-                    <Skeleton className="h-4 w-28 bg-muted/50" />
-                    <Skeleton className="h-6 w-20 bg-muted/50" />
+                    <Skeleton className="h-5 w-28 bg-muted/50" />
+                    <Skeleton className="h-7 w-20 bg-muted/50" />
                  </div>
             </div>
         </CardContent>
@@ -416,8 +418,7 @@ export default function ProfilePage() {
                             </CardDescription>
                         )}
                     </div>
-                    <Link href="/profile/account-settings" passHref>
-                        {/* Use primary button */}
+                    <Link href="/profile/account-settings" passHref legacyBehavior>
                          <Button variant="default" size="sm" className="self-start sm:self-center">
                             <Settings className="mr-2 h-4 w-4" /> Account Settings
                         </Button>
@@ -431,7 +432,7 @@ export default function ProfilePage() {
                          {/* Use Heading 3 size */}
                         <div className="flex justify-between items-center">
                             <h3 className="h3 flex items-center gap-2 text-foreground/90"><MapPin className="h-5 w-5 text-primary"/>Delivery Addresses</h3> {/* Use h3 class */}
-                             <Link href="/profile/addresses" passHref>
+                             <Link href="/profile/addresses" passHref legacyBehavior>
                                  <Button variant="outline" size="sm" className="ml-auto mr-2">Manage All</Button>
                              </Link>
                             <Button variant="default" size="sm" onClick={() => handleOpenAddressDialog()}>
@@ -484,6 +485,7 @@ export default function ProfilePage() {
                                                         <AlertDialogDescription>
                                                             Are you sure you want to delete the address labeled "{address.label}"?
                                                             {address.isDefault && profile.addresses.length > 1 && " You must set another address as default before deleting this one."}
+                                                            {profile.addresses.length === 1 && " You cannot delete your only address."}
                                                         </AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>
@@ -563,7 +565,7 @@ export default function ProfilePage() {
                                 {/* Use Heading 3 size */}
                                 <h3 className="h3 flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3> {/* Use h3 class */}
                                 <p className="text-base text-muted-foreground">Manage your stores, products, and orders.</p> {/* Use text-base */}
-                                <Link href="/stores" passHref>
+                                <Link href="/stores" passHref legacyBehavior>
                                      <Button variant="default" size="lg">Go to Store Management</Button> {/* Use size="lg" */}
                                 </Link>
                             </div>
@@ -586,6 +588,126 @@ export default function ProfilePage() {
                     userAddresses={profile.addresses || []} // Ensure addresses is not undefined
                 />
             )}
+
+            <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
+
+            {/* Recent Orders Section */}
+            <div className="space-y-6">
+                 {/* Use Heading 2 size */}
+                <div className="flex justify-between items-center">
+                    <h2 className="h2 flex items-center gap-2"> {/* Use h2 class */}
+                        <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
+                    </h2>
+                     <Link href="/orders" passHref>
+                          <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
+                     </Link>
+                </div>
+
+                 {orderError && !isLoadingOrders && ( // Show order-specific error
+                    <Alert variant="destructive">
+                        <XCircle className="h-4 w-4" />
+                        <AlertTitle>Error Loading Orders</AlertTitle>
+                        <AlertDescription>{orderError}</AlertDescription>
+                    </Alert>
+                )}
+
+                {isLoadingOrders ? <OrderHistorySkeleton /> : orders.length > 0 ? (
+                    <motion.div
+                       variants={listVariants}
+                       initial="hidden"
+                       animate="visible"
+                     >
+                        <Card className="shadow-sm overflow-hidden border">
+                             {/* Remove CardContent padding */}
+                            <CardContent className="p-0">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                             {/* Add padding */}
+                                            <TableHead className="w-[100px] pl-4">Order ID</TableHead>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Store</TableHead>
+                                            <TableHead className="hidden md:table-cell text-right">Total</TableHead>
+                                            <TableHead>Status</TableHead>
+                                             {/* Add padding */}
+                                            <TableHead className="text-right pr-4">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <AnimatePresence>
+                                            {orders.map((order) => {
+                                                const details = orderStatusDetails[order.status];
+                                                const StatusIcon = details.icon;
+                                                const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
+                                                const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
+                                                const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
+
+                                                return (
+                                                     <motion.tr
+                                                        key={order.id}
+                                                        variants={itemVariants}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        exit="exit"
+                                                        layout // Add layout animation
+                                                        className="hover:bg-muted/20 transition-colors duration-150"
+                                                     >
+                                                         {/* Add padding */}
+                                                        <TableCell className="font-mono text-xs pl-4">#{order.id.substring(order.id.length - 6)}</TableCell>
+                                                        <TableCell className="text-xs text-muted-foreground">{format(order.orderDate, 'MMM d, yyyy')}</TableCell>
+                                                        <TableCell className="text-sm">
+                                                            <Link href={`/store/${order.storeId}`} className="hover:underline font-medium">
+                                                                {order.storeName}
+                                                            </Link>
+                                                        </TableCell>
+                                                        <TableCell className="hidden md:table-cell text-right font-medium">{formatCurrency(order.totalAmount)}</TableCell>
+                                                        <TableCell>
+                                                            <Badge
+                                                                variant={details.variant === 'default' ? 'secondary' : details.variant} // Adjust variant logic
+                                                                className={cn(
+                                                                    'capitalize text-[11px] px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit', // Smaller text
+                                                                    details.color,
+                                                                    details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`, // Conditionally apply bg/border
+                                                                    order.status === 'Delivered' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400' // Specific success style
+                                                                )}
+                                                            >
+                                                                <StatusIcon className="h-3 w-3" />
+                                                                <span>{order.status}</span>
+                                                            </Badge>
+                                                        </TableCell>
+                                                         {/* Add padding */}
+                                                        <TableCell className="text-right pr-4">
+                                                            <Link href={`/orders?orderId=${order.id}`} passHref legacyBehavior>
+                                                                 <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="View Order Details">
+                                                                     <Eye className="h-4 w-4 text-foreground/70" />
+                                                                 </Button>
+                                                            </Link>
+                                                        </TableCell>
+                                                    </motion.tr>
+                                                );
+                                            })}
+                                       </AnimatePresence>
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                ) : !orderError && !isLoadingOrders ? (
+                     <Card>
+                         {/* Use p-4 */}
+                         <CardContent className="p-10 text-center text-muted-foreground">
+                            <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
+                           <p className="text-lg font-medium">No recent orders found.</p>
+                            {/* Use Body 2 */}
+                           <p className="text-body2 mt-2">Start shopping to see your orders here!</p>
+                           <Link href="/" passHref legacyBehavior>
+                                <Button variant="default" className="mt-6">Browse Stores</Button>
+                           </Link>
+                       </CardContent>
+                     </Card>
+                ) : null}
+            </div>
+
 
             <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
 
@@ -612,14 +734,17 @@ export default function ProfilePage() {
                         animate="visible"
                     >
                         <Card className="shadow-sm overflow-hidden border">
+                             {/* Remove padding */}
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
+                                             {/* Add padding */}
                                             <TableHead className="pl-4">Offer</TableHead>
                                             <TableHead>Store</TableHead>
                                             <TableHead className="hidden md:table-cell">Next Delivery</TableHead>
                                             <TableHead>Status</TableHead>
+                                             {/* Add padding */}
                                             <TableHead className="text-right pr-4">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -643,6 +768,7 @@ export default function ProfilePage() {
                                                         layout
                                                         className="hover:bg-muted/20 transition-colors duration-150"
                                                     >
+                                                         {/* Add padding */}
                                                         <TableCell className="font-medium pl-4">{sub.offerName}</TableCell>
                                                         <TableCell>
                                                             <Link href={`/store/${sub.storeId}`} className="hover:underline text-primary">
@@ -666,21 +792,22 @@ export default function ProfilePage() {
                                                                 <span>{details.label}</span>
                                                             </Badge>
                                                         </TableCell>
+                                                         {/* Add padding */}
                                                         <TableCell className="text-right pr-4 space-x-1">
                                                             {sub.status === 'active' && (
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-yellow-100/50 dark:hover:bg-yellow-900/30" onClick={() => handleUpdateSubscription(sub.id, 'paused')} disabled={isUpdating}>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-yellow-100/50 dark:hover:bg-yellow-900/30" onClick={() => handleUpdateSubscription(sub.id, 'paused')} disabled={isUpdating} title="Pause Subscription">
                                                                     {isUpdating ? <Loader2 className="h-4 w-4 animate-spin"/> : <Pause className="h-4 w-4 text-yellow-600"/>}
                                                                 </Button>
                                                             )}
                                                             {sub.status === 'paused' && (
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100/50 dark:hover:bg-green-900/30" onClick={() => handleUpdateSubscription(sub.id, 'active')} disabled={isUpdating}>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100/50 dark:hover:bg-green-900/30" onClick={() => handleUpdateSubscription(sub.id, 'active')} disabled={isUpdating} title="Resume Subscription">
                                                                     {isUpdating ? <Loader2 className="h-4 w-4 animate-spin"/> : <Play className="h-4 w-4 text-green-600"/>}
                                                                 </Button>
                                                             )}
                                                             {sub.status !== 'cancelled' && (
                                                                 <AlertDialog>
                                                                     <AlertDialogTrigger asChild>
-                                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" disabled={isUpdating}>
+                                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" disabled={isUpdating} title="Cancel Subscription">
                                                                              {isUpdating ? <Loader2 className="h-4 w-4 animate-spin"/> : <Trash2 className="h-4 w-4"/>}
                                                                         </Button>
                                                                     </AlertDialogTrigger>
@@ -724,7 +851,7 @@ export default function ProfilePage() {
                     <Card>
                         <CardContent className="p-10 text-center text-muted-foreground">
                             <CalendarClock className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
-                            <p className="text-lg font-medium">No active subscriptions found.</p>
+                           <p className="text-lg font-medium">No active subscriptions found.</p>
                             <p className="text-sm mt-2">Explore stores offering daily or weekly deliveries!</p>
                              <Link href="/" passHref legacyBehavior>
                                 <Button variant="default" className="mt-6">Browse Stores</Button>

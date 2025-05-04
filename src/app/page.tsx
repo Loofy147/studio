@@ -79,7 +79,7 @@ export default function HomePage() {
       transition={{ duration: 0.3, delay: delay * 0.05 }}
       className="h-full"
     >
-      {/* Use p-4 for consistent padding */}
+      {/* Use p-4 for card padding */}
       <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-xl border group bg-card p-0">
         <CardHeader className="p-0">
           <div className="relative w-full h-40 overflow-hidden">
@@ -99,22 +99,24 @@ export default function HomePage() {
               </Badge>
             )}
           </div>
-          {/* Use Heading 2 size (h2 element via CardTitle) */}
-          {/* Use p-4 */}
+          {/* Use p-4 pb-2 */}
           <div className="p-4 pb-2">
-              <CardTitle>{store.name}</CardTitle> {/* Renders as h2 */}
-              <Badge variant="outline" className="mt-1 capitalize text-[11px] tracking-wide border-accent/30 text-accent bg-accent/10 px-1.5 py-0.5">{store.category}</Badge>
+              {/* Apply Heading 2 styles */}
+              <CardTitle className="h2">{store.name}</CardTitle>
+              {/* Apply Caption styles */}
+              <Badge variant="outline" className="mt-1 capitalize caption border-accent/30 text-accent bg-accent/10 px-1.5 py-0.5">{store.category}</Badge>
           </div>
         </CardHeader>
         {/* Use p-4 pt-0 */}
         <CardContent className="flex-grow p-4 pt-0">
-          <CardDescription className="text-sm line-clamp-3 text-muted-foreground">{store.description}</CardDescription>
+          {/* Apply Body 2 styles */}
+          <CardDescription className="text-body2 line-clamp-3 text-muted-foreground">{store.description}</CardDescription>
         </CardContent>
-        {/* Solid primary button (variant="default") */}
         {/* Use p-4 pt-0 */}
         <CardFooter className="p-4 pt-0 mt-auto">
           <Link href={`/store/${store.id}`} passHref legacyBehavior>
-              <Button className="w-full group/button" size="sm" variant="default">
+              {/* Use solid primary button */}
+              <Button className="w-full group/button" size="sm" variant="default" withRipple>
                   <Eye className="mr-1.5 h-4 w-4" />
                   Visit Store
                   <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover/button:translate-x-1" />
@@ -153,21 +155,21 @@ export default function HomePage() {
                 </Link>
              )}
           </div>
-          {/* Use Heading 2 size (h2 element via CardTitle) */}
           {/* Use p-3 pb-0 */}
           <div className="p-3 pb-0">
-            <CardTitle>{product.name}</CardTitle> {/* Renders as h2 */}
+             {/* Apply Heading 2 styles */}
+            <CardTitle className="h2 line-clamp-1">{product.name}</CardTitle>
           </div>
         </CardHeader>
-        {/* Use Heading 2 size for price */}
         {/* Use p-3 pt-1 */}
         <CardContent className="flex-grow p-3 pt-1">
-          <p className="h2 text-primary font-bold">{formatCurrency(product.price)}</p> {/* Use h2 class, themed color */}
+          {/* Apply Heading 2 styles */}
+          <p className="h2 text-primary font-bold">{formatCurrency(product.price)}</p>
         </CardContent>
-        {/* Use solid primary button */}
         {/* Use p-3 pt-0 */}
         <CardFooter className="p-3 pt-0 mt-auto">
-             <Button size="sm" variant="default" className="w-full group/button h-8"> {/* Use default variant, no uppercase override */}
+             {/* Use solid primary button */}
+             <Button size="sm" variant="default" className="w-full group/button h-8" withRipple>
                  View Details <ArrowRight className="ml-auto h-3 w-3 transition-transform duration-300 group-hover/button:translate-x-0.5" />
              </Button>
         </CardFooter>
@@ -180,15 +182,18 @@ export default function HomePage() {
     // Use p-0 for card, p-4 for header/footer/content
      <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50 p-0">
         <Skeleton className="h-40 w-full bg-muted/50" />
+        {/* Use p-4 pb-2 */}
         <CardHeader className="p-4 pb-2">
             <Skeleton className="h-6 w-3/4 mb-1 bg-muted/50" />
             <Skeleton className="h-4 w-1/4 bg-muted/50" />
         </CardHeader>
+        {/* Use p-4 pt-0 */}
         <CardContent className="p-4 pt-0 space-y-1">
             <Skeleton className="h-4 w-full bg-muted/50" />
             <Skeleton className="h-4 w-5/6 bg-muted/50" />
         </CardContent>
-        <CardFooter className="p-4 pt-2">
+        {/* Use p-4 pt-2 */}
+        <CardFooter className="p-4 pt-0">
             <Skeleton className="h-9 w-full bg-muted/50" />
         </CardFooter>
     </Card>
@@ -197,12 +202,15 @@ export default function HomePage() {
    const ProductSkeleton = () => (
      <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50 p-0"> {/* Use p-0 */}
         <Skeleton className="h-32 w-full bg-muted/50 rounded-t-md" />
+        {/* Use p-3 pb-0 */}
         <CardHeader className="p-3 pb-0">
             <Skeleton className="h-6 w-3/4 mb-1 bg-muted/50" />
         </CardHeader>
+         {/* Use p-3 pt-1 */}
         <CardContent className="p-3 pt-1">
              <Skeleton className="h-6 w-1/3 bg-muted/50" />
         </CardContent>
+        {/* Use p-3 pt-0 */}
         <CardFooter className="p-3 pt-0">
             <Skeleton className="h-8 w-full bg-muted/50" />
         </CardFooter>
@@ -214,7 +222,7 @@ export default function HomePage() {
       <div className="flex min-h-screen">
          <Sidebar side="left" collapsible="icon" variant="inset" className="bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
            <SidebarHeader className="p-2 border-b border-sidebar-border group-data-[collapsible=icon]:justify-center">
-             <span className="font-semibold text-lg group-data-[collapsible=icon]:hidden">Categories</span>
+             <span className="overline group-data-[collapsible=icon]:hidden">Categories</span> {/* Use Overline */}
              <span className="group-data-[collapsible=icon]:flex items-center justify-center hidden">
                 <Filter className="h-5 w-5"/>
              </span>
@@ -234,7 +242,7 @@ export default function HomePage() {
                                 isActive={selectedCategory === category}
                                 onClick={() => setSelectedCategory(category as StoreCategory | "all")}
                                 tooltip={category === "all" ? "All Categories" : category}
-                                className="capitalize w-full justify-start text-sm data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                                className="capitalize w-full justify-start text-body2 data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" // Use Body 2
                                 variant="ghost"
                             >
                                 <span className="group-data-[collapsible=icon]:hidden">{category === "all" ? "All Categories" : category}</span>
@@ -249,11 +257,11 @@ export default function HomePage() {
          </Sidebar>
 
          <SidebarInset className="flex-1 flex flex-col">
-            {/* Use p-6 spacing, space-y-8 */}
+            {/* Use p-6 spacing, space-y-10 */}
             <LayoutAnimator>
-                <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
+                <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-10">
 
-                    {/* Hero/Welcome Section - Adjusted styles */}
+                    {/* Hero/Welcome Section - Use H1, lead text */}
                     <section className="text-center py-12 md:py-16 px-4 bg-gradient-to-br from-primary/10 via-background to-secondary/5 rounded-xl shadow-sm border border-primary/10 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full opacity-30 -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
                         <div className="absolute bottom-0 right-0 w-48 h-48 bg-secondary/10 rounded-full opacity-30 translate-x-1/3 translate-y-1/3 blur-3xl"></div>
@@ -262,7 +270,7 @@ export default function HomePage() {
                          initial={{ opacity: 0, y: -20 }}
                          animate={{ opacity: 1, y: 0 }}
                          transition={{ duration: 0.5 }}
-                         className="h1 text-primary mb-4 relative z-10" // Use h1 class
+                         className="h1 text-primary mb-4 relative z-10"
                       >
                         Welcome to SwiftDispatch!
                      </motion.h1>
@@ -270,7 +278,7 @@ export default function HomePage() {
                          initial={{ opacity: 0, y: 10 }}
                          animate={{ opacity: 1, y: 0 }}
                          transition={{ duration: 0.5, delay: 0.2 }}
-                         className="lead max-w-2xl mx-auto relative z-10" // Use lead class
+                         className="lead max-w-2xl mx-auto relative z-10"
                      >
                         Discover local gems, find unique products, and get everything delivered swiftly to your door.
                       </motion.p>
@@ -299,9 +307,9 @@ export default function HomePage() {
                         </Alert>
                      )}
 
-                    {/* Best Selling Products Section - Use space-y-6 */}
+                    {/* Best Selling Products Section - Use H2, space-y-6 */}
                     <section className="space-y-6">
-                      <h2 className="h2 flex items-center gap-2 border-b pb-3 text-foreground/90"> {/* Use h2 class */}
+                      <h2 className="h2 flex items-center gap-2 border-b pb-3 text-foreground/90">
                         <TrendingUp className="text-secondary" /> Best Selling Products
                       </h2>
                       {isLoadingProducts ? (
@@ -322,16 +330,16 @@ export default function HomePage() {
                             </AnimatePresence>
                         </motion.div>
                       ) : (
-                        <p className="muted italic text-center py-4">No best selling products found at the moment.</p> {/* Use muted class */}
+                        <p className="caption italic text-center py-4">No best selling products found at the moment.</p>
                       )}
                     </section>
 
-                     {/* Become a Driver Section - Use themed primary background, added animation */}
+                     {/* Become a Driver Section - Use H2, solid primary bg, animation */}
                       <motion.section
                          initial={{ opacity: 0, y: 20 }}
-                         whileInView={{ opacity: 1, y: 0 }} // Animate when scrolling into view
-                         viewport={{ once: true, amount: 0.3 }} // Trigger animation once, 30% visible
-                         transition={{ duration: 0.5 }}
+                         whileInView={{ opacity: 1, y: 0 }}
+                         viewport={{ once: true, amount: 0.3 }}
+                         transition={{ duration: 0.5, delay: 0.1 }}
                          className="bg-primary text-primary-foreground p-8 md:p-12 rounded-lg shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden"
                         >
                          <div className="absolute inset-0 opacity-10 bg-[url('/circuit-pattern.svg')] bg-repeat mix-blend-overlay"></div>
@@ -342,8 +350,8 @@ export default function HomePage() {
                             transition={{ delay: 0.2, type: 'spring', stiffness: 100 }}
                             className="flex-1 relative z-10 text-center md:text-left"
                         >
-                            <h2 className="h2 font-bold mb-3 flex items-center justify-center md:justify-start gap-2"> {/* Use h2 class */}
-                                <TruckIcon className="h-8 w-8 animate-spin-wheel" style={{ animationDuration: '2s' }}/> {/* Apply wheel spin animation */}
+                            <h2 className="h2 font-bold mb-3 flex items-center justify-center md:justify-start gap-2">
+                                <TruckIcon className="h-8 w-8 animate-spin-wheel" style={{ animationDuration: '2s' }}/>
                                 Become a SwiftDispatch Driver!
                             </h2>
                             <p className="text-lg opacity-90">
@@ -357,8 +365,8 @@ export default function HomePage() {
                              transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}
                         >
                             <Link href="/driver/apply" passHref legacyBehavior>
-                                 {/* Use Secondary button (or default outline) for contrast */}
-                                 <Button size="lg" variant="secondary" className="font-bold py-4 px-10 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative z-10"> {/* Removed uppercase override */}
+                                 {/* Use Secondary button for contrast */}
+                                 <Button size="lg" variant="secondary" className="font-bold py-4 px-10 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative z-10" withRipple>
                                    Start Earning Now <ArrowRight className="ml-2 h-5 w-5"/>
                                  </Button>
                             </Link>
@@ -368,9 +376,9 @@ export default function HomePage() {
 
                     <Separator className="my-10 border-border/50"/>
 
-                    {/* Top Stores Section - Use space-y-6 */}
+                    {/* Top Stores Section - Use H2, space-y-6 */}
                     <section className="space-y-6">
-                      <h2 className="h2 flex items-center gap-2 border-b pb-3 text-foreground/90"> {/* Use h2 class */}
+                      <h2 className="h2 flex items-center gap-2 border-b pb-3 text-foreground/90">
                         <Building className="text-primary" /> Top Rated Stores
                       </h2>
                       {isLoadingStores ? (
@@ -391,17 +399,18 @@ export default function HomePage() {
                             </AnimatePresence>
                         </motion.div>
                       ) : (
-                         <p className="muted italic text-center py-4">No top rated stores available yet.</p> {/* Use muted class */}
+                         <p className="caption italic text-center py-4">No top rated stores available yet.</p>
                       )}
                     </section>
 
                     <Separator className="my-10 border-border/50"/>
 
-                    {/* All Stores Section (Filtered) - Use space-y-6 */}
+                    {/* All Stores Section (Filtered) - Use H2, space-y-6 */}
                     <section className="space-y-6">
                       <div className="flex justify-between items-center border-b pb-3 mb-6">
-                        <h2 className="h2">{selectedCategory === 'all' ? 'All Stores' : `Stores in ${selectedCategory}`}</h2> {/* Use h2 class */}
-                        <span className="text-sm text-muted-foreground">
+                        <h2 className="h2">{selectedCategory === 'all' ? 'All Stores' : `Stores in ${selectedCategory}`}</h2>
+                        {/* Use Caption */}
+                        <span className="caption">
                             {isLoadingStores ? 'Loading...' : `${filteredStores.length} store${filteredStores.length !== 1 ? 's' : ''} found`}
                         </span>
                       </div>
@@ -432,7 +441,8 @@ export default function HomePage() {
                           <CardContent className="p-10 text-center text-muted-foreground">
                               <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
                             <p className="text-lg font-medium">No stores found matching your criteria.</p>
-                            <p className="text-sm mt-1">Try adjusting your search or selected category.</p>
+                            {/* Use Body 2 */}
+                            <p className="text-body2 mt-1">Try adjusting your search or selected category.</p>
                             <Button variant="link" onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }} className="mt-4 text-primary h-auto p-0">
                               Clear Search & Filters
                             </Button>
@@ -447,3 +457,4 @@ export default function HomePage() {
     </SidebarProvider>
   );
 }
+

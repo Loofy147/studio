@@ -115,7 +115,7 @@ export default function CartPage() {
         }
         console.log("Placing order with:", { cartItems, deliveryAddressId: selectedAddressId, deliveryMethod, paymentMethod, promoCode, total });
         // In a real app: send order to backend, clear cart, navigate to order confirmation
-        toast({ title: "Order Placed!", description: "Thank you for your purchase!" });
+        toast({ title: "Order Placed!", description: "Thank you for your purchase!", variant: "default" }); // Use accent for success?
         setCartItems([]); // Clear cart on successful order (mock)
     };
 
@@ -158,18 +158,23 @@ export default function CartPage() {
     };
 
     return (
+        // Use space-y-10
         <div className="container mx-auto px-4 py-12 space-y-10">
             <div className="flex items-center gap-3 border-b pb-4">
                 <ShoppingCart className="h-8 w-8 text-primary" />
-                <h1 className="text-3xl font-bold tracking-tight">Your Shopping Cart</h1>
+                {/* Use H1 */}
+                <h1 className="h1">Your Shopping Cart</h1>
             </div>
 
+             {/* Use space-x-12 gutter */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
                 {/* Cart Items Section */}
+                 {/* Use space-y-6 */}
                 <div className="lg:col-span-2 space-y-6">
                     <Card className="shadow-sm border">
                         <CardHeader>
-                            <CardTitle>Items in Cart ({cartItems.length})</CardTitle>
+                            {/* Use H3 */}
+                            <CardTitle className="h3">Items in Cart ({cartItems.length})</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
                             {cartItems.length > 0 ? (
@@ -183,6 +188,7 @@ export default function CartPage() {
                                                 initial="hidden"
                                                 animate="visible"
                                                 exit="exit"
+                                                // Use p-4
                                                 className="flex items-center gap-4 px-4 py-4 hover:bg-muted/30 transition-colors duration-150"
                                             >
                                                 <Image
@@ -194,16 +200,19 @@ export default function CartPage() {
                                                     data-ai-hint={`${item.category} product`}
                                                 />
                                                 <div className="flex-grow">
+                                                     {/* Use Body 1 for link */}
                                                     <Link href={`/store/${item.storeId}?product=${item.productId}`} className="font-semibold text-base hover:text-primary hover:underline line-clamp-1">{item.name}</Link>
-                                                    <p className="text-sm text-muted-foreground">From: <Link href={`/store/${item.storeId}`} className="hover:underline">{item.storeName}</Link></p>
-                                                    <p className="text-sm font-medium">{formatCurrency(item.price)}</p>
+                                                     {/* Use Body 2 */}
+                                                    <p className="text-body2 text-muted-foreground">From: <Link href={`/store/${item.storeId}`} className="hover:underline">{item.storeName}</Link></p>
+                                                     {/* Use Body 2 */}
+                                                    <p className="text-body2 font-medium">{formatCurrency(item.price)}</p>
                                                 </div>
                                                 <div className="flex items-center gap-2 border rounded-md p-1">
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleQuantityChange(item.productId, -1)}> - </Button>
-                                                    <span className="text-sm font-medium w-5 text-center">{item.quantity}</span>
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleQuantityChange(item.productId, 1)}> + </Button>
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleQuantityChange(item.productId, -1)} withRipple> - </Button>
+                                                    <span className="text-body2 font-medium w-5 text-center">{item.quantity}</span>
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleQuantityChange(item.productId, 1)} withRipple> + </Button>
                                                 </div>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => handleRemoveItem(item.productId)} title="Remove Item">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => handleRemoveItem(item.productId)} title="Remove Item" withRipple>
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </motion.div>
@@ -211,8 +220,10 @@ export default function CartPage() {
                                     </AnimatePresence>
                                 </motion.div>
                             ) : (
+                                // Use p-4
                                 <div className="p-10 text-center text-muted-foreground">
                                      <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
+                                     {/* Use Body 1 */}
                                     <p>Your cart is currently empty.</p>
                                     <Link href="/" passHref>
                                         <Button variant="link" className="mt-2 text-primary">Continue Shopping</Button>
@@ -224,11 +235,14 @@ export default function CartPage() {
                 </div>
 
                 {/* Order Summary Section */}
+                 {/* Use space-y-6 */}
                 <div className="lg:col-span-1 space-y-6">
                     <Card className="shadow-sm border sticky top-24"> {/* Make summary sticky */}
                         <CardHeader>
-                            <CardTitle>Order Summary</CardTitle>
+                             {/* Use H3 */}
+                            <CardTitle className="h3">Order Summary</CardTitle>
                         </CardHeader>
+                         {/* Use space-y-4 */}
                         <CardContent className="space-y-4">
                             {/* Delivery Address Selector */}
                              <div className="space-y-2">
@@ -245,13 +259,15 @@ export default function CartPage() {
                                                 </SelectItem>
                                             ))}
                                              <Separator className="my-1"/>
-                                             <Link href="/profile#addresses" passHref>
-                                                 <p className="text-xs px-2 py-1.5 hover:bg-accent rounded-sm cursor-pointer">Manage Addresses</p>
+                                             <Link href="/profile/addresses" passHref>
+                                                 {/* Apply Caption */}
+                                                 <p className="caption px-2 py-1.5 hover:bg-accent rounded-sm cursor-pointer">Manage Addresses</p>
                                             </Link>
                                         </SelectContent>
                                     </Select>
                                 )}
-                                {selectedAddressObj && <p className="text-xs text-muted-foreground px-1">{formatAddress(selectedAddressObj)}</p>}
+                                 {/* Apply Caption */}
+                                {selectedAddressObj && <p className="caption px-1">{formatAddress(selectedAddressObj)}</p>}
                              </div>
 
                             {/* Delivery Method */}
@@ -295,12 +311,13 @@ export default function CartPage() {
                                      <Label htmlFor="promo-code">Promo Code</Label>
                                      <Input id="promo-code" placeholder="Enter code" value={promoCode} onChange={(e) => setPromoCode(e.target.value)} />
                                 </div>
-                                 <Button variant="secondary" disabled={!promoCode}>Apply</Button>
+                                 <Button variant="secondary" disabled={!promoCode} withRipple>Apply</Button>
                              </div>
                              <Separator />
 
                              {/* Cost Breakdown */}
-                             <div className="space-y-1.5 text-sm">
+                              {/* Apply Body 2 */}
+                             <div className="space-y-1.5 text-body2">
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Subtotal</span>
                                     <span>{formatCurrency(subtotal)}</span>
@@ -320,6 +337,7 @@ export default function CartPage() {
                                     </div>
                                 )}
                                  <Separator className="my-2"/>
+                                  {/* Apply Body 1 */}
                                  <div className="flex justify-between font-semibold text-base">
                                     <span>Total</span>
                                     <span>{formatCurrency(total)}</span>
@@ -327,7 +345,8 @@ export default function CartPage() {
                              </div>
                         </CardContent>
                         <CardFooter>
-                            <Button className="w-full" size="lg" onClick={handlePlaceOrder} disabled={cartItems.length === 0 || !selectedAddressId || isLoadingProfile}>
+                             {/* Use Primary button */}
+                            <Button className="w-full" size="lg" onClick={handlePlaceOrder} disabled={cartItems.length === 0 || !selectedAddressId || isLoadingProfile} withRipple>
                                 {paymentMethod === 'card' ? <CreditCard className="mr-2 h-5 w-5" /> : <Wallet className="mr-2 h-5 w-5" />}
                                 {paymentMethod === 'card' ? 'Proceed to Checkout' : 'Place Order (Cash)'}
                             </Button>
