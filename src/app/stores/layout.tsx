@@ -12,15 +12,19 @@ import { Logo } from '@/components/Logo'; // Import the new Logo component
 import { Button } from '@/components/ui/button';
 
 // Store Owner specific navigation items
+// Ensure hrefs are unique or use index for keys if duplicates exist
 const storeOwnerNavItems = [
   { href: "/stores", label: "Overview", icon: LayoutDashboard },
   // Link to manage a specific store (will be dynamic later)
   // For now, just placeholders or link back to the list
-  { href: "/stores", label: "Products", icon: Package }, // Potential duplicate href
-  { href: "/stores", label: "Orders", icon: Package }, // Potential duplicate href, Reuse Package icon for orders
-  { href: "/stores", label: "Subscriptions", icon: CalendarClock }, // Potential duplicate href
-  { href: "/stores", label: "Promotions", icon: Ticket }, // Potential duplicate href
-  { href: "/stores", label: "Analytics", icon: BarChart }, // Potential duplicate href
+  // NOTE: Removed duplicate '/stores' links. If specific pages are needed,
+  // they should have unique hrefs like '/stores/products', '/stores/orders' etc.
+  // Temporarily pointing them back to /stores for now until specific pages exist.
+  { href: "/stores#products", label: "Products", icon: Package },
+  { href: "/stores#orders", label: "Orders", icon: Package },
+  { href: "/stores#subscriptions", label: "Subscriptions", icon: CalendarClock },
+  { href: "/stores#promotions", label: "Promotions", icon: Ticket },
+  { href: "/stores#analytics", label: "Analytics", icon: BarChart },
   { href: "/stores/settings", label: "Store Settings", icon: Settings },
 ];
 
