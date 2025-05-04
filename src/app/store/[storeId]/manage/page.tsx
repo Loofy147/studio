@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Store, Product, DailyOffer, Promotion, getStoreById, createProduct, createDailyOffer, dailyOfferEligibleCategories, deleteProduct, deleteDailyOffer, createPromotion, deletePromotion, toggleStoreOpenStatus } from '@/services/store'; // Import Promotion, createPromotion, deletePromotion, toggleStoreOpenStatus
+import { Store, Product, DailyOffer, Promotion, getStoreById, createProduct, createDailyOffer, dailyOfferEligibleCategories, deleteProduct, deleteDailyOffer, createPromotion, deletePromotion, toggleStoreOpenStatus, StoreCategory } from '@/services/store'; // Import Promotion, createPromotion, deletePromotion, toggleStoreOpenStatus, StoreCategory
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductForm } from "@/components/ProductForm";
@@ -50,12 +50,12 @@ export default function StoreManagePage() {
   const { toast } = useToast();
   const userId = "user123"; // Hardcoded owner ID for demo
 
-  const [store, setStore] = useState<Store | null(null);
+  const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [dailyOffers, setDailyOffers] = useState<DailyOffer[]>([]);
   const [promotions, setPromotions] = useState<Promotion[]>([]); // Add state for promotions
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null(null);
+  const [error, setError] = useState<string | null>(null);
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [showNewOfferForm, setShowNewOfferForm] = useState(false);
   const [showNewPromotionForm, setShowNewPromotionForm] = useState(false); // State for promotion form
@@ -398,7 +398,7 @@ export default function StoreManagePage() {
                                         <ProductForm
                                             onProductCreated={handleProductCreated}
                                             storeId={store.id}
-                                            storeCategory={store.category}
+                                            storeCategory={store.category as StoreCategory}
                                         />
                                     </div>
                                 </motion.div>
