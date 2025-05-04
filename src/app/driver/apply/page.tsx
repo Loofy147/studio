@@ -24,7 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Truck as TruckIcon, User, Mail, Phone, Car, Motorcycle, Bike, Info } from 'lucide-react';
+// Updated: Replaced Motorcycle with Moped
+import { Truck as TruckIcon, User, Mail, Phone, Car, Moped, Bike, Info } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -219,7 +220,8 @@ export default function DriverApplyPage() {
                                             </FormControl>
                                             <SelectContent>
                                                 <SelectItem value="car"><div className="flex items-center gap-2"><Car className="h-4 w-4 text-muted-foreground"/>Car</div></SelectItem>
-                                                <SelectItem value="motorcycle"><div className="flex items-center gap-2"><Motorcycle className="h-4 w-4 text-muted-foreground"/>Motorcycle</div></SelectItem>
+                                                {/* Updated: Replaced Motorcycle with Moped */}
+                                                <SelectItem value="motorcycle"><div className="flex items-center gap-2"><Moped className="h-4 w-4 text-muted-foreground"/>Motorcycle</div></SelectItem>
                                                 <SelectItem value="bicycle"><div className="flex items-center gap-2"><Bike className="h-4 w-4 text-muted-foreground"/>Bicycle</div></SelectItem>
                                                 <SelectItem value="scooter">Scooter</SelectItem>
                                                 <SelectItem value="van">Van/Truck</SelectItem>
