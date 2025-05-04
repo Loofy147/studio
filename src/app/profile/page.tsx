@@ -31,6 +31,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutAnimator } from "@/components/LayoutAnimator"; // Ensure correct import
 
+
 // Re-define AddressFormData if needed or import from a shared types file
 interface AddressFormData {
     id?: string;
@@ -73,10 +74,6 @@ export default function ProfilePage() {
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [isLoadingSubs, setIsLoadingSubs] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Note: States related to address dialog and editing removed as they belong to sub-pages
-  // const [updatingSubId, setUpdatingSubId] = useState<string | null>(null);
-  // const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
-  // const [currentAddress, setCurrentAddress] = useState<AddressFormData | null>(null);
 
 
   useEffect(() => {
@@ -675,7 +672,7 @@ export default function ProfilePage() {
                            <p className="text-lg font-medium">No active subscriptions found.</p>
                             {/* Use Body 2 */}
                             <p className="text-body2 mt-2">Explore stores offering daily or weekly deliveries!</p>
-                             <Link href="/" passHref>
+                             <Link href="/" passHref legacyBehavior>
                                 <Button variant="default" className="mt-6" withRipple>Browse Stores</Button>
                              </Link>
                         </CardContent>
@@ -686,5 +683,3 @@ export default function ProfilePage() {
     </LayoutAnimator>
   );
 }
-
-    
