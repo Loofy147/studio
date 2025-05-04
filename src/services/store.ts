@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 
 // Expanded store categories
@@ -116,6 +115,8 @@ export interface UserProfile {
     role?: 'customer' | 'store_owner' | 'driver' | 'admin' | string; // User role
     status?: 'active' | 'disabled' | 'pending' | string; // User account status
     joinedAt?: Date; // When the user joined
+    friendIds?: string[]; // IDs of other users who are friends
+    followedStoreIds?: string[]; // IDs of stores the user follows
 }
 
 export interface Order {
@@ -430,22 +431,39 @@ function generateMockUserProfiles(): UserProfile[] {
         id: "user123", name: "Alex Ryder", email: "alex.ryder@example.com", loyaltyPoints: 285, role: 'customer', status: 'active', joinedAt: new Date(Date.now() - 150 * 86400000),
         addresses: generateAddresses(2, 0), // Home (default), Work
         phone: '555-111-2222',
+        friendIds: ['user-friend-1', 'owner-001'], // Example friends
+        followedStoreIds: ['store-1', 'store-3', 'store-9'], // Example followed stores
     });
     users.push({
         id: "owner-001", name: "Eleanor Vance", email: "eleanor@electromart.com", loyaltyPoints: 50, role: 'store_owner', status: 'active', joinedAt: new Date(Date.now() - 300 * 86400000),
         addresses: generateAddresses(1, 0), // Home (default)
         phone: '555-333-4444',
+        friendIds: ['user123'],
+        followedStoreIds: [],
     });
     users.push({
         id: "driver-001", name: "Driver Dan", email: "dan.driver@dispatch.com", loyaltyPoints: 15, role: 'driver', status: 'active', joinedAt: new Date(Date.now() - 90 * 86400000),
         addresses: [], // Drivers might not need delivery addresses stored this way
         phone: '555-555-6666',
+        friendIds: [],
+        followedStoreIds: ['store-10'],
     });
     users.push({
         id: "admin-001", name: "Admin User", email: "admin@swiftdispatch.example", loyaltyPoints: 0, role: 'admin', status: 'active', joinedAt: new Date(Date.now() - 500 * 86400000),
         addresses: [],
         phone: '555-777-8888',
+        friendIds: [],
+        followedStoreIds: [],
     });
+    // Add a sample friend for user123
+    users.push({
+        id: "user-friend-1", name: "Beth Green", email: "beth.g@example.com", loyaltyPoints: 550, role: 'customer', status: 'active', joinedAt: new Date(Date.now() - 200 * 86400000),
+        addresses: generateAddresses(1, 0),
+        phone: '555-999-0000',
+        friendIds: ['user123'],
+        followedStoreIds: ['store-2', 'store-8'],
+    });
+
 
     // Add more random users with addresses
     for (let i = 0; i < 20; i++) {
@@ -464,7 +482,9 @@ function generateMockUserProfiles(): UserProfile[] {
             status: statuses[Math.floor(Math.random() * statuses.length)],
             joinedAt: new Date(Date.now() - Math.random() * 500 * 86400000),
             addresses: generateAddresses(numAddresses, defaultAddressIndex),
-            phone: `555-1${i.toString().padStart(2,'0')}-1234`
+            phone: `555-1${i.toString().padStart(2,'0')}-1234`,
+            friendIds: [], // Start with no friends for random users
+            followedStoreIds: [], // Start with no followed stores
         });
     }
 
@@ -554,7 +574,7 @@ function generateMockSubscriptions(userId: string, offers: DailyOffer[], stores:
             id: `sub-${userId}-${offer.id.slice(-4)}`, // Make ID slightly more unique
             userId: userId,
             offerId: offer.id,
-            storeId: offer.storeId,
+            storeId: store.id,
             storeName: store.name,
             offerName: offer.name,
             startDate: startDate,
@@ -580,6 +600,11 @@ async function initializeMockData() {
                 const potentialOwner = mockUserProfiles!.find(u => u.role === 'store_owner' && Math.random() > 0.5); // Assign randomly
                  if (potentialOwner) store.ownerId = potentialOwner.id;
             }
+            // Assign initial followedStoreIds to user123 if not already set (for demo)
+             const user123 = mockUserProfiles?.find(u => u.id === 'user123');
+             if (user123 && !user123.followedStoreIds) {
+                user123.followedStoreIds = ['store-1', 'store-3', 'store-9'];
+             }
         })
     }
     if (!mockProducts) {
@@ -813,7 +838,7 @@ export async function createSubscription(userId: string, offerId: string): Promi
     const offer = mockDailyOffers!.find(o => o.id === offerId);
     const store = mockStores!.find(s => s.id === offer?.storeId);
     // Ensure store is active and open for new subscriptions
-    if (!offer || !store || !offer.isActive || !store.isActive || !store.isOpen) throw new Error("Offer not available for subscription at this time.");
+    if (!offer || !store || !offer.isActive || !store.isOpen) throw new Error("Offer not available for subscription at this time.");
     const newSubscription: Subscription = {
         id: `sub-${userId}-${offerId.slice(-4)}`, userId, offerId, storeId: store.id, storeName: store.name,
         offerName: offer.name, startDate: new Date(), status: 'active',
@@ -1056,6 +1081,114 @@ export async function deleteUserAddress(userId: string, addressId: string): Prom
 }
 
 
+// --- FRIEND & FOLLOW FUNCTIONS ---
+
+// Function to get profiles of friends based on IDs
+export async function getFriendProfiles(friendIds: string[]): Promise<UserProfile[]> {
+    console.log("Fetching friend profiles for IDs:", friendIds);
+    await initializeMockData();
+    const friends = mockUserProfiles!.filter(p => friendIds.includes(p.id));
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(friends.map(f => ({...f}))); // Return copies
+        }, 150);
+    });
+}
+
+// Function for user to follow a store
+export async function followStore(userId: string, storeId: string): Promise<UserProfile | null> {
+    console.log(`User ${userId} following store ${storeId}`);
+    await initializeMockData();
+    const userIndex = mockUserProfiles!.findIndex(p => p.id === userId);
+    if (userIndex === -1) return null;
+
+    const followedIds = new Set(mockUserProfiles![userIndex].followedStoreIds || []);
+    if (!followedIds.has(storeId)) {
+        followedIds.add(storeId);
+        mockUserProfiles![userIndex].followedStoreIds = Array.from(followedIds);
+        console.log("Store followed successfully");
+    } else {
+        console.log("User already following this store");
+    }
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({...mockUserProfiles![userIndex]});
+        }, 100);
+    });
+}
+
+// Function for user to unfollow a store
+export async function unfollowStore(userId: string, storeId: string): Promise<UserProfile | null> {
+    console.log(`User ${userId} unfollowing store ${storeId}`);
+    await initializeMockData();
+    const userIndex = mockUserProfiles!.findIndex(p => p.id === userId);
+    if (userIndex === -1) return null;
+
+    mockUserProfiles![userIndex].followedStoreIds = (mockUserProfiles![userIndex].followedStoreIds || []).filter(id => id !== storeId);
+    console.log("Store unfollowed successfully");
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({...mockUserProfiles![userIndex]});
+        }, 100);
+    });
+}
+
+// Function to add a friend (mutual)
+export async function addFriend(userId: string, friendId: string): Promise<UserProfile | null> {
+    console.log(`User ${userId} adding friend ${friendId}`);
+    await initializeMockData();
+    const userIndex = mockUserProfiles!.findIndex(p => p.id === userId);
+    const friendIndex = mockUserProfiles!.findIndex(p => p.id === friendId);
+
+    if (userIndex === -1 || friendIndex === -1 || userId === friendId) return null; // Cannot friend self
+
+    // Add friend to user's list
+    const userFriendIds = new Set(mockUserProfiles![userIndex].friendIds || []);
+    userFriendIds.add(friendId);
+    mockUserProfiles![userIndex].friendIds = Array.from(userFriendIds);
+
+    // Add user to friend's list (mutual relationship)
+    const friendFriendIds = new Set(mockUserProfiles![friendIndex].friendIds || []);
+    friendFriendIds.add(userId);
+    mockUserProfiles![friendIndex].friendIds = Array.from(friendFriendIds);
+
+    console.log(`Friendship added between ${userId} and ${friendId}`);
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({...mockUserProfiles![userIndex]}); // Return updated profile of the initiating user
+        }, 100);
+    });
+}
+
+// Function to remove a friend (mutual)
+export async function removeFriend(userId: string, friendId: string): Promise<UserProfile | null> {
+    console.log(`User ${userId} removing friend ${friendId}`);
+    await initializeMockData();
+    const userIndex = mockUserProfiles!.findIndex(p => p.id === userId);
+    const friendIndex = mockUserProfiles!.findIndex(p => p.id === friendId);
+
+    if (userIndex === -1) return null;
+
+    // Remove friend from user's list
+    mockUserProfiles![userIndex].friendIds = (mockUserProfiles![userIndex].friendIds || []).filter(id => id !== friendId);
+
+    // Remove user from friend's list
+    if (friendIndex !== -1) {
+        mockUserProfiles![friendIndex].friendIds = (mockUserProfiles![friendIndex].friendIds || []).filter(id => id !== userId);
+    }
+
+    console.log(`Friendship removed between ${userId} and ${friendId}`);
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({...mockUserProfiles![userIndex]}); // Return updated profile of the initiating user
+        }, 100);
+    });
+}
+
 
 // --- Mock Delete Functions (Placeholder) ---
 export async function deleteStore(storeId: string): Promise<void> {
@@ -1069,6 +1202,10 @@ export async function deleteStore(storeId: string): Promise<void> {
    mockPromotions = mockPromotions?.filter(promo => promo.storeId !== storeId) ?? null;
    mockOrders = mockOrders?.filter(o => o.storeId !== storeId) ?? null;
    mockSubscriptions = mockSubscriptions?.filter(s => s.storeId !== storeId) ?? null;
+   // Also remove from users' followed stores
+   mockUserProfiles?.forEach(user => {
+       user.followedStoreIds = (user.followedStoreIds || []).filter(id => id !== storeId);
+   });
 }
 
 export async function deleteProduct(productId: string): Promise<void> {

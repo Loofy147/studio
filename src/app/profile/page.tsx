@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat, Home, Briefcase, Plus, Building, Lock, CreditCard, Bell } from 'lucide-react'; // Added more icons
+import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat, Home, Briefcase, Plus, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon } from 'lucide-react'; // Added UsersIcon, StoreIcon
 import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
@@ -261,6 +260,18 @@ export default function ProfilePage() {
                  </div>
              </div>
              <Separator />
+             {/* Friends/Followed Stores Skeleton */}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                     <Skeleton className="h-7 w-7 rounded" />
+                     <Skeleton className="h-5 w-32" />
+                  </div>
+                   <div className="flex items-center gap-3">
+                     <Skeleton className="h-7 w-7 rounded" />
+                     <Skeleton className="h-5 w-36" />
+                  </div>
+             </div>
+             <Separator />
              <div className="flex items-center gap-3">
                  <Skeleton className="h-6 w-6 rounded" />
                  <div className="space-y-1">
@@ -409,7 +420,7 @@ export default function ProfilePage() {
                  )}
             </div>
              {/* Link to Account Settings Page */}
-             <Link href="/profile/account-settings" passHref>
+             <Link href="/profile/account-settings" passHref legacyBehavior>
                 <Button variant="outline" size="sm" className="self-start sm:self-center">
                     <Settings className="mr-2 h-4 w-4" /> Account Settings
                 </Button>
@@ -497,6 +508,37 @@ export default function ProfilePage() {
                 )}
              </div>
 
+             {/* Friends & Followed Stores Links */}
+             <Separator />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Link href="/profile/friends" passHref legacyBehavior>
+                         <Card className="hover:bg-muted/40 transition-colors cursor-pointer h-full">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-base font-medium flex items-center gap-2">
+                                    <UsersIcon className="h-5 w-5 text-primary"/> My Friends
+                                </CardTitle>
+                                <span className="text-sm text-muted-foreground">({profile.friendIds?.length || 0})</span>
+                            </CardHeader>
+                             <CardContent>
+                                <p className="text-xs text-muted-foreground">View and manage your friends list.</p>
+                             </CardContent>
+                        </Card>
+                     </Link>
+                    <Link href="/profile/followed-stores" passHref legacyBehavior>
+                         <Card className="hover:bg-muted/40 transition-colors cursor-pointer h-full">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-base font-medium flex items-center gap-2">
+                                    <StoreIcon className="h-5 w-5 text-primary"/> Followed Stores
+                                </CardTitle>
+                                 <span className="text-sm text-muted-foreground">({profile.followedStoreIds?.length || 0})</span>
+                            </CardHeader>
+                             <CardContent>
+                                <p className="text-xs text-muted-foreground">See updates from stores you follow.</p>
+                             </CardContent>
+                        </Card>
+                     </Link>
+                </div>
+
             <Separator />
 
             {/* Loyalty Points */}
@@ -509,7 +551,6 @@ export default function ProfilePage() {
                  </div>
             </div>
 
-            {/* Removed Account Settings Section Link - Now in header */}
 
             {/* Store Management Link (Conditional) */}
              {profile.role === 'store_owner' && (
@@ -691,9 +732,9 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-semibold flex items-center gap-2">
                 <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
             </h2>
-             <Link href="/orders" passHref>
-                 <Button variant="link" className="text-primary px-0">View All Orders</Button>
-             </Link>
+            <Button asChild variant="link" className="text-primary px-0">
+                <Link href="/orders">View All Orders</Link>
+            </Button>
         </div>
 
         {orderError && !isLoadingOrders && ( // Show order-specific error
@@ -795,5 +836,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    

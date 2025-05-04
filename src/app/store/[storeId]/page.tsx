@@ -1,15 +1,14 @@
-
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from 'next/navigation'; // Use hook for client components
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getStoreById, Store, Product, DailyOffer, createSubscription, dailyOfferEligibleCategories } from "@/services/store"; // Updated service import
+import { getStoreById, Store, Product, DailyOffer, createSubscription, dailyOfferEligibleCategories, getUserProfile, UserProfile, followStore, unfollowStore } from "@/services/store"; // Added follow/unfollow
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { ArrowLeft, ShoppingCart, Star, Plus, Filter, Tag, Clock, MapPin, CalendarClock, Repeat, CheckCircle, XCircle, Store as StoreIcon, Bell } from 'lucide-react'; // Added XCircle, StoreIcon, Bell
+import { ArrowLeft, ShoppingCart, Star, Plus, Filter, Tag, Clock, MapPin, CalendarClock, Repeat, CheckCircle, XCircle, Store as StoreIcon, Bell, BookmarkPlus, BookmarkMinus } from 'lucide-react'; // Added Bookmark icons
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast"; // Import useToast
 import { Separator } from "@/components/ui/separator"; // Import Separator
@@ -35,18 +34,23 @@ const getThemeClass = (category: Store['category'] | undefined): string => {
 export default function StorePage() {
   const params = useParams();
   const storeId = params.storeId as string; // Get storeId from URL parameters
+  const userId = "user123"; // Hardcoded for demo - replace with auth context
   const { toast } = useToast(); // Initialize toast
 
   const [store, setStore] = useState<Store | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null); // Add user profile state
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true); // Loading state for profile
   const [error, setError] = useState<string | null>(null);
   const [selectedProductCategory, setSelectedProductCategory] = useState<string>("all");
   const [isSubscribing, setIsSubscribing] = useState<string | null>(null); // Track which offer is being subscribed to
+  const [isTogglingFollow, setIsTogglingFollow] = useState(false); // State for follow button loading
 
   useEffect(() => {
     if (!storeId) {
         setError("Store ID is missing.");
         setIsLoading(false);
+        setIsLoadingProfile(false);
         return;
     };
 
@@ -54,12 +58,8 @@ export default function StorePage() {
       setIsLoading(true);
       setError(null);
       try {
-        // Simulate loading
-        // await new Promise(resolve => setTimeout(resolve, 500));
         const storeDetails = await getStoreById(storeId);
         if (storeDetails) {
-            // Only show active stores by default, but allow viewing if directly linked?
-            // For now, let's show it but indicate status clearly.
            setStore(storeDetails);
         } else {
             setError("Store not found.");
@@ -72,8 +72,23 @@ export default function StorePage() {
       }
     };
 
+     const fetchUserProfile = async () => {
+        setIsLoadingProfile(true);
+         try {
+            const profile = await getUserProfile(userId);
+            setUserProfile(profile);
+         } catch (err) {
+             console.error("Failed to fetch user profile:", err);
+             // Optionally handle profile loading error separately
+             // setError("Could not load user information.");
+         } finally {
+             setIsLoadingProfile(false);
+         }
+     }
+
     fetchStoreDetails();
-  }, [storeId]);
+    fetchUserProfile();
+  }, [storeId, userId]);
 
    // Memoize product categories
     const productCategories = useMemo(() => {
@@ -95,6 +110,11 @@ export default function StorePage() {
        if (!store?.isActive || !store.isOpen) return [];
       return store?.dailyOffers?.filter(offer => offer.isActive) || [];
    }, [store?.dailyOffers, store?.isActive, store?.isOpen]);
+
+   // Check if the current user is following this store
+   const isFollowing = useMemo(() => {
+       return userProfile?.followedStoreIds?.includes(storeId) ?? false;
+   }, [userProfile?.followedStoreIds, storeId]);
 
 
    const handleAddToCart = (product: Product) => {
@@ -132,7 +152,7 @@ export default function StorePage() {
         setIsSubscribing(offer.id);
         console.log(`Subscribing to ${offer.name} from ${store.name}`);
         // Assume userId is available (e.g., from auth context)
-        const userId = "user123";
+        // const userId = "user123"; // Already defined above
 
         try {
             await createSubscription(userId, offer.id);
@@ -157,6 +177,39 @@ export default function StorePage() {
             setIsSubscribing(null);
         }
    };
+
+    const handleToggleFollow = useCallback(async () => {
+        if (!userProfile || !store) return;
+        setIsTogglingFollow(true);
+        try {
+            let updatedProfile;
+            if (isFollowing) {
+                updatedProfile = await unfollowStore(userId, storeId);
+            } else {
+                updatedProfile = await followStore(userId, storeId);
+            }
+            if (updatedProfile) {
+                setUserProfile(updatedProfile); // Update local profile state
+                toast({
+                    title: isFollowing ? "Store Unfollowed" : "Store Followed",
+                    description: `You are now ${isFollowing ? 'no longer following' : 'following'} ${store.name}.`,
+                    variant: isFollowing ? "destructive" : "default",
+                });
+            } else {
+                throw new Error("Failed to update follow status.");
+            }
+        } catch (err) {
+            console.error("Failed to toggle follow:", err);
+            toast({
+                title: "Error",
+                description: "Could not update follow status. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsTogglingFollow(false);
+        }
+    }, [userId, storeId, userProfile, isFollowing, store, toast]);
+
 
    // Updated Product Card
    const ProductCard = ({ product, delay = 0 }: { product: Product, delay?: number }) => (
@@ -318,7 +371,7 @@ export default function StorePage() {
 
    const themeClass = getThemeClass(store?.category);
 
-  if (isLoading) {
+  if (isLoading || isLoadingProfile) { // Show loading skeleton if either store or profile is loading
     return (
         <div className="container mx-auto px-4 py-10 space-y-8 animate-pulse"> {/* Added container and padding */}
             {/* Loading state structure */}
@@ -338,6 +391,7 @@ export default function StorePage() {
                     <Skeleton className="h-4 w-3/4 mx-auto bg-muted/50" /> {/* Description */}
                     <Skeleton className="h-4 w-2/3 mx-auto bg-muted/50" /> {/* Description */}
                     <Skeleton className="h-5 w-1/3 mx-auto bg-muted/50" /> {/* Rating/Details */}
+                     <Skeleton className="h-10 w-32 mx-auto mt-2 bg-muted/50"/> {/* Follow Button Skeleton */}
                 </CardContent>
             </Card>
 
@@ -491,7 +545,26 @@ export default function StorePage() {
                         </div>
                      )}
                  </div>
-            </CardContent>
+                 {/* Follow Button */}
+                {userProfile && ( // Only show if profile is loaded
+                    <Button
+                        variant={isFollowing ? "secondary" : "outline"}
+                        size="sm"
+                        onClick={handleToggleFollow}
+                        disabled={isTogglingFollow}
+                        className="mt-4"
+                    >
+                        {isTogglingFollow ? (
+                             <Repeat className="mr-2 h-4 w-4 animate-spin" />
+                        ) : isFollowing ? (
+                            <BookmarkMinus className="mr-2 h-4 w-4 text-destructive" />
+                        ) : (
+                             <BookmarkPlus className="mr-2 h-4 w-4 text-primary" />
+                        )}
+                        {isFollowing ? "Unfollow Store" : "Follow Store"}
+                    </Button>
+                )}
+            CardContent>
         </Card>
        </motion.div>
 
@@ -577,4 +650,3 @@ export default function StorePage() {
     </div>
   );
 }
-
