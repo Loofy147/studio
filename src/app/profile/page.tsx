@@ -3,14 +3,14 @@
 
 import { useState, useEffect, useCallback } from "react"; // Added useCallback
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, updateSubscriptionStatus, DailyOffer, DeliveryAddress, addUserAddress, updateUserAddress, deleteUserAddress } from '@/services/store'; // Import address functions
+import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, DeliveryAddress, deleteUserAddress } from '@/services/store'; // Removed address add/update imports
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Button, buttonVariants } from "@/components/ui/button"; // Import buttonVariants
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge, badgeVariants, type BadgeProps } from "@/components/ui/badge"; // Import badgeVariants & type
-import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Play, Pause, Trash2, Repeat, Home, Briefcase, Plus, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon, Check, Loader2 } from 'lucide-react'; // Added Check icon, Loader2
+import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon, Check } from 'lucide-react'; // Added Check icon
 import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
 import Link from "next/link";
@@ -28,10 +28,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog" // Import Alert Dialog
-import { Input } from "@/components/ui/input"; // For edit forms
-import { Label } from "@/components/ui/label"; // For edit forms
-import { Checkbox } from "@/components/ui/checkbox"; // For default address
-import { AddressDialog } from './AddressDialog'; // Import AddressDialog component
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 import { LayoutAnimator } from "@/components/LayoutAnimator"; // Import LayoutAnimator
 
@@ -52,17 +48,6 @@ const subscriptionStatusDetails: Record<Subscription['status'], { icon: React.El
     'cancelled': { icon: XCircle, variant: 'destructive', color: 'text-destructive-foreground dark:text-destructive-foreground', label: 'Cancelled' }
 };
 
-// Define state for the address form
-interface AddressFormData {
-    id?: string;
-    label: string;
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country?: string;
-    isDefault: boolean;
-}
 
 export default function ProfilePage() {
   // In a real app, you'd get the userId from authentication context
@@ -76,10 +61,6 @@ export default function ProfilePage() {
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [isLoadingSubs, setIsLoadingSubs] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [updatingSubId, setUpdatingSubId] = useState<string | null>(null);
-
-  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState<AddressFormData | null>(null);
 
 
   useEffect(() => {
@@ -125,7 +106,7 @@ export default function ProfilePage() {
          try {
             const subData = await getUserSubscriptions(userId);
              if (isMounted) {
-                setSubscriptions(subData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()));
+                setSubscriptions(subData.sort((a, b) => b.startDate.getTime() - a.startDate.getTime()).slice(0,3)); // Limit to 3 recent subs
              }
          } catch (err) {
             console.error("Failed to fetch subscriptions:", err);
@@ -144,82 +125,7 @@ export default function ProfilePage() {
     }
   }, [userId]);
 
-  const handleUpdateSubscription = useCallback(async (subId: string, newStatus: Subscription['status']) => {
-        setUpdatingSubId(subId);
-        try {
-             const updatedSub = await updateSubscriptionStatus(subId, newStatus);
-             if (updatedSub) {
-                setSubscriptions(prevSubs =>
-                    prevSubs.map(sub => (sub.id === subId ? updatedSub : sub))
-                );
-                 toast({
-                    title: `Subscription ${newStatus}`,
-                    description: `Your subscription has been successfully ${newStatus}.`,
-                    variant: newStatus === 'cancelled' ? 'destructive' : 'default',
-                 });
-             } else {
-                 throw new Error("Subscription not found or update failed.");
-             }
-        } catch (err) {
-            console.error(`Failed to ${newStatus} subscription:`, err);
-            toast({
-                title: "Update Failed",
-                description: `Could not ${newStatus} the subscription. Please try again.`,
-                variant: "destructive",
-            });
-        } finally {
-            setUpdatingSubId(null);
-        }
-    }, [toast]); // Add toast to dependency array
 
-
-    const handleOpenAddressDialog = (address?: DeliveryAddress) => {
-        setCurrentAddress(address ? { ...address } : null);
-        setIsAddressDialogOpen(true);
-    };
-
-    const handleSaveAddress = async (addressFormData: AddressFormData) => {
-        if (!profile) return;
-        // Logic moved from AddressDialog to here
-        try {
-            let updatedProfile: UserProfile | null = null;
-            if (addressFormData.id) { // Editing existing address
-                updatedProfile = await updateUserAddress(userId, addressFormData.id, addressFormData);
-            } else { // Adding new address
-                 // Create a new object without the 'id' property if it exists
-                const { id, ...newAddressData } = addressFormData;
-                updatedProfile = await addUserAddress(userId, newAddressData as Omit<DeliveryAddress, 'id'>);
-            }
-            if (updatedProfile) {
-                setProfile(updatedProfile);
-                 toast({ title: "Address Saved", description: "Your address has been updated successfully." });
-                setIsAddressDialogOpen(false);
-            } else {
-                 throw new Error("Failed to save address.");
-            }
-        } catch (error) {
-            console.error("Error saving address:", error);
-            toast({ title: "Error Saving Address", description: "Could not save the address. Please try again.", variant: "destructive" });
-            // Rethrow or handle error so AddressDialog knows saving failed
-             throw error;
-        }
-    };
-
-     const handleDeleteAddress = useCallback(async (addressId: string) => {
-        if (!profile) return;
-        try {
-            const updatedProfile = await deleteUserAddress(userId, addressId);
-            if (updatedProfile) {
-                setProfile(updatedProfile);
-                 toast({ title: "Address Deleted", description: "The address has been removed.", variant: 'destructive' });
-            } else {
-                 toast({ title: "Deletion Failed", description: "Could not delete the address. Make sure it's not your only or default address.", variant: 'destructive' });
-            }
-        } catch (error) {
-            console.error("Error deleting address:", error);
-            toast({ title: "Error Deleting Address", description: "An error occurred while deleting the address.", variant: 'destructive' });
-        }
-    }, [userId, profile, toast]); // Add dependencies
 
   const ProfileInfoSkeleton = () => (
      <Card>
@@ -242,14 +148,10 @@ export default function ProfilePage() {
               <div className="space-y-4">
                  <div className="flex justify-between items-center">
                     <Skeleton className="h-6 w-36 bg-muted/50" />
-                    <div className="flex gap-2">
-                        <Skeleton className="h-9 w-28 bg-muted/50" />
-                        <Skeleton className="h-9 w-28 bg-muted/50" />
-                    </div>
+                    <Skeleton className="h-9 w-28 bg-muted/50" />
                  </div>
                  <div className="space-y-3">
-                     <Skeleton className="h-16 w-full bg-muted/50" />
-                     <Skeleton className="h-16 w-full bg-muted/50" />
+                     <Skeleton className="h-8 w-full bg-muted/50" /> {/* Simulate address card */}
                  </div>
              </div>
              <Separator />
@@ -323,6 +225,7 @@ export default function ProfilePage() {
                 <Skeleton className="h-7 w-44 bg-muted/50" />
                 <Skeleton className="h-4 w-60 bg-muted/50" />
             </div>
+            <Skeleton className="h-9 w-32 bg-muted/50" /> {/* View All Button */}
         </CardHeader>
         <CardContent className="p-0">
             <Table>
@@ -338,13 +241,12 @@ export default function ProfilePage() {
                 <TableBody>
                      {Array.from({ length: 2 }).map((_, i) => (
                         <TableRow key={i} className="hover:bg-muted/20">
-                            <TableCell className="pl-4"><Skeleton className="h-4 w-32 bg-muted/50" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-24 bg-muted/50" /></TableCell>
-                            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-28 bg-muted/50" /></TableCell>
+                            <TableCell className="pl-4"><Skeleton className="h-4 w-full" /></TableCell>
+                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-full" /></TableCell>
                              <TableCell><Skeleton className="h-6 w-20 rounded-full bg-muted/50" /></TableCell> {/* Status */}
                             <TableCell className="text-right pr-4 space-x-1">
-                                <Skeleton className="h-8 w-8 inline-block bg-muted/50" />
-                                <Skeleton className="h-8 w-8 inline-block bg-muted/50" />
+                                <Skeleton className="h-8 w-8 inline-block rounded-md bg-muted/50" />
                             </TableCell>
                         </TableRow>
                     ))}
@@ -373,16 +275,16 @@ export default function ProfilePage() {
 
 
   return (
-    <LayoutAnimator> {/* Added Layout Animator */}
+    <LayoutAnimator>
         {/* Use standard page padding and spacing */}
         <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 space-y-10">
             {/* Profile Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6">
                 {/* Use Heading 1 size */}
                 <h1 className="h1 flex items-center gap-3"> {/* Use h1 class */}
-                    <User className="h-8 w-8 text-primary" /> Your Profile
+                    <User className="h-8 w-8 text-primary" /> Your Profile Overview
                 </h1>
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive self-start sm:self-center">
                     <LogOut className="mr-2 h-4 w-4" /> Log Out
                 </Button>
             </div>
@@ -420,7 +322,7 @@ export default function ProfilePage() {
                             </CardDescription>
                         )}
                     </div>
-                    <Link href="/profile/account-settings" passHref legacyBehavior>
+                    <Link href="/profile/account-settings" passHref>
                          <Button variant="default" size="sm" className="self-start sm:self-center">
                             <Settings className="mr-2 h-4 w-4" /> Account Settings
                         </Button>
@@ -430,92 +332,30 @@ export default function ProfilePage() {
                 {/* Use standard padding and spacing */}
                 <CardContent className="space-y-6 p-6 pt-4">
                     <Separator />
-                    <div className="space-y-4">
-                         {/* Use Heading 3 size */}
+                     {/* Default Address Display */}
+                    <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                            <h3 className="h3 flex items-center gap-2 text-foreground/90"><MapPin className="h-5 w-5 text-primary"/>Delivery Addresses</h3> {/* Use h3 class */}
-                             <Link href="/profile/addresses" passHref legacyBehavior>
-                                 <Button variant="outline" size="sm" className="ml-auto mr-2">Manage All</Button>
-                             </Link>
-                            <Button variant="default" size="sm" onClick={() => handleOpenAddressDialog()}>
-                                <Plus className="mr-2 h-4 w-4" /> Add Address
-                            </Button>
+                            <h3 className="text-lg font-medium flex items-center gap-2"><MapPin className="h-5 w-5 text-primary"/>Default Delivery Address</h3>
+                            <Link href="/profile/addresses" passHref>
+                                <Button variant="outline" size="sm">Manage Addresses</Button>
+                            </Link>
                         </div>
-                        {profile.addresses.length > 0 ? (
-                            <motion.div layout className="space-y-3">
-                                <AnimatePresence>
-                                    {profile.addresses.map((address) => (
-                                        <motion.div
-                                            key={address.id}
-                                            layout
-                                            variants={itemVariants}
-                                            initial="hidden"
-                                            animate="visible"
-                                            exit="exit"
-                                            className="flex items-center justify-between p-3 border rounded-md bg-muted/30 hover:shadow-sm hover:border-primary/20 transition-all duration-150"
-                                        >
-                                            <div className="flex items-center gap-3 text-sm">
-                                                {address.label === 'Home' ? <Home className="h-4 w-4 text-primary/80 shrink-0" /> :
-                                                address.label === 'Work' ? <Briefcase className="h-4 w-4 text-primary/80 shrink-0" /> :
-                                                <MapPin className="h-4 w-4 text-primary/80 shrink-0" />}
-                                                <div>
-                                                    <span className="font-medium block text-foreground">
-                                                        {address.label} {address.isDefault && <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0 h-5"><Check className="h-3 w-3 mr-0.5"/> Default</Badge>}
-                                                    </span>
-                                                    <span className="text-muted-foreground text-xs">{address.street}, {address.city}, {address.state} {address.zipCode} {address.country && `(${address.country})`}</span>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-1">
-                                                <Button variant="ghost" size="icon" className="h-7 w-7" title="Edit Address" onClick={() => handleOpenAddressDialog(address)}>
-                                                    <Edit className="h-3.5 w-3.5 opacity-70"/>
-                                                </Button>
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button
-                                                            size="icon"
-                                                            variant="ghost"
-                                                            className="h-7 w-7 text-destructive hover:bg-destructive/10"
-                                                            title="Delete Address"
-                                                            disabled={profile.addresses.length === 1 || (address.isDefault && profile.addresses.length > 1)}
-                                                        >
-                                                            <Trash2 className="h-3.5 w-3.5"/>
-                                                        </Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader>
-                                                        <AlertDialogTitle>Delete Address?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Are you sure you want to delete the address labeled "{address.label}"?
-                                                            {address.isDefault && profile.addresses.length > 1 && " You must set another address as default before deleting this one."}
-                                                            {profile.addresses.length === 1 && " You cannot delete your only address."}
-                                                        </AlertDialogDescription>
-                                                        </AlertDialogHeader>
-                                                        <AlertDialogFooter>
-                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={() => handleDeleteAddress(address.id)}
-                                                            className={buttonVariants({ variant: "destructive" })}
-                                                            disabled={profile.addresses.length === 1 || (address.isDefault && profile.addresses.length > 1)}
-                                                            >
-                                                            Yes, Delete
-                                                        </AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
-                            </motion.div>
+                        {profile.addresses && profile.addresses.length > 0 ? (
+                            profile.addresses.filter(a => a.isDefault).map(address => (
+                                <div key={address.id} className="p-3 border rounded-md bg-muted/30 text-sm text-muted-foreground">
+                                    <span className="font-semibold text-foreground block">{address.label}</span>
+                                    {address.street}, {address.city}, {address.state} {address.zipCode} {address.country && `(${address.country})`}
+                                </div>
+                            ))
                         ) : (
-                            <p className="text-sm text-muted-foreground italic text-center py-4 border border-dashed rounded-md">No addresses saved yet. Click "Add Address" to add one.</p>
+                            <p className="text-sm text-muted-foreground italic">No default address set.</p>
                         )}
                     </div>
 
                     {/* Friends & Followed Stores Links */}
                     <Separator />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Link href="/profile/friends" passHref legacyBehavior>
+                        <Link href="/profile/friends" passHref>
                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
                                  {/* Use p-4 */}
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
@@ -530,7 +370,7 @@ export default function ProfilePage() {
                                 </CardContent>
                             </Card>
                         </Link>
-                        <Link href="/profile/followed-stores" passHref legacyBehavior>
+                        <Link href="/profile/followed-stores" passHref>
                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -567,7 +407,7 @@ export default function ProfilePage() {
                                 {/* Use Heading 3 size */}
                                 <h3 className="h3 flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3> {/* Use h3 class */}
                                 <p className="text-base text-muted-foreground">Manage your stores, products, and orders.</p> {/* Use text-base */}
-                                <Link href="/stores" passHref legacyBehavior>
+                                <Link href="/stores" passHref>
                                      <Button variant="default" size="lg">Go to Store Management</Button> {/* Use size="lg" */}
                                 </Link>
                             </div>
@@ -579,17 +419,6 @@ export default function ProfilePage() {
             <Card><CardContent className="p-6 text-muted-foreground text-center">Could not load profile information.</CardContent></Card>
             ): null}
 
-            {/* Address Dialog */}
-            {profile && (
-                <AddressDialog
-                    isOpen={isAddressDialogOpen}
-                    onOpenChange={setIsAddressDialogOpen}
-                    addressData={currentAddress}
-                    onSave={handleSaveAddress}
-                    userId={userId}
-                    userAddresses={profile.addresses || []} // Ensure addresses is not undefined
-                />
-            )}
 
             <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
 
@@ -601,9 +430,7 @@ export default function ProfilePage() {
                         <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
                     </h2>
                      <Link href="/orders" passHref>
-                         <Button asChild variant="link" className="text-primary px-0">
-                             <a>View All Orders</a>
-                         </Button>
+                         <Button variant="link" className="text-primary px-0">View All Orders</Button>
                      </Link>
                 </div>
 
@@ -715,13 +542,18 @@ export default function ProfilePage() {
 
             <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
 
-            {/* Subscriptions Section */}
+            {/* Recent Subscriptions Section */}
              {/* Use space-y-6 */}
             <div className="space-y-6">
                  {/* Use Heading 2 size */}
-                <h2 className="h2 flex items-center gap-2"> {/* Use h2 class */}
-                    <CalendarClock className="h-7 w-7 text-primary" /> My Subscriptions
-                </h2>
+                 <div className="flex justify-between items-center">
+                     <h2 className="h2 flex items-center gap-2"> {/* Use h2 class */}
+                        <CalendarClock className="h-7 w-7 text-primary" /> Recent Subscriptions
+                    </h2>
+                    <Link href="/profile/subscriptions" passHref>
+                         <Button variant="link" className="text-primary px-0">View All Subscriptions</Button>
+                     </Link>
+                </div>
 
                 {subError && !isLoadingSubs && ( // Show subscription-specific error
                     <Alert variant="destructive">
@@ -748,8 +580,6 @@ export default function ProfilePage() {
                                             <TableHead>Store</TableHead>
                                             <TableHead className="hidden md:table-cell">Next Delivery</TableHead>
                                             <TableHead>Status</TableHead>
-                                             {/* Add padding */}
-                                            <TableHead className="text-right pr-4">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -760,7 +590,6 @@ export default function ProfilePage() {
                                                 const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
                                                 const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
                                                 const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
-                                                const isUpdating = updatingSubId === sub.id;
 
                                                 return (
                                                     <motion.tr
@@ -796,52 +625,7 @@ export default function ProfilePage() {
                                                                 <span>{details.label}</span>
                                                             </Badge>
                                                         </TableCell>
-                                                         {/* Add padding */}
-                                                        <TableCell className="text-right pr-4 space-x-1">
-                                                            {sub.status === 'active' && (
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-yellow-100/50 dark:hover:bg-yellow-900/30" onClick={() => handleUpdateSubscription(sub.id, 'paused')} disabled={isUpdating} title="Pause Subscription">
-                                                                    {isUpdating ? <Loader2 className="h-4 w-4 animate-spin"/> : <Pause className="h-4 w-4 text-yellow-600"/>}
-                                                                </Button>
-                                                            )}
-                                                            {sub.status === 'paused' && (
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100/50 dark:hover:bg-green-900/30" onClick={() => handleUpdateSubscription(sub.id, 'active')} disabled={isUpdating} title="Resume Subscription">
-                                                                    {isUpdating ? <Loader2 className="h-4 w-4 animate-spin"/> : <Play className="h-4 w-4 text-green-600"/>}
-                                                                </Button>
-                                                            )}
-                                                            {sub.status !== 'cancelled' && (
-                                                                <AlertDialog>
-                                                                    <AlertDialogTrigger asChild>
-                                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" disabled={isUpdating} title="Cancel Subscription">
-                                                                             {isUpdating ? <Loader2 className="h-4 w-4 animate-spin"/> : <Trash2 className="h-4 w-4"/>}
-                                                                        </Button>
-                                                                    </AlertDialogTrigger>
-                                                                    <AlertDialogContent>
-                                                                        <AlertDialogHeader>
-                                                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                                        <AlertDialogDescription>
-                                                                            This will permanently cancel your subscription to "{sub.offerName}". This action cannot be undone.
-                                                                        </AlertDialogDescription>
-                                                                        </AlertDialogHeader>
-                                                                        <AlertDialogFooter>
-                                                                        <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
-                                                                        <AlertDialogAction
-                                                                            onClick={() => handleUpdateSubscription(sub.id, 'cancelled')}
-                                                                            className={buttonVariants({ variant: "destructive" })}
-                                                                            disabled={isUpdating}
-                                                                        >
-                                                                            {isUpdating ? 'Cancelling...' : 'Yes, Cancel'}
-                                                                        </AlertDialogAction>
-                                                                        </AlertDialogFooter>
-                                                                    </AlertDialogContent>
-                                                                </AlertDialog>
-                                                            )}
-                                                            {sub.status === 'cancelled' && (
-                                                                    <span className="text-xs text-muted-foreground italic mr-2">Cancelled</span>
-                                                            )}
-                                                             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="View Offer Details (Not Implemented)">
-                                                                <Eye className="h-4 w-4 text-foreground/70" />
-                                                            </Button>
-                                                        </TableCell>
+                                                        {/* Actions removed from overview */}
                                                     </motion.tr>
                                                 );
                                             })}
@@ -857,7 +641,7 @@ export default function ProfilePage() {
                             <CalendarClock className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
                            <p className="text-lg font-medium">No active subscriptions found.</p>
                             <p className="text-sm mt-2">Explore stores offering daily or weekly deliveries!</p>
-                             <Link href="/" passHref legacyBehavior>
+                             <Link href="/" passHref>
                                 <Button variant="default" className="mt-6">Browse Stores</Button>
                              </Link>
                         </CardContent>
@@ -868,3 +652,5 @@ export default function ProfilePage() {
     </LayoutAnimator>
   );
 }
+
+
