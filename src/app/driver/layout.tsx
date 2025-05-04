@@ -1,10 +1,12 @@
+
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Truck, UserCircle, Settings, LogOut, Bell, MessageSquare } from 'lucide-react';
+// Updated icon imports: Replaced MessageSquare with DollarSign for Earnings
+import { LayoutDashboard, Truck, UserCircle, Settings, LogOut, Bell, DollarSign } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; // Assuming user info available
@@ -14,7 +16,7 @@ const driverNavItems = [
   { href: "/driver/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/driver/orders", label: "Available Orders", icon: Bell },
   { href: "/driver/route", label: "Current Route", icon: Truck },
-  { href: "/driver/earnings", label: "Earnings", icon: MessageSquare }, // Placeholder icon
+  { href: "/driver/earnings", label: "Earnings", icon: DollarSign }, // Updated icon
   { href: "/driver/profile", label: "Profile", icon: UserCircle },
 ];
 
@@ -128,3 +130,5 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
     </SidebarProvider>
   );
 }
+
+    
