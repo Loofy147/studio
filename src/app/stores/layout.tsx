@@ -1,3 +1,4 @@
+
 // src/app/stores/layout.tsx
 'use client';
 
@@ -8,24 +9,19 @@ import { cn } from '@/lib/utils';
 import { LayoutDashboard, Package, CalendarClock, Ticket, Settings, LogOut, Building, ArrowLeft, BarChart } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Logo } from '@/components/Logo'; // Import the new Logo component
+import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 
 // Store Owner specific navigation items
-// Ensure hrefs are unique or use index for keys if duplicates exist
 const storeOwnerNavItems = [
   { href: "/stores", label: "Overview", icon: LayoutDashboard },
-  // Link to manage a specific store (will be dynamic later)
-  // For now, just placeholders or link back to the list
-  // NOTE: Removed duplicate '/stores' links. If specific pages are needed,
-  // they should have unique hrefs like '/stores/products', '/stores/orders' etc.
-  // Temporarily pointing them back to /stores for now until specific pages exist.
+  // Updated links to potentially use hashes or distinct paths
   { href: "/stores#products", label: "Products", icon: Package },
-  { href: "/stores#orders", label: "Orders", icon: Package }, // Duplicate icon OK, but href must be distinct if used as key
+  { href: "/stores#orders", label: "Orders", icon: Package }, // Keeping duplicate icon, distinct href via hash
   { href: "/stores#subscriptions", label: "Subscriptions", icon: CalendarClock },
   { href: "/stores#promotions", label: "Promotions", icon: Ticket },
   { href: "/stores#analytics", label: "Analytics", icon: BarChart },
-  { href: "/stores/settings", label: "Store Settings", icon: Settings }, // Distinct href
+  { href: "/stores/settings", label: "Store Settings", icon: Settings },
 ];
 
 export default function StoreOwnerLayout({ children }: { children: React.ReactNode }) {
@@ -104,8 +100,8 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                          </Link>
                      </SidebarMenuItem>
                       {/* Manage-specific links */}
-                      {manageStoreNavItems.map((item, index) => ( // Use index
-                          <SidebarMenuItem key={`manage-${index}`}> {/* Use index only */}
+                      {manageStoreNavItems.map((item, index) => (
+                          <SidebarMenuItem key={`manage-${item.label}-${index}`}> {/* Use label + index for uniqueness */}
                              <Link href={item.href} passHref legacyBehavior>
                                  <SidebarMenuButton
                                      asChild
@@ -127,12 +123,12 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                  </SidebarMenu>
              ) : (
                  <SidebarMenu className="px-2 py-4">
-                    {storeOwnerNavItems.map((item, index) => ( // Use index
-                        <SidebarMenuItem key={`owner-${index}`}> {/* Use index only */}
+                    {storeOwnerNavItems.map((item, index) => (
+                        <SidebarMenuItem key={`${item.label}-${index}`}> {/* Combine label and index for uniqueness */}
                         <Link href={item.href} passHref legacyBehavior>
                             <SidebarMenuButton
                             asChild
-                            isActive={pathname === item.href} // Simple active check for this layout
+                            isActive={pathname === item.href || pathname.startsWith(item.href.split('#')[0] + '/')} // Check if current path starts with the base href
                             tooltip={item.label}
                             // Use themed styles
                             className="capitalize focus:bg-sidebar-accent focus:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground"

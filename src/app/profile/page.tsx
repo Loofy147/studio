@@ -1,21 +1,22 @@
+
 "use client";
 
-import { useState, useEffect, useCallback } from "react"; // Added useCallback
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, DeliveryAddress, deleteUserAddress } from '@/services/store'; // Removed address add/update imports
+import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, DeliveryAddress } from '@/services/store';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Button, buttonVariants } from "@/components/ui/button"; // Import buttonVariants
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge, badgeVariants, type BadgeProps } from "@/components/ui/badge"; // Import badgeVariants & type
-import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon, Check, Play, Pause } from 'lucide-react'; // Added Check icon, Play, Pause
+import { Badge, badgeVariants, type BadgeProps } from "@/components/ui/badge";
+import { User, ShoppingBag, MapPin, Phone, Mail, Award, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Building, Store as StoreIcon, Check, Play, Pause, Users as UsersIcon, BookmarkPlus, BookmarkMinus, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 import { cn, formatCurrency } from "@/lib/utils";
 import React from 'react';
-import { useToast } from '@/hooks/use-toast'; // Import useToast
+import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,9 +27,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog" // Import Alert Dialog
-import { motion, AnimatePresence } from 'framer-motion'; // Import motion
-import { LayoutAnimator } from "@/components/LayoutAnimator"; // Import LayoutAnimator
+} from "@/components/ui/alert-dialog";
+import { motion, AnimatePresence } from 'framer-motion';
+import { LayoutAnimator } from "@/components/LayoutAnimator";
 
 // Re-define AddressFormData if needed or import from a shared types file
 interface AddressFormData {
@@ -53,7 +54,7 @@ const orderStatusDetails: Record<Order['status'], { icon: React.ElementType; var
 };
 
 // Map status to icon and variant for the subscription table
-const subscriptionStatusDetails: Record<Subscription['status'], { icon: React.ElementType; variant: BadgeProps["variant"]; color: string; label: string }> = {
+const subscriptionStatusDetails: Record<Subscription['status'], { icon: React.ElementType; variant: BadgeProps['variant']; color: string; label: string }> = {
     'active': { icon: Play, variant: 'success', color: 'text-accent-foreground dark:text-accent-foreground', label: 'Active' },
     'paused': { icon: Pause, variant: 'secondary', color: 'text-yellow-600 dark:text-yellow-400', label: 'Paused' },
     'cancelled': { icon: XCircle, variant: 'destructive', color: 'text-destructive-foreground dark:text-destructive-foreground', label: 'Cancelled' }
@@ -178,7 +179,7 @@ export default function ProfilePage() {
                   </div>
              </div>
              <Separator />
-             <div className="flex items-center gap-3 p-4 border rounded-lg bg-gradient-to-r from-yellow-100/20 via-amber-50/20 to-orange-100/20">
+             <div className="flex items-center gap-3 p-4 border rounded-lg bg-gradient-to-r from-yellow-100/20 via-amber-50/20 to-orange-100/20 dark:from-yellow-900/30 dark:via-amber-950/30 dark:to-orange-950/30">
                  <Skeleton className="h-10 w-10 rounded-full bg-muted/50" />
                  <div className="space-y-1">
                     <Skeleton className="h-5 w-28 bg-muted/50" />
@@ -333,7 +334,7 @@ export default function ProfilePage() {
                             </CardDescription>
                         )}
                     </div>
-                    <Link href="/profile/account-settings" passHref>
+                    <Link href="/profile/account-settings" passHref legacyBehavior>
                          <Button variant="default" size="sm" className="self-start sm:self-center" withRipple>
                             <Settings className="mr-2 h-4 w-4" /> Account Settings
                         </Button>
@@ -348,7 +349,7 @@ export default function ProfilePage() {
                         <div className="flex justify-between items-center">
                              {/* Use text-lg */}
                             <h3 className="text-lg font-medium flex items-center gap-2 text-foreground"><MapPin className="h-5 w-5 text-primary"/>Default Delivery Address</h3>
-                            <Link href="/profile/addresses" passHref>
+                            <Link href="/profile/addresses" passHref legacyBehavior>
                                 <Button variant="outline" size="sm" withRipple>Manage Addresses</Button>
                             </Link>
                         </div>
@@ -367,8 +368,8 @@ export default function ProfilePage() {
                     {/* Friends & Followed Stores Links */}
                     <Separator />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Link href="/profile/friends" passHref>
-                            <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
+                        <Link href="/profile/friends" passHref legacyBehavior>
+                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
                                  {/* Use p-4 */}
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                                     {/* Use text-lg */}
@@ -383,8 +384,8 @@ export default function ProfilePage() {
                                 </CardContent>
                             </Card>
                         </Link>
-                        <Link href="/profile/followed-stores" passHref>
-                            <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
+                        <Link href="/profile/followed-stores" passHref legacyBehavior>
+                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
                                  {/* Use p-4 */}
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                                      {/* Use text-lg */}
@@ -427,7 +428,7 @@ export default function ProfilePage() {
                                 <h3 className="h3 flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3> {/* Use h3 class */}
                                  {/* Use text-base */}
                                 <p className="text-base text-muted-foreground">Manage your stores, products, and orders.</p>
-                                <Link href="/stores" passHref>
+                                <Link href="/stores" passHref legacyBehavior>
                                      <Button variant="default" size="lg" withRipple>Go to Store Management</Button> {/* Use size="lg" */}
                                 </Link>
                             </div>
@@ -451,7 +452,7 @@ export default function ProfilePage() {
                     <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
                         <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
                     </h2>
-                     <Link href="/orders" passHref>
+                     <Link href="/orders" passHref legacyBehavior>
                          <Button variant="link" className="text-primary px-0">View All Orders</Button>
                      </Link>
                 </div>
@@ -574,7 +575,7 @@ export default function ProfilePage() {
                      <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
                         <CalendarClock className="h-7 w-7 text-primary" /> Recent Subscriptions
                     </h2>
-                    <Link href="/profile/subscriptions" passHref>
+                    <Link href="/profile/subscriptions" passHref legacyBehavior>
                          <Button variant="link" className="text-primary px-0">View All Subscriptions</Button>
                      </Link>
                 </div>
