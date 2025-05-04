@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -97,18 +98,20 @@ export default function DriverDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-8">
-        <Skeleton className="h-8 w-48 bg-muted/50" />
-        <Card className="bg-card border-border">
-          <CardHeader><Skeleton className="h-6 w-1/2 bg-muted/50" /></CardHeader>
-          <CardContent><Skeleton className="h-20 w-full bg-muted/50" /></CardContent>
-          <CardFooter><Skeleton className="h-10 w-32 bg-muted/50" /></Card>
-        </Card>
-        <Card className="bg-card border-border">
-           <CardHeader><Skeleton className="h-6 w-1/3 bg-muted/50" /></CardHeader>
-           <CardContent><Skeleton className="h-16 w-full bg-muted/50" /></CardContent>
-        </Card>
-      </div>
+      <> {/* Wrap in Fragment to potentially resolve parsing issue */}
+        <div className="space-y-8">
+            <Skeleton className="h-8 w-48 bg-muted/50" />
+            <Card className="bg-card border-border">
+            <CardHeader><Skeleton className="h-6 w-1/2 bg-muted/50" /></CardHeader>
+            <CardContent><Skeleton className="h-20 w-full bg-muted/50" /></CardContent>
+            <CardFooter><Skeleton className="h-10 w-32 bg-muted/50" /></CardFooter>
+            </Card>
+            <Card className="bg-card border-border">
+            <CardHeader><Skeleton className="h-6 w-1/3 bg-muted/50" /></CardHeader>
+            <CardContent><Skeleton className="h-16 w-full bg-muted/50" /></CardContent>
+            </Card>
+        </div>
+      </>
     );
   }
 
