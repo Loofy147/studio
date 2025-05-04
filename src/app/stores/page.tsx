@@ -1,5 +1,4 @@
-
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -19,7 +18,7 @@ import { cn } from '@/lib/utils'; // Import cn
 export default function StoreManagementPage() {
   const [userStores, setUserStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // Fixed type definition
+  const [error, setError] = useState<string | null>(null); // Initialize with null
   const [showNewStoreForm, setShowNewStoreForm] = useState(false);
   const { toast } = useToast();
 
@@ -34,12 +33,12 @@ export default function StoreManagementPage() {
         // Simulate fetching stores owned by the current user
         // In a real backend, this would filter by ownerId
         const allStores = await getStores();
-        // Mock: Show stores explicitly owned by user123 or those without an owner ID for demo purposes
-        const ownedStores = allStores.filter(store => store.ownerId === userId /* || !store.ownerId */); // Only show owned stores
+        // Ensure ownerId exists before filtering
+        const ownedStores = allStores.filter(store => store.ownerId && store.ownerId === userId);
         setUserStores(ownedStores);
-      } catch (err) {
+      } catch (err: any) { // Explicitly type error
         console.error("Failed to fetch user stores:", err);
-        setError("Could not load your stores. Please try again later.");
+        setError(err.message || "Could not load your stores. Please try again later."); // Set specific error message
       } finally {
         setIsLoading(false);
       }
@@ -58,7 +57,7 @@ export default function StoreManagementPage() {
   };
 
    const StoreCardSkeleton = () => (
-     <Card className="animate-pulse border">
+     <Card className="animate-pulse border bg-card/50"> {/* Use card background */}
        <CardHeader className="p-0">
          <Skeleton className="h-48 w-full bg-muted/50" />
          <div className="p-4 space-y-2">
@@ -92,18 +91,18 @@ export default function StoreManagementPage() {
   };
   const formVariants = {
     hidden: { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, padding: 0, border: 0 },
-    visible: { opacity: 1, height: 'auto', marginTop: '2rem', marginBottom: '2rem', padding: '1.5rem', border: '1px solid hsl(var(--border))', transition: { duration: 0.3, ease: "easeInOut" } },
+    visible: { opacity: 1, height: 'auto', marginTop: '2rem', marginBottom: '2rem', padding: '1.5rem', border: '1px solid hsl(var(--store-owner-border))', transition: { duration: 0.3, ease: "easeInOut" } }, // Use themed border
      exit: { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, padding: 0, border: 0, transition: { duration: 0.2, ease: "easeInOut" } }
   };
 
 
   return (
     <div className="container mx-auto py-10 space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Building className="h-8 w-8 text-primary" /> Manage Your Stores
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-6 border-[var(--store-owner-border)]"> {/* Use themed border */}
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2 text-[var(--store-owner-foreground)]"> {/* Use themed text */}
+          <Building className="h-8 w-8 text-[var(--store-owner-primary)]" /> Manage Your Stores {/* Use themed icon color */}
         </h1>
-        <Button onClick={() => setShowNewStoreForm(!showNewStoreForm)} variant={showNewStoreForm ? "secondary" : "default"} size="lg"> {/* Larger button */}
+        <Button onClick={() => setShowNewStoreForm(!showNewStoreForm)} variant={showNewStoreForm ? "secondary" : "default"} size="lg" className="bg-[var(--store-owner-primary)] text-[var(--store-owner-primary-foreground)] hover:bg-[var(--store-owner-primary)]/90"> {/* Use themed button */}
           <PlusCircle className="mr-2 h-5 w-5" /> {/* Larger icon */}
           {showNewStoreForm ? 'Cancel Creation' : 'Create New Store'}
         </Button>
@@ -119,10 +118,10 @@ export default function StoreManagementPage() {
               exit="exit"
               className="rounded-lg overflow-hidden" // Add overflow hidden for clean animation
            >
-              <Card className="border-primary/20 bg-primary/5 shadow-md"> {/* Use primary theme */}
+              <Card className="border-[var(--store-owner-border)] bg-[var(--store-owner-card)] shadow-md"> {/* Use themed card */}
                   <CardHeader>
-                      <CardTitle className="text-2xl text-primary">Create a New Store</CardTitle> {/* Use primary color */}
-                      <CardDescription>Fill in the details for your new marketplace storefront.</CardDescription>
+                      <CardTitle className="text-2xl text-[var(--store-owner-primary)]">Create a New Store</CardTitle> {/* Use themed color */}
+                      <CardDescription className="text-[var(--store-owner-card-foreground)]/80">Fill in the details for your new marketplace storefront.</CardDescription> {/* Use themed text */}
                   </CardHeader>
                 <CardContent>
                   <NewStoreForm onStoreCreated={handleStoreCreated} userId={userId}/>
@@ -142,7 +141,7 @@ export default function StoreManagementPage() {
        )}
 
       <div>
-        <h2 className="text-2xl font-semibold mb-6 text-foreground/90">Your Stores ({userStores.length})</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-[var(--store-owner-foreground)]/90">Your Stores ({userStores.length})</h2> {/* Use themed text */}
         {isLoading ? (
            <motion.div
                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -163,7 +162,7 @@ export default function StoreManagementPage() {
           >
             {userStores.map((store) => (
              <motion.div key={store.id} variants={itemVariants} layout>
-                <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-xl border hover:border-primary/40 group bg-card"> {/* Enhanced hover */}
+                <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-xl border hover:border-[var(--store-owner-primary)]/40 group bg-[var(--store-owner-card)]"> {/* Enhanced hover and theme */}
                     <CardHeader className="p-0">
                         <div className="relative w-full h-48 overflow-hidden">
                         <Image
@@ -195,16 +194,16 @@ export default function StoreManagementPage() {
                             )}
                         </div>
                         <div className="p-4 pb-2">
-                            <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">{store.name}</CardTitle>
-                            <Badge variant="outline" className="mt-2 capitalize text-xs tracking-wide border-primary/30 text-primary/90 bg-primary/5">{store.category}</Badge>
+                            <CardTitle className="text-xl font-semibold group-hover:text-[var(--store-owner-primary)] transition-colors text-[var(--store-owner-card-foreground)]">{store.name}</CardTitle> {/* Themed text */}
+                            <Badge variant="outline" className="mt-2 capitalize text-xs tracking-wide border-[var(--store-owner-primary)]/30 text-[var(--store-owner-primary)]/90 bg-[var(--store-owner-primary)]/5">{store.category}</Badge> {/* Themed badge */}
                         </div>
                     </CardHeader>
                     <CardContent className="flex-grow p-4 pt-0">
-                        <CardDescription className="text-sm line-clamp-3 text-muted-foreground">{store.description}</CardDescription>
+                        <CardDescription className="text-sm line-clamp-3 text-[var(--store-owner-card-foreground)]/70">{store.description}</CardDescription> {/* Themed text */}
                     </CardContent>
                     <CardFooter className="p-4 pt-2 mt-auto">
                     <Link href={`/store/${store.id}/manage`} passHref legacyBehavior>
-                        <Button className="w-full group/button" variant="default" size="lg"> {/* Larger manage button */}
+                        <Button className="w-full group/button bg-[var(--store-owner-primary)] text-[var(--store-owner-primary-foreground)] hover:bg-[var(--store-owner-primary)]/90" size="lg"> {/* Larger manage button and theme */}
                             <Edit className="mr-2 h-4 w-4" />
                             Manage Store
                             <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover/button:translate-x-1" />
@@ -215,15 +214,15 @@ export default function StoreManagementPage() {
               </motion.div>
             ))}
           </motion.div>
-        ) : (
-          <Card className="border-dashed border-muted-foreground/30 bg-card/50">
-             <CardContent className="p-10 text-center text-muted-foreground">
-                 <Building className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
+        ) : !isLoading && !error ? ( // Ensure we only show this if not loading and no errors
+          <Card className="border-dashed border-[var(--store-owner-border)]/50 bg-[var(--store-owner-card)]/50"> {/* Themed border/bg */}
+             <CardContent className="p-10 text-center text-[var(--store-owner-card-foreground)]/70"> {/* Themed text */}
+                 <Building className="h-12 w-12 mx-auto mb-4 text-[var(--store-owner-card-foreground)]/30"/>
                 <p className="text-lg font-medium">You haven't created any stores yet.</p>
                 <p className="text-sm mt-1">Click the "Create New Store" button above to get started!</p>
              </CardContent>
           </Card>
-        )}
+        ) : null } {/* Render nothing if loading or error */}
       </div>
     </div>
   );

@@ -57,7 +57,7 @@ export interface Store {
   openingHours?: string; // Example for restaurants/shops
   address?: string; // Example for physical locations
   // Admin related fields (added via declaration merging later or directly)
-  isActive?: boolean; // Managed by admin (overall platform approval)
+  isActive: boolean; // Managed by admin (overall platform approval) - Make non-optional
   isOpen: boolean; // Managed by store owner (temporary open/close)
   createdAt?: Date; // When the store was created/approved
 }
@@ -93,13 +93,13 @@ export interface Subscription {
 // Interface for Delivery Address
 export interface DeliveryAddress {
     id: string;
-    label: 'Home' | 'Work' | 'Friend' | string; // e.g., 'Home', 'Work', 'Mom's House'
+    label: string; // Allow any string label
     street: string;
     city: string;
     state: string;
     zipCode: string;
     country?: string; // Optional
-    isDefault?: boolean;
+    isDefault: boolean; // Make non-optional
 }
 
 
@@ -113,8 +113,8 @@ export interface UserProfile {
     phone?: string;
     loyaltyPoints: number;
     // Admin related fields (added via declaration merging later or directly)
-    role?: 'customer' | 'store_owner' | 'driver' | 'admin' | string; // User role
-    status?: 'active' | 'disabled' | 'pending' | string; // User account status
+    role: 'customer' | 'store_owner' | 'driver' | 'admin' | string; // User role - Make non-optional
+    status: 'active' | 'disabled' | 'pending' | string; // User account status - Make non-optional
     joinedAt?: Date; // When the user joined
     friendIds?: string[]; // IDs of other users who are friends
     followedStoreIds?: string[]; // IDs of stores the user follows
@@ -152,47 +152,47 @@ function generateMockStores(): Store[] {
      return [
         {
           id: "store-1", name: "ElectroMart", description: "Your one-stop shop for the latest electronics.", category: "electronics",
-          imageUrl: `https://picsum.photos/seed/electromart/400/300`, rating: 4.5, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: [], isOpen: true
+          imageUrl: `https://picsum.photos/seed/electromart/400/300`, rating: 4.5, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
         {
           id: "store-2", name: "Fashionista Boutique", description: "Trendy clothing and accessories.", category: "clothing",
-          imageUrl: `https://picsum.photos/seed/fashionista/400/300`, rating: 4.2, ownerId: 'owner-002', products: [], dailyOffers: [], promotions: [], isOpen: true
+          imageUrl: `https://picsum.photos/seed/fashionista/400/300`, rating: 4.2, ownerId: 'owner-002', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
         {
           id: "store-3", name: "FreshGrocer", description: "Quality groceries and fresh produce.", category: "groceries",
-          imageUrl: `https://picsum.photos/seed/freshgrocer/400/300`, rating: 4.8, openingHours: "7 AM - 9 PM", address: "100 Grocery Lane", ownerId: 'owner-003', products: [], dailyOffers: [], promotions: [], isOpen: true
+          imageUrl: `https://picsum.photos/seed/freshgrocer/400/300`, rating: 4.8, openingHours: "7 AM - 9 PM", address: "100 Grocery Lane", ownerId: 'owner-003', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
         {
           id: "store-4", name: "The Book Nook", description: "Discover your next favorite read.", category: "books",
-          imageUrl: `https://picsum.photos/seed/booknook/400/300`, rating: 4.6, ownerId: 'owner-004', products: [], dailyOffers: [], promotions: [], isOpen: true
+          imageUrl: `https://picsum.photos/seed/booknook/400/300`, rating: 4.6, ownerId: 'owner-004', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
         {
           id: "store-5", name: "Cozy Home", description: "Everything for your home.", category: "home goods",
-          imageUrl: `https://picsum.photos/seed/cozyhome/400/300`, rating: 4.3, ownerId: 'owner-005', products: [], dailyOffers: [], promotions: [], isOpen: true
+          imageUrl: `https://picsum.photos/seed/cozyhome/400/300`, rating: 4.3, ownerId: 'owner-005', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
         {
           id: "store-6", name: "Toy Galaxy", description: "Fun and educational toys.", category: "toys",
-          imageUrl: `https://picsum.photos/seed/toygalaxy/400/300`, rating: 4.0, ownerId: 'owner-006', products: [], dailyOffers: [], promotions: [], isOpen: true
+          imageUrl: `https://picsum.photos/seed/toygalaxy/400/300`, rating: 4.0, ownerId: 'owner-006', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
         {
           id: "store-7", name: "Gadget Hub", description: "Cutting-edge tech.", category: "electronics",
-          imageUrl: `https://picsum.photos/seed/gadgethub/400/300`, rating: 4.7, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: [], isOpen: true // Reused owner
+          imageUrl: `https://picsum.photos/seed/gadgethub/400/300`, rating: 4.7, ownerId: 'owner-001', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true // Reused owner
         },
         {
           id: "store-8", name: "Style Threads", description: "Affordable and stylish clothing.", category: "clothing",
-          imageUrl: `https://picsum.photos/seed/stylethreads/400/300`, rating: 3.9, ownerId: 'owner-007', products: [], dailyOffers: [], promotions: [], isOpen: true
+          imageUrl: `https://picsum.photos/seed/stylethreads/400/300`, rating: 3.9, ownerId: 'owner-007', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
         {
             id: "store-9", name: "The Daily Grind", description: "Artisan coffee, pastries, and light bites.", category: "coffee shops",
-            imageUrl: `https://picsum.photos/seed/dailygrind/400/300`, rating: 4.9, openingHours: "6 AM - 6 PM", address: "25 Coffee Bean Blvd", ownerId: 'owner-008', products: [], dailyOffers: [], promotions: [], isOpen: true
+            imageUrl: `https://picsum.photos/seed/dailygrind/400/300`, rating: 4.9, openingHours: "6 AM - 6 PM", address: "25 Coffee Bean Blvd", ownerId: 'owner-008', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
         {
             id: "store-10", name: "Mama Mia Pizzeria", description: "Authentic Italian pizza and pasta dishes.", category: "restaurants",
-            imageUrl: `https://picsum.photos/seed/mamamia/400/300`, rating: 4.5, openingHours: "11 AM - 10 PM", address: "50 Pizza Plaza", ownerId: 'owner-009', products: [], dailyOffers: [], promotions: [], isOpen: false // Example closed store
+            imageUrl: `https://picsum.photos/seed/mamamia/400/300`, rating: 4.5, openingHours: "11 AM - 10 PM", address: "50 Pizza Plaza", ownerId: 'owner-009', products: [], dailyOffers: [], promotions: [], isOpen: false, isActive: true // Example closed store
         },
         {
             id: "store-11", name: "GreenBasket Organics", description: "Certified organic fruits, vegetables, and pantry staples.", category: "groceries",
-            imageUrl: `https://picsum.photos/seed/greenbasket/400/300`, rating: 4.7, openingHours: "8 AM - 8 PM", address: "75 Organic Way", ownerId: 'owner-010', products: [], dailyOffers: [], promotions: [], isOpen: true
+            imageUrl: `https://picsum.photos/seed/greenbasket/400/300`, rating: 4.7, openingHours: "8 AM - 8 PM", address: "75 Organic Way", ownerId: 'owner-010', products: [], dailyOffers: [], promotions: [], isOpen: true, isActive: true
         },
          { // Example inactive store (admin disabled)
           id: "store-12", name: "Vintage Finds", description: "Closed for renovation.", category: "other",
@@ -697,7 +697,7 @@ export async function getStoreById(storeId: string): Promise<Store | null> {
      });
 }
 
-export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'promotions' | 'isActive' | 'isOpen' | 'createdAt' | 'ownerId'>, ownerId: string): Promise<Store> {
+export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'dailyOffers' | 'promotions' | 'isActive' | 'isOpen' | 'createdAt' | 'ownerId' | 'rating'>, ownerId: string): Promise<Store> {
   console.log("Creating store:", storeData);
   await initializeMockData();
   const newStore: Store = {
@@ -710,6 +710,7 @@ export async function createStore(storeData: Omit<Store, 'id' | 'products' | 'da
     isActive: false, // New stores start inactive/pending approval by admin
     isOpen: false, // New stores start closed until explicitly opened by owner
     createdAt: new Date(),
+    rating: undefined, // New stores have no rating initially
   };
   mockStores!.push(newStore);
   return new Promise((resolve) => {
@@ -1009,6 +1010,9 @@ export async function updateUserAddress(userId: string, addressId: string, addre
     }
 
     const updatedAddress = { ...mockUserProfiles![userIndex].addresses[addressIndex], ...addressData };
+    // Ensure isDefault is explicitly set if passed in addressData, otherwise keep original
+    updatedAddress.isDefault = addressData.isDefault ?? mockUserProfiles![userIndex].addresses[addressIndex].isDefault;
+
 
     // Ensure only one default address
     if (updatedAddress.isDefault) {
@@ -1053,22 +1057,24 @@ export async function deleteUserAddress(userId: string, addressId: string): Prom
         return null;
     }
 
-    // Prevent deleting the only address or the default address if others exist
+    // Prevent deleting the only address
     if (mockUserProfiles![userIndex].addresses.length === 1) {
         console.error("Cannot delete the only address.");
-        return mockUserProfiles![userIndex]; // Return current profile without changes
+        throw new Error("Cannot delete the only address."); // Throw error to handle in UI
+        // return mockUserProfiles![userIndex]; // Return current profile without changes
     }
     if (addressToDelete.isDefault) {
         console.error("Cannot delete the default address. Set another address as default first.");
-         // Find the first non-default address and make it default
-        const newDefaultIndex = mockUserProfiles![userIndex].addresses.findIndex(a => a.id !== addressId);
-        if (newDefaultIndex > -1) {
-            mockUserProfiles![userIndex].addresses[newDefaultIndex].isDefault = true;
-            console.log(`Set ${mockUserProfiles![userIndex].addresses[newDefaultIndex].id} as new default.`);
-        } else {
-             console.error("Error: Could not find another address to set as default.");
-             return mockUserProfiles![userIndex]; // Return current profile without changes
-        }
+        throw new Error("Cannot delete the default address. Set another address as default first."); // Throw error
+        // Find the first non-default address and make it default
+        // const newDefaultIndex = mockUserProfiles![userIndex].addresses.findIndex(a => a.id !== addressId);
+        // if (newDefaultIndex > -1) {
+        //     mockUserProfiles![userIndex].addresses[newDefaultIndex].isDefault = true;
+        //     console.log(`Set ${mockUserProfiles![userIndex].addresses[newDefaultIndex].id} as new default.`);
+        // } else {
+        //      console.error("Error: Could not find another address to set as default.");
+        //      return mockUserProfiles![userIndex]; // Return current profile without changes
+        // }
     }
 
 

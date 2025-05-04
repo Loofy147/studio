@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 // Assume a service function getDrivers exists
-import { Driver, getDrivers } from '@/services/driver'; // Import or define Driver type and fetch function
+import { Driver, getDrivers, DriverStatus } from '@/services/driver'; // Import or define Driver type and fetch function
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowUpDown, Search, Truck as TruckIcon, Eye, Edit, Ban, CheckCircle, XCircle, Filter, MapPin, Hourglass, Loader2 } from 'lucide-react'; // Added Hourglass, Loader2
-import { format } from 'date-fns'; // Assuming drivers have a join date
+import { format, isValid } from 'date-fns'; // Assuming drivers have a join date, added isValid
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -37,8 +37,11 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
+// Type for the driver with guaranteed joinedAt date for sorting/display
+type DriverWithDate = Driver & { joinedAt: Date };
+
 // Mock function to toggle driver status (replace with actual API call)
-async function toggleDriverStatus(driverId: string, currentStatus: Driver['status']): Promise<Driver['status']> {
+async function toggleDriverStatus(driverId: string, currentStatus: DriverStatus): Promise<DriverStatus> {
     console.log(`Toggling status for driver ${driverId} from ${currentStatus}`);
     await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API delay
     // Simplified toggle logic for mock
@@ -49,14 +52,14 @@ async function toggleDriverStatus(driverId: string, currentStatus: Driver['statu
 }
 
 // Mock function to approve driver (replace with actual API call)
-async function approveDriver(driverId: string): Promise<Driver['status']> {
+async function approveDriver(driverId: string): Promise<DriverStatus> {
     console.log(`Approving driver ${driverId}`);
     await new Promise(resolve => setTimeout(resolve, 400));
     return 'active';
 }
 
 // Mock function to reject driver (replace with actual API call)
-async function rejectDriver(driverId: string): Promise<Driver['status']> {
+async function rejectDriver(driverId: string): Promise<DriverStatus> {
     console.log(`Rejecting driver ${driverId}`);
     await new Promise(resolve => setTimeout(resolve, 400));
     return 'inactive'; // Rejected drivers become inactive
@@ -64,12 +67,12 @@ async function rejectDriver(driverId: string): Promise<Driver['status']> {
 
 
 export default function AdminDriversPage() {
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [drivers, setDrivers] = useState<DriverWithDate[]>([]); // Use DriverWithDate
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<Driver['status'] | 'all'>('all');
-  const [sortField, setSortField] = useState<keyof Driver | 'name' | 'vehicleType' | 'rating' | 'joinedAt'>('name');
+  const [statusFilter, setStatusFilter] = useState<DriverStatus | 'all'>('all'); // Use DriverStatus
+  const [sortField, setSortField] = useState<keyof DriverWithDate | 'name' | 'vehicleType' | 'rating'>('name'); // Adjusted keys
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [updatingDriverId, setUpdatingDriverId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -80,23 +83,23 @@ export default function AdminDriversPage() {
       setError(null);
       try {
         const driverData = await getDrivers(); // Fetch drivers
-        // Ensure join date exists
+        // Ensure join date exists and is valid
         const driversWithDate = driverData.map(d => ({
             ...d,
-            joinedAt: d.joinedAt ?? new Date(Date.now() - Math.random() * 365 * 86400000) // Mock join date if missing
-        })) as (Driver & { joinedAt: Date })[];
+            joinedAt: d.joinedAt && isValid(new Date(d.joinedAt)) ? new Date(d.joinedAt) : new Date(Date.now() - Math.random() * 365 * 86400000) // Mock join date if missing/invalid
+        })).filter((d): d is DriverWithDate => d.joinedAt instanceof Date); // Type guard
         setDrivers(driversWithDate);
-      } catch (err) {
+      } catch (err: any) { // Explicitly type error
         console.error("Failed to fetch drivers:", err);
-        setError("Could not load driver data. Please try again later.");
+        setError(err.message || "Could not load driver data. Please try again later."); // Provide specific error message
       } finally {
         setIsLoading(false);
       }
     };
     fetchDriversData();
-  }, []);
+  }, []); // Empty dependency array is correct here
 
-  const handleSort = (field: keyof Driver | 'name' | 'vehicleType' | 'rating' | 'joinedAt') => {
+  const handleSort = (field: keyof DriverWithDate | 'name' | 'vehicleType' | 'rating') => { // Adjusted keys
     const newDirection = (sortField === field && sortDirection === 'asc') ? 'desc' : 'asc';
     setSortField(field);
     setSortDirection(newDirection);
@@ -107,20 +110,21 @@ export default function AdminDriversPage() {
       const matchesSearch = driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             driver.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             driver.vehicleType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            (driver.phone && driver.phone.includes(searchTerm));
+                            (driver.phone && driver.phone.includes(searchTerm)) ||
+                            (driver.email && driver.email.toLowerCase().includes(searchTerm.toLowerCase())); // Include email in search
       const matchesStatus = statusFilter === 'all' || driver.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
 
     processedDrivers.sort((a, b) => {
-      let valA: any = a[sortField as keyof Driver];
-      let valB: any = b[sortField as keyof Driver];
+       let valA: any = a[sortField as keyof DriverWithDate];
+       let valB: any = b[sortField as keyof DriverWithDate];
 
        // Handle specific sort types
        if (sortField === 'rating') {
          valA = a.rating ?? 0;
          valB = b.rating ?? 0;
-      } else if (sortField === 'joinedAt' && valA instanceof Date && valB instanceof Date) {
+       } else if (sortField === 'joinedAt') { // Always Date type now
           valA = valA.getTime();
           valB = valB.getTime();
       } else if (typeof valA === 'string') {
@@ -136,7 +140,7 @@ export default function AdminDriversPage() {
     return processedDrivers;
   }, [drivers, searchTerm, statusFilter, sortField, sortDirection]);
 
-   const handleToggleStatus = async (driver: Driver) => {
+   const handleToggleStatus = async (driver: DriverWithDate) => {
         setUpdatingDriverId(driver.id);
         try {
             // For simplicity, mock toggles between active/inactive. Pending requires specific actions.
@@ -151,11 +155,11 @@ export default function AdminDriversPage() {
                 title: `Driver ${newStatus === 'active' ? 'Enabled' : 'Disabled'}`,
                 description: `${driver.name}'s account has been ${newStatus}.`,
              });
-        } catch (err) {
+        } catch (err: any) { // Explicitly type error
             console.error("Failed to toggle driver status:", err);
             toast({
                 title: "Update Failed",
-                description: `Could not change the status for ${driver.name}.`,
+                description: `Could not change the status for ${driver.name}. ${err.message || ''}`, // Add error message
                 variant: "destructive",
             });
         } finally {
@@ -163,7 +167,7 @@ export default function AdminDriversPage() {
         }
     };
 
-  const handleApprove = async (driver: Driver) => {
+  const handleApprove = async (driver: DriverWithDate) => {
         setUpdatingDriverId(driver.id);
         try {
             const newStatus = await approveDriver(driver.id);
@@ -172,11 +176,11 @@ export default function AdminDriversPage() {
                 title: `Driver Approved`,
                 description: `${driver.name}'s account has been approved and set to active.`,
              });
-        } catch (err) {
+        } catch (err: any) { // Explicitly type error
              console.error("Failed to approve driver:", err);
             toast({
                 title: "Approval Failed",
-                description: `Could not approve ${driver.name}.`,
+                description: `Could not approve ${driver.name}. ${err.message || ''}`, // Add error message
                 variant: "destructive",
             });
         } finally {
@@ -184,7 +188,7 @@ export default function AdminDriversPage() {
         }
   }
 
-    const handleReject = async (driver: Driver) => {
+    const handleReject = async (driver: DriverWithDate) => {
         setUpdatingDriverId(driver.id);
         try {
             const newStatus = await rejectDriver(driver.id);
@@ -194,11 +198,11 @@ export default function AdminDriversPage() {
                 description: `${driver.name}'s application has been rejected.`,
                 variant: "destructive"
              });
-        } catch (err) {
+        } catch (err: any) { // Explicitly type error
              console.error("Failed to reject driver:", err);
             toast({
                 title: "Rejection Failed",
-                description: `Could not reject ${driver.name}.`,
+                description: `Could not reject ${driver.name}. ${err.message || ''}`, // Add error message
                 variant: "destructive",
             });
         } finally {
@@ -211,30 +215,30 @@ export default function AdminDriversPage() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[60px]"><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead className="w-[180px]"><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead className="hidden sm:table-cell"><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead className="hidden lg:table-cell"><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead><Skeleton className="h-4 w-full" /></TableHead>
-          <TableHead className="hidden xl:table-cell"><Skeleton className="h-4 w-full" /></TableHead> {/* Joined Date */}
-          <TableHead className="text-right"><Skeleton className="h-4 w-full" /></TableHead>
+          <TableHead className="w-[60px]"><Skeleton className="h-4 w-full bg-muted/50" /></TableHead>
+          <TableHead className="w-[180px]"><Skeleton className="h-4 w-full bg-muted/50" /></TableHead>
+          <TableHead className="hidden sm:table-cell"><Skeleton className="h-4 w-full bg-muted/50" /></TableHead>
+          <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-full bg-muted/50" /></TableHead>
+          <TableHead className="hidden lg:table-cell"><Skeleton className="h-4 w-full bg-muted/50" /></TableHead>
+          <TableHead><Skeleton className="h-4 w-full bg-muted/50" /></TableHead>
+          <TableHead className="hidden xl:table-cell"><Skeleton className="h-4 w-full bg-muted/50" /></TableHead> {/* Joined Date */}
+          <TableHead className="text-right"><Skeleton className="h-4 w-full bg-muted/50" /></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {Array.from({ length: 5 }).map((_, i) => (
           <TableRow key={i}>
-            <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
-            <TableCell><Skeleton className="h-4 w-3/4" /></TableCell>
-            <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-full" /></TableCell>
-            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-1/2" /></TableCell>
-            <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-3/4" /></TableCell>
-            <TableCell><Skeleton className="h-6 w-24 rounded-full" /></TableCell> {/* Status Badge */}
-            <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-full" /></TableCell> {/* Joined Date */}
+            <TableCell><Skeleton className="h-10 w-10 rounded-full bg-muted/50" /></TableCell>
+            <TableCell><Skeleton className="h-4 w-3/4 bg-muted/50" /></TableCell>
+            <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-full bg-muted/50" /></TableCell>
+            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-1/2 bg-muted/50" /></TableCell>
+            <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-3/4 bg-muted/50" /></TableCell>
+            <TableCell><Skeleton className="h-6 w-24 rounded-full bg-muted/50" /></TableCell> {/* Status Badge */}
+            <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-full bg-muted/50" /></TableCell> {/* Joined Date */}
             <TableCell className="text-right space-x-1">
-                <Skeleton className="h-8 w-8 inline-block" />
-                <Skeleton className="h-8 w-8 inline-block" />
-                <Skeleton className="h-8 w-8 inline-block" />
+                <Skeleton className="h-8 w-8 inline-block rounded-md bg-muted/50" />
+                <Skeleton className="h-8 w-8 inline-block rounded-md bg-muted/50" />
+                <Skeleton className="h-8 w-8 inline-block rounded-md bg-muted/50" />
             </TableCell>
           </TableRow>
         ))}
@@ -243,7 +247,7 @@ export default function AdminDriversPage() {
   );
 
   // Status Badge Component
-    const StatusBadge = ({ status }: { status: Driver['status'] }) => {
+    const StatusBadge = ({ status }: { status: DriverStatus }) => {
         let variant: BadgeProps['variant'] = 'default';
         let className = '';
         let Icon = CheckCircle;
@@ -277,7 +281,7 @@ export default function AdminDriversPage() {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="shadow-md border"> {/* Added shadow */}
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-[var(--admin-primary)]"> {/* Use admin theme color */}
             <TruckIcon className="h-6 w-6" /> Driver Management
@@ -290,13 +294,13 @@ export default function AdminDriversPage() {
             <div className="relative flex-grow w-full md:w-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by name, ID, vehicle, phone..."
+                placeholder="Search by name, ID, vehicle, phone, email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 w-full"
               />
             </div>
-             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as Driver['status'] | 'all')}> {/* Corrected type */}
+             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as DriverStatus | 'all')}> {/* Corrected type */}
               <SelectTrigger className="w-full md:w-[180px]">
                 <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
                 <SelectValue placeholder="Filter by Status" />
@@ -352,8 +356,8 @@ export default function AdminDriversPage() {
                       <TableRow key={driver.id} className={cn(driver.status === 'inactive' && 'opacity-60')}>
                          <TableCell>
                              <Avatar className="h-9 w-9">
-                                {/* Use email for avatar generation */}
-                                <AvatarImage src={`https://avatar.vercel.sh/${driver.email}?size=36`} alt={driver.name} />
+                                {/* Use email for avatar generation if available */}
+                                <AvatarImage src={driver.email ? `https://avatar.vercel.sh/${driver.email}?size=36` : undefined} alt={driver.name} />
                                 <AvatarFallback>{driver.name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                             </Avatar>
                         </TableCell>
@@ -381,26 +385,68 @@ export default function AdminDriversPage() {
                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30" title="Approve Driver" onClick={() => handleApprove(driver)} disabled={updatingDriverId === driver.id}>
                                         {updatingDriverId === driver.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <CheckCircle className="h-4 w-4"/>}
                                     </Button>
-                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Reject Driver" onClick={() => handleReject(driver)} disabled={updatingDriverId === driver.id}>
-                                        {updatingDriverId === driver.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <XCircle className="h-4 w-4"/>}
-                                    </Button>
+                                     <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Reject Driver" disabled={updatingDriverId === driver.id}>
+                                                 {updatingDriverId === driver.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <XCircle className="h-4 w-4"/>}
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Reject Driver Application?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Are you sure you want to reject the application for {driver.name}? This will set their status to inactive.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={() => handleReject(driver)}
+                                                    className={buttonVariants({ variant: "destructive" })}
+                                                    >
+                                                    Yes, Reject Driver
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                              ) : (
                                 // Action for active/inactive: Toggle Status
-                                 <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    onClick={() => handleToggleStatus(driver)}
-                                    disabled={updatingDriverId === driver.id}
-                                    title={driver.status === 'active' ? 'Disable Driver' : 'Enable Driver'}
-                                >
-                                    {updatingDriverId === driver.id
-                                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                                        : driver.status === 'active'
-                                            ? <Ban className="h-4 w-4 text-red-600" />
-                                            : <CheckCircle className="h-4 w-4 text-green-600" />}
-                                </Button>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                         <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                            disabled={updatingDriverId === driver.id}
+                                            title={driver.status === 'active' ? 'Disable Driver' : 'Enable Driver'}
+                                        >
+                                            {updatingDriverId === driver.id
+                                                ? <Loader2 className="h-4 w-4 animate-spin" />
+                                                : driver.status === 'active'
+                                                    ? <Ban className="h-4 w-4 text-red-600" />
+                                                    : <CheckCircle className="h-4 w-4 text-green-600" />}
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                     <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Confirm Status Change</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                 Are you sure you want to {driver.status === 'active' ? 'disable' : 'enable'} the account for {driver.name}?
+                                                 {driver.status === 'active' ? ' Disabling prevents them from logging in or receiving orders.' : ' Enabling allows them to log in and receive orders.'}
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction
+                                                onClick={() => handleToggleStatus(driver)}
+                                                className={buttonVariants({ variant: driver.status === 'active' ? "destructive" : "default" })}
+                                                >
+                                                Yes, {driver.status === 'active' ? 'Disable' : 'Enable'} Driver
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                              )}
                              {/* View Live Location Button (Placeholder) */}
                               <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="View Live Location (Not Implemented)">
@@ -426,11 +472,3 @@ export default function AdminDriversPage() {
     </div>
   );
 }
-
-// Extend Driver type for client-side state if needed
-// Ensure required fields have defaults in useEffect, so declaration merging isn't strictly necessary here
-// declare module '@/services/driver' {
-//     interface Driver {
-//         joinedAt: Date; // Ensure joinedAt exists
-//     }
-// }

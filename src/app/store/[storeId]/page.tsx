@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'; // Use hook for client components
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getStoreById, Store, Product, DailyOffer, createSubscription, dailyOfferEligibleCategories, getUserProfile, UserProfile, followStore, unfollowStore } from "@/services/store"; // Added follow/unfollow
+import { getStoreById, Store, Product, DailyOffer, createSubscription, dailyOfferEligibleCategories, getUserProfile, UserProfile, followStore, unfollowStore, StoreCategory } from "@/services/store"; // Added follow/unfollow, StoreCategory
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { ArrowLeft, ShoppingCart, Star, Plus, Filter, Tag, Clock, MapPin, CalendarClock, Repeat, CheckCircle, XCircle, Store as StoreIcon, Bell, BookmarkPlus, BookmarkMinus } from 'lucide-react'; // Added Bookmark icons
@@ -13,20 +13,14 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast"; // Import useToast
 import { Separator } from "@/components/ui/separator"; // Import Separator
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils"; // Updated import path for formatCurrency
 import { motion, AnimatePresence } from "framer-motion"; // Import motion
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
 
-// Helper to format currency
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
-};
-
 // Helper to generate theme class based on store category
-const getThemeClass = (category: Store['category'] | undefined): string => {
-   if (!category) return '';
-   // Replace spaces with hyphens for CSS class compatibility
-   const formattedCategory = category.replace(/\s+/g, '-');
+const getThemeClass = (category: StoreCategory | undefined): string => {
+   if (!category) return 'theme-category-other'; // Default theme
+   const formattedCategory = category.replace(/\s+/g, '-').toLowerCase();
    return `theme-category-${formattedCategory}`;
 }
 
@@ -54,21 +48,25 @@ export default function StorePage() {
         return;
     };
 
+    let isMounted = true; // Flag to prevent state updates on unmounted component
+
     const fetchStoreDetails = async () => {
       setIsLoading(true);
       setError(null);
       try {
         const storeDetails = await getStoreById(storeId);
-        if (storeDetails) {
-           setStore(storeDetails);
-        } else {
-            setError("Store not found.");
+        if (isMounted) {
+           if (storeDetails) {
+             setStore(storeDetails);
+           } else {
+              setError("Store not found.");
+           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to fetch store details:", err);
-        setError("Could not load store details. Please try again later.");
+         if (isMounted) setError(err.message || "Could not load store details. Please try again later.");
       } finally {
-        setIsLoading(false);
+         if (isMounted) setIsLoading(false);
       }
     };
 
@@ -76,18 +74,20 @@ export default function StorePage() {
         setIsLoadingProfile(true);
          try {
             const profile = await getUserProfile(userId);
-            setUserProfile(profile);
-         } catch (err) {
+             if (isMounted) setUserProfile(profile);
+         } catch (err: any) {
              console.error("Failed to fetch user profile:", err);
-             // Optionally handle profile loading error separately
-             // setError("Could not load user information.");
+              if (isMounted) setError(prev => prev ? `${prev} Failed to load user info.` : "Failed to load user information."); // Add to existing error or set new
          } finally {
-             setIsLoadingProfile(false);
+              if (isMounted) setIsLoadingProfile(false);
          }
      }
 
     fetchStoreDetails();
     fetchUserProfile();
+
+     return () => { isMounted = false; } // Cleanup function
+
   }, [storeId, userId]);
 
    // Memoize product categories
@@ -107,7 +107,7 @@ export default function StorePage() {
    // Memoize active daily offers
    const activeDailyOffers = useMemo(() => {
        // Only show offers if the store is active AND open
-       if (!store?.isActive || !store.isOpen) return [];
+       if (!store?.isActive || !store?.isOpen) return [];
       return store?.dailyOffers?.filter(offer => offer.isActive) || [];
    }, [store?.dailyOffers, store?.isActive, store?.isOpen]);
 
@@ -166,11 +166,11 @@ export default function StorePage() {
                 ),
                 variant: "default", // Or a success variant
             });
-        } catch (err) {
+        } catch (err: any) { // Explicitly type error
              console.error("Subscription failed:", err);
              toast({
                 title: "Subscription Failed",
-                description: "Could not subscribe to this offer. Please try again.",
+                description: err.message || "Could not subscribe to this offer. Please try again.", // Show error message
                 variant: "destructive",
              });
         } finally {
@@ -196,13 +196,13 @@ export default function StorePage() {
                     variant: isFollowing ? "destructive" : "default",
                 });
             } else {
-                throw new Error("Failed to update follow status.");
+                throw new Error("Failed to update profile after follow/unfollow.");
             }
-        } catch (err) {
+        } catch (err: any) { // Explicitly type error
             console.error("Failed to toggle follow:", err);
             toast({
                 title: "Error",
-                description: "Could not update follow status. Please try again.",
+                description: err.message || "Could not update follow status. Please try again.", // Show error message
                 variant: "destructive",
             });
         } finally {
@@ -257,12 +257,14 @@ export default function StorePage() {
                     )}
                     onClick={() => handleAddToCart(product)}
                     style={{ '--store-accent': 'hsl(var(--store-accent))' } as React.CSSProperties}
-                    disabled={!store?.isOpen} // Disable button if store is closed
+                    disabled={!store?.isOpen || !store?.isActive} // Disable button if store is closed OR inactive
                     >
-                     {store?.isOpen ? (
+                     {store?.isOpen && store?.isActive ? (
                          <>
                             <Plus className="mr-1 h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" /> Add to Cart
                          </>
+                     ) : !store?.isActive ? (
+                        <XCircle className="mr-1 h-4 w-4"/> Unavailable
                      ) : (
                           <>
                              <Bell className="mr-1 h-4 w-4"/> Pre-order
@@ -283,7 +285,10 @@ export default function StorePage() {
         transition={{ duration: 0.2, delay: delay * 0.05 }}
         className="h-full"
     >
-        <Card className="flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-amber-400/50 hover:border-amber-500 group bg-amber-50/30 dark:bg-amber-950/20">
+        <Card className={cn(
+             "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-amber-400/50 hover:border-amber-500 group bg-amber-50/30 dark:bg-amber-950/20",
+             !store?.isOpen && "opacity-60 cursor-not-allowed" // Dim if store closed
+             )}>
             <CardHeader className="p-0">
                  <div className="relative w-full h-32 overflow-hidden">
                      <Image
@@ -319,7 +324,7 @@ export default function StorePage() {
                         !store?.isOpen && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
                     )}
                     onClick={() => handleSubscribe(offer)}
-                    disabled={isSubscribing === offer.id || !store?.isOpen}
+                    disabled={isSubscribing === offer.id || !store?.isOpen || !store?.isActive}
                     >
                      {isSubscribing === offer.id ? (
                         <Repeat className="mr-1 h-4 w-4 animate-spin" />
@@ -335,7 +340,7 @@ export default function StorePage() {
 
 
    const ProductSkeleton = () => (
-     <Card className="flex flex-col overflow-hidden border animate-pulse">
+     <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50">
         <Skeleton className="h-40 w-full bg-muted/50" />
         <CardHeader className="p-3 pb-1">
             <Skeleton className="h-5 w-3/4 mb-1 bg-muted/50" />
@@ -353,7 +358,7 @@ export default function StorePage() {
    )
 
     const DailyOfferSkeleton = () => (
-     <Card className="flex flex-col overflow-hidden border animate-pulse">
+     <Card className="flex flex-col overflow-hidden border animate-pulse bg-card/50">
         <Skeleton className="h-32 w-full bg-muted/50" />
         <CardHeader className="p-3 pb-1">
             <Skeleton className="h-5 w-3/4 mb-1 bg-muted/50" />
@@ -376,9 +381,9 @@ export default function StorePage() {
         <div className="container mx-auto px-4 py-10 space-y-8 animate-pulse"> {/* Added container and padding */}
             {/* Loading state structure */}
              <div className="flex items-center mb-6">
-                <Skeleton className="h-8 w-32" /> {/* Back button */}
+                <Skeleton className="h-8 w-32 bg-muted/50" /> {/* Back button */}
             </div>
-            <Card className="overflow-hidden border shadow-sm bg-card">
+            <Card className="overflow-hidden border shadow-sm bg-card/50">
                 <CardHeader className="p-0 relative">
                     <Skeleton className="h-56 w-full bg-muted/50" /> {/* Banner area */}
                     <div className="absolute inset-0 flex items-center justify-center p-4">
@@ -399,7 +404,7 @@ export default function StorePage() {
 
              {/* Offer Skeleton section (if applicable) */}
             {/* A simple check like this isn't ideal for loading state, but okay for now */}
-             {dailyOfferEligibleCategories.includes('groceries') && (
+             {/* {dailyOfferEligibleCategories.includes('groceries') && ( */}
                 <>
                      <Skeleton className="h-8 w-1/3 mb-4 bg-muted/50" />
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -408,7 +413,7 @@ export default function StorePage() {
                      </div>
                      <Separator className="my-8"/>
                 </>
-            )}
+            {/* )} */}
 
 
             <div className="flex justify-between items-center mb-6">
@@ -433,7 +438,7 @@ export default function StorePage() {
                      <div className="mt-4">
                         <Link href="/" passHref legacyBehavior>
                            <Button variant="secondary" size="sm">
-                               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Stores
+                               <ArrowLeft className="mr-2 h-4 w-4" /> Back to All Stores
                            </Button>
                        </Link>
                      </div>
@@ -448,12 +453,12 @@ export default function StorePage() {
         <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center h-[60vh]"> {/* Added container */}
            <Card className="w-full max-w-md">
                <CardContent className="p-10 text-center text-muted-foreground">
-                   <Tag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
+                   <StoreIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/> {/* Changed Icon */}
                    <p className="text-lg font-medium">Store Not Found</p>
                    <p className="text-sm mt-2">We couldn't find the store you were looking for.</p>
                     <Link href="/" passHref legacyBehavior>
                        <Button variant="outline" size="sm" className="mt-6">
-                           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Stores
+                           <ArrowLeft className="mr-2 h-4 w-4" /> Back to All Stores
                        </Button>
                    </Link>
                </CardContent>
@@ -496,7 +501,7 @@ export default function StorePage() {
                          </div>
                     </div>
                     {/* Store Status Overlay/Badge */}
-                     {!store.isOpen && (
+                     {!store.isOpen && store.isActive && ( // Show closed overlay only if store is active but closed by owner
                         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-20">
                            <StoreIcon className="h-12 w-12 text-white/70 mb-2"/>
                            <Badge variant="destructive" className="text-lg px-4 py-1 font-semibold">
@@ -530,7 +535,7 @@ export default function StorePage() {
                  <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-2 pt-2 text-xs text-muted-foreground">
                     {store.rating && (
                         <div className="flex items-center gap-1 font-medium">
-                            <Star className="w-4 h-4 text-yellow-500" />
+                            <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" /> {/* Filled star */}
                             <span className="font-bold text-sm text-foreground">{store.rating.toFixed(1)}</span> / 5.0
                         </div>
                      )}
@@ -546,7 +551,7 @@ export default function StorePage() {
                      )}
                  </div>
                  {/* Follow Button */}
-                {userProfile && ( // Only show if profile is loaded
+                {userProfile && store.isActive && ( // Only show follow button if profile loaded and store is active
                     <Button
                         variant={isFollowing ? "secondary" : "outline"}
                         size="sm"
@@ -564,12 +569,12 @@ export default function StorePage() {
                         {isFollowing ? "Unfollow Store" : "Follow Store"}
                     </Button>
                 )}
-            CardContent>
+            </CardContent>
         </Card>
        </motion.div>
 
        {/* Daily Offers Section (if applicable) */}
-       {dailyOfferEligibleCategories.includes(store.category) && store.dailyOffers.length > 0 && store.isActive && ( // Only show section if offers exist and store is active
+       {dailyOfferEligibleCategories.includes(store.category as StoreCategory) && activeDailyOffers.length > 0 && store.isActive && ( // Ensure StoreCategory type check and active check
           <section className="pt-0"> {/* Removed top padding */}
             <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
                <CalendarClock className="text-amber-500"/> Daily & Weekly Offers
@@ -581,9 +586,7 @@ export default function StorePage() {
                     ))}
                 </AnimatePresence>
             </div>
-             {activeDailyOffers.length === 0 && (
-                 <p className="text-muted-foreground italic text-center py-4 border border-dashed rounded-md">No active subscription offers currently available.</p>
-             )}
+             {/* Removed 'no offers' message from here, handled by section conditional */}
              <Separator className="mt-10 border-[hsl(var(--store-accent))] opacity-30"/>
           </section>
        )}
@@ -596,10 +599,11 @@ export default function StorePage() {
                    <Tag className="text-[hsl(var(--store-accent))]"/> Products
                 </h2>
                  {/* Product Category Filter */}
-                 {productCategories.length > 2 && ( // Only show filter if more than 'all' + 1 category
+                 {productCategories.length > 2 && store.isActive && ( // Only show filter if store is active
                      <Select
                         value={selectedProductCategory}
                         onValueChange={(value: string) => setSelectedProductCategory(value)}
+                        disabled={!store.isActive} // Disable if store inactive
                      >
                         <SelectTrigger className="w-full sm:w-[240px] shadow-sm"> {/* Added shadow */}
                             <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -616,7 +620,7 @@ export default function StorePage() {
                  )}
             </div>
 
-            {store.products && store.products.length > 0 ? (
+            {store.products && store.products.length > 0 && store.isActive ? ( // Only render product grid if store is active
                  filteredProducts.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                         <AnimatePresence>
@@ -625,7 +629,7 @@ export default function StorePage() {
                             ))}
                         </AnimatePresence>
                     </div>
-                 ) : (
+                 ) : ( // Render 'no products found' only if store is active
                      <Card className="border-dashed border-muted-foreground/50 col-span-full">
                        <CardContent className="p-10 text-center text-muted-foreground">
                             <Tag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
@@ -637,7 +641,8 @@ export default function StorePage() {
                        </CardContent>
                     </Card>
                  )
-            ) : (
+            ) : !store.isActive ? null // Don't show products if store is inactive
+            : ( // Render 'no products yet' only if store is active
                 <Card className="border-dashed border-muted-foreground/50 col-span-full">
                    <CardContent className="p-10 text-center text-muted-foreground">
                         <Tag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
