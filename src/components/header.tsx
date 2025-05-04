@@ -1,14 +1,14 @@
-
 "use client";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building } from 'lucide-react'; // Added Building icon
+import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useState, useEffect } from "react"; // Added useEffect
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Logo } from '@/components/Logo'; // Import the new Logo component
 // Assume a cart state/hook exists (replace with actual implementation)
 // import { useCart } from '@/hooks/useCart';
 
@@ -16,6 +16,8 @@ export function Header() {
    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
    const pathname = usePathname();
    const isAdminRoute = pathname.startsWith('/admin');
+   const isDriverRoute = pathname.startsWith('/driver');
+   const isStoreOwnerRoute = pathname.startsWith('/stores'); // Assuming /stores is the owner portal
 
    // TODO: Replace with actual cart count from state management
    // const { cartItemCount } = useCart(); // Example usage
@@ -33,20 +35,46 @@ export function Header() {
 
    // Define different nav items based on route context
    const customerNavItems = [
-      { href: "/", label: "Stores", icon: PackageSearch },
+      { href: "/", label: "Browse Stores", icon: PackageSearch },
       { href: "/orders", label: "My Orders", icon: Package },
-      { href: "/stores", label: "Manage Stores", icon: Building }, // Added Manage Stores link
+      { href: "/stores", label: "Manage Stores", icon: Building }, // Added Manage Stores link for owners
       { href: "/profile", label: "Profile", icon: User },
    ];
 
-   // Basic Admin links - consider moving to Admin Layout's sidebar
-    const adminNavItems = [
-      { href: "/admin", label: "Dashboard", icon: Settings }, // Example admin link
-      { href: "/admin/settings", label: "App Settings", icon: Shield }, // Example admin link
-   ];
+   // Basic Admin links - sidebar is primary nav for admin
+    const adminNavItems: typeof customerNavItems = []; // Admin header might not need these
+
+    // Basic Driver links - sidebar is primary nav for driver
+    const driverNavItems: typeof customerNavItems = []; // Driver header might not need these
+
+    // Basic Store Owner links - sidebar is primary nav for store owner
+    const storeOwnerNavItems: typeof customerNavItems = []; // Store owner header might not need these
 
    // Choose nav items based on route
-   const navItems = isAdminRoute ? [] : customerNavItems; // Admin header might not need main nav
+    let navItems: typeof customerNavItems = [];
+    let logoLink = "/";
+    let accountLink = "/profile";
+    let logoText = "SwiftDispatch";
+
+    if (isAdminRoute) {
+        navItems = adminNavItems;
+        logoLink = "/admin";
+        accountLink = "/admin/profile"; // Example admin profile link
+        logoText = "SwiftDispatch Admin";
+    } else if (isDriverRoute) {
+        navItems = driverNavItems;
+        logoLink = "/driver/dashboard";
+        accountLink = "/driver/profile";
+        logoText = "SwiftDispatch Driver";
+    } else if (isStoreOwnerRoute) {
+        navItems = storeOwnerNavItems;
+        logoLink = "/stores";
+        accountLink = "/profile"; // Store owner uses main profile for now
+        logoText = "SwiftDispatch Stores";
+    } else {
+         navItems = customerNavItems;
+    }
+
 
    const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
@@ -55,7 +83,7 @@ export function Header() {
       <div className="container flex h-16 items-center px-4 md:px-6"> {/* Adjusted padding */}
         {/* Logo/Brand Name */}
          <div className="mr-4 md:mr-6 flex items-center"> {/* Container for logo and mobile trigger */}
-             {/* Mobile Menu Trigger (Moved near logo for common pattern) */}
+             {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
                      <Button variant="ghost" size="icon" className="md:hidden mr-2 rounded-full hover:bg-accent/50">
@@ -67,17 +95,13 @@ export function Header() {
                 <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0"> {/* Remove padding for full control */}
                     <SheetHeader className="p-4 mb-0 border-b"> {/* Adjust padding/margin */}
                         <SheetTitle className="flex items-center gap-2">
-                             {/* Re-use logo SVG */}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
-                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                            <span className="font-bold text-lg">SwiftDispatch</span>
+                            <Logo className="h-6 w-auto text-primary"/> {/* Use Logo */}
+                            <span className="font-bold text-lg">{logoText}</span>
                         </SheetTitle>
                     </SheetHeader>
                     {/* Mobile Navigation Links */}
                     <nav className="grid gap-2 p-4 text-base font-medium">
-                        {(isAdminRoute ? adminNavItems : customerNavItems).map((item) => ( // Show relevant links
+                        {navItems.map((item) => ( // Show relevant links
                            <Link
                             key={item.href}
                             href={item.href}
@@ -94,9 +118,9 @@ export function Header() {
                             </Link>
                          ))}
                          {/* Add conditional Login/Account link for mobile */}
-                         {!isAdminRoute && (
+                         {( !isDriverRoute && !isStoreOwnerRoute) && ( // Show Account for Customer/Admin
                             <Link
-                                href="/profile" // Or /login if not authenticated
+                                href={accountLink}
                                 onClick={closeMobileMenu}
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                             >
@@ -104,7 +128,7 @@ export function Header() {
                                 Account
                             </Link>
                          )}
-                         {!isAdminRoute && (
+                         {(!isAdminRoute && !isDriverRoute && !isStoreOwnerRoute) && ( // Only show Cart for customer view
                              <Link
                                 href="/cart" // Link to cart page
                                 onClick={closeMobileMenu}
@@ -123,19 +147,16 @@ export function Header() {
                 </SheetContent>
             </Sheet>
 
-            <Link href={isAdminRoute ? "/admin" : "/"} className="flex items-center space-x-2" onClick={closeMobileMenu}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
-                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                <span className="font-bold text-lg hidden sm:inline-block">SwiftDispatch{isAdminRoute ? ' Admin' : ''}</span>
+            <Link href={logoLink} className="flex items-center space-x-2" onClick={closeMobileMenu}>
+                 <Logo className="h-8 w-auto text-primary"/> {/* Use Logo */}
+                <span className="font-bold text-lg hidden sm:inline-block">{logoText}</span>
             </Link>
         </div>
 
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium flex-1 ml-6">
-           {navItems.map((item) => ( // Only shows customer items or empty for admin
+           {navItems.map((item) => (
                <Link
                 key={item.href}
                 href={item.href}
@@ -151,8 +172,8 @@ export function Header() {
 
          {/* Right side Actions (Cart, Login/Profile) */}
          <div className="flex items-center justify-end space-x-2 md:space-x-3 ml-auto">
-            {/* Cart Button - Placeholder (Only for customer view) */}
-             {!isAdminRoute && (
+            {/* Cart Button - Only for customer view */}
+             {(!isAdminRoute && !isDriverRoute && !isStoreOwnerRoute) && (
                 <Link href="/cart" passHref>
                      <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-accent/50">
                         <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
@@ -166,11 +187,13 @@ export function Header() {
                  </Link>
              )}
 
-             {/* Login/Profile Button - Placeholder */}
-              <Link href={isAdminRoute ? "/admin/profile" : "/profile"} passHref>
+             {/* Login/Profile Button */}
+              <Link href={accountLink} passHref>
                  <Button variant="outline" size="sm" className="rounded-full border-border"> {/* Use outline and border */}
                     <User className="h-4 w-4 md:mr-2" />
-                    <span className="hidden md:inline">{isAdminRoute ? 'Admin' : 'Account'}</span>
+                     <span className="hidden md:inline">
+                        {isAdminRoute ? 'Admin' : (isDriverRoute ? 'Driver' : (isStoreOwnerRoute ? 'Owner' : 'Account'))}
+                     </span>
                  </Button>
              </Link>
              {/* Example Login Button (use if no user logged in) */}

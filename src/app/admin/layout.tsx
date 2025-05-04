@@ -6,9 +6,10 @@ import { Separator } from "@/components/ui/separator";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Store, Package, Users, Settings, BarChart2, FileText, ShieldCheck, LifeBuoy, Truck, MessageSquare, BrainCircuit, LogOut } from 'lucide-react'; // Added BrainCircuit, LogOut
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; // Import Avatar
-import { Button } from '@/components/ui/button'; // Import Button for logout
+import { LayoutDashboard, Store, Package, Users, Settings, BarChart2, FileText, ShieldCheck, LifeBuoy, Truck, MessageSquare, BrainCircuit, LogOut } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Logo } from '@/components/Logo'; // Import the new Logo component
 
 // Admin specific navigation items
 const adminNavItems = [
@@ -18,7 +19,7 @@ const adminNavItems = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/orders", label: "Orders", icon: FileText },
   { href: "/admin/drivers", label: "Drivers", icon: Truck },
-  { href: "/admin/ai-model", label: "AI Model", icon: BrainCircuit }, // Added AI Model Management
+  { href: "/admin/ai-model", label: "AI Model", icon: BrainCircuit },
   { href: "/admin/reports", label: "Reports", icon: BarChart2 },
   { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/support", label: "Support", icon: LifeBuoy },
@@ -35,16 +36,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     // Apply admin-layout class for scoping admin theme variables
     <SidebarProvider>
-      <div className={cn("flex min-h-screen bg-admin-background", "admin-layout")}> {/* Changed background */}
+      <div className={cn("flex min-h-screen", "admin-layout")}> {/* Removed explicit bg, uses variable */}
         {/* Admin Sidebar */}
         {/* Added admin-sidebar class for specific sidebar theme overrides */}
-        <Sidebar collapsible="icon" side="left" variant="sidebar" className={cn("bg-[--admin-sidebar-background] text-[--admin-sidebar-foreground] border-r border-[--admin-sidebar-border] shadow-lg", "admin-sidebar")}> {/* Added shadow */}
+        <Sidebar collapsible="icon" side="left" variant="sidebar" className={cn("bg-[--admin-sidebar-background] text-[--admin-sidebar-foreground] border-r border-[--admin-sidebar-border] shadow-lg", "admin-sidebar")}> {/* Use variable colors */}
           <SidebarHeader className="p-2 border-b border-[--admin-sidebar-border]">
              <div className="flex items-center justify-between p-2"> {/* Padding for logo area */}
-                {/* Simplified Logo for Admin */}
+                {/* Use new Logo component */}
                  <Link href="/admin" className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
-                      {/* Use a distinct admin icon or logo */}
-                     <ShieldCheck className="h-7 w-7 text-[var(--admin-sidebar-primary)]" /> {/* Example: Shield for admin */}
+                      <Logo className="h-7 w-auto text-[var(--admin-sidebar-primary)]" /> {/* Use logo with primary color */}
                      <span className="font-bold text-xl group-data-[collapsible=icon]:hidden text-[var(--admin-sidebar-foreground)]">SwiftDispatch</span>
                      <span className="font-semibold text-xs text-[var(--admin-sidebar-foreground)]/70 group-data-[collapsible=icon]:hidden ml-1">Admin</span>
                  </Link>
@@ -111,9 +111,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Main Content Area for Admin Pages */}
         <SidebarInset className="flex-1 flex flex-col">
            {/* Admin Header */}
-           <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur px-6 shadow-md"> {/* Added shadow */}
+           <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur px-6 shadow-md"> {/* Use theme background, Added shadow */}
                 <SidebarTrigger className="md:hidden" /> {/* Mobile Trigger */}
-                <h1 className="text-xl font-semibold md:text-2xl flex-1 text-foreground"> {/* Use default foreground */}
+                <h1 className="text-xl font-semibold md:text-2xl flex-1 text-foreground"> {/* Use theme foreground */}
                      {adminNavItems.find(item => pathname.startsWith(item.href))?.label || 'Admin Dashboard'}
                 </h1>
                 {/* Add User menu/settings dropdown here */}
@@ -121,7 +121,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {/* <UserMenu /> */}
            </header>
            {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-admin-background"> {/* Ensure main bg matches layout */}
+          <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-background"> {/* Ensure main bg matches layout variable */}
             {children}
           </main>
         </SidebarInset>
