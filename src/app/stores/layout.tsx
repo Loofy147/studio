@@ -101,7 +101,7 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                      </SidebarMenuItem>
                       {/* Manage-specific links */}
                       {manageStoreNavItems.map((item, index) => (
-                          <SidebarMenuItem key={`${item.href}-${index}`}>
+                          <SidebarMenuItem key={`${item.href}-${index}`}> {/* Use index in key */}
                              <Link href={item.href} passHref legacyBehavior>
                                  <SidebarMenuButton
                                      asChild
@@ -125,7 +125,7 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                  <SidebarMenu className="px-2 py-4">
                     {storeOwnerNavItems.map((item, index) => (
                         // Use index in key to prevent duplicate key error if hrefs are the same
-                        <SidebarMenuItem key={`${item.href}-${index}`}>
+                        <SidebarMenuItem key={`${item.href}-${index}`}> {/* Use index in key */}
                         <Link href={item.href} passHref legacyBehavior>
                             <SidebarMenuButton
                             asChild
