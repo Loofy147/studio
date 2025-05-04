@@ -11,90 +11,283 @@ body {
 }
 
 @layer base {
-  /* --- SwiftDispatch Theme --- */
+  /* --- Base Theme Variables --- */
   :root {
-    /* Color Palette */
-    --teal-base: 180; /* H value for Teal #008080 */
-    --gray-base: 0; /* H value for Gray #F0F0F0 */
-    --orange-base: 39; /* H value for Orange #FFA500 */
+    /* Core Palette Hues */
+    --sdp-blue-hue: 220; /* Primary */
+    --sdp-orange-hue: 25; /* Secondary */
+    --sdp-green-hue: 145; /* Accent */
+    --sdp-gray-hue: 215; /* Neutral */
+    --sdp-red-hue: 0; /* Destructive */
 
-    /* Light Mode Theme */
-    --background: var(--gray-base) 0% 98%; /* Slightly off-white #FAFAFA (derived from F0F0F0) */
-    --foreground: var(--teal-base) 20% 15%; /* Dark Teal text */
-    --card: var(--gray-base) 0% 100%; /* White cards */
-    --card-foreground: var(--teal-base) 20% 15%;
-    --popover: var(--gray-base) 0% 100%; /* White popovers */
-    --popover-foreground: var(--teal-base) 20% 15%;
-    --primary: var(--teal-base) 100% 25.1%; /* Teal #008080 */
-    --primary-foreground: var(--gray-base) 0% 100%; /* White */
-    --secondary: var(--gray-base) 0% 94.1%; /* Light Gray #F0F0F0 */
-    --secondary-foreground: var(--teal-base) 20% 15%; /* Dark Teal text on light gray */
-    --muted: var(--gray-base) 0% 94.1%; /* Light Gray #F0F0F0 */
-    --muted-foreground: var(--teal-base) 15% 45%; /* Muted Teal text */
-    --accent: var(--orange-base) 100% 50%; /* Orange #FFA500 */
-    --accent-foreground: var(--gray-base) 0% 10%; /* Dark text for Orange */
-    --destructive: 0 84.2% 60.2%; /* Default Red */
-    --destructive-foreground: 0 0% 98%; /* White */
-    --border: var(--gray-base) 0% 87.1%; /* Slightly darker gray border #DEDEDE */
-    --input: var(--gray-base) 0% 90.1%; /* Input border #E6E6E6 */
-    --ring: var(--teal-base) 80% 60%; /* Lighter Teal for focus rings */
+    /* Light Mode */
+    --background: var(--sdp-gray-hue) 20% 98%; /* Off-white */
+    --foreground: var(--sdp-gray-hue) 10% 10%; /* Dark Gray */
+    --card: var(--sdp-gray-hue) 0% 100%; /* White */
+    --card-foreground: var(--sdp-gray-hue) 10% 10%;
+    --popover: var(--sdp-gray-hue) 0% 100%;
+    --popover-foreground: var(--sdp-gray-hue) 10% 10%;
+    --primary: var(--sdp-blue-hue) 75% 55%; /* #3366FF */
+    --primary-foreground: var(--sdp-gray-hue) 0% 100%; /* White */
+    --secondary: var(--sdp-orange-hue) 90% 60%; /* #FF6633 */
+    --secondary-foreground: var(--sdp-gray-hue) 0% 100%; /* White */
+    --muted: var(--sdp-gray-hue) 15% 94%; /* Light Gray */
+    --muted-foreground: var(--sdp-gray-hue) 15% 45%; /* Medium Gray */
+    --accent: var(--sdp-green-hue) 60% 50%; /* #33CC99 - For success/confirmation */
+    --accent-foreground: var(--sdp-gray-hue) 0% 10%; /* Dark text for Green */
+    --destructive: var(--sdp-red-hue) 80% 60%; /* Red */
+    --destructive-foreground: var(--sdp-gray-hue) 0% 100%; /* White */
+    --border: var(--sdp-gray-hue) 15% 88%; /* Light Gray Border */
+    --input: var(--sdp-gray-hue) 15% 88%; /* Input border */
+    --ring: var(--sdp-blue-hue) 60% 70%; /* Lighter Blue for focus rings */
 
     --radius: 0.5rem;
 
-    /* Chart Colors (Example) */
+    /* Chart Colors (Derived from palette) */
     --chart-1: hsl(var(--primary));
-    --chart-2: hsl(var(--accent)); /* Orange */
-    --chart-3: hsl(120, 70%, 45%); /* Green */
-    --chart-4: hsl(210, 70%, 55%); /* Blue */
-    --chart-5: hsl(330, 70%, 55%); /* Pink */
+    --chart-2: hsl(var(--secondary));
+    --chart-3: hsl(var(--accent));
+    --chart-4: hsl(var(--sdp-gray-hue) 60% 55%); /* Muted blue */
+    --chart-5: hsl(var(--sdp-orange-hue) 70% 70%); /* Lighter orange */
 
-    /* Sidebar Theme Variables (Using new theme) */
-    --sidebar-background: hsl(var(--gray-base) 0% 96%); /* Slightly darker gray than main bg */
+    /* Default Sidebar Theme (Matches base theme) */
+    --sidebar-background: hsl(var(--sdp-gray-hue) 20% 96%); /* Slightly darker gray */
     --sidebar-foreground: hsl(var(--foreground));
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: hsl(var(--secondary)); /* Use secondary gray for accent */
-    --sidebar-accent-foreground: hsl(var(--secondary-foreground));
+    --sidebar-accent: hsl(var(--sdp-blue-hue) 70% 95%); /* Very light blue accent */
+    --sidebar-accent-foreground: hsl(var(--primary)); /* Use primary text on light blue */
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
   }
 
   .dark {
-    /* Dark Mode Theme */
-    --background: var(--teal-base) 10% 12%; /* Very dark desaturated teal */
-    --foreground: var(--gray-base) 0% 90%; /* Light gray text */
-    --card: var(--teal-base) 10% 16%; /* Slightly lighter card bg */
-    --card-foreground: var(--gray-base) 0% 90%;
-    --popover: var(--teal-base) 10% 14%; /* Dark popover */
-    --popover-foreground: var(--gray-base) 0% 90%;
-    --primary: var(--teal-base) 80% 55%; /* Brighter Teal */
-    --primary-foreground: var(--teal-base) 10% 10%; /* Very dark text */
-    --secondary: var(--gray-base) 0% 20%; /* Dark Gray */
-    --secondary-foreground: var(--gray-base) 0% 85%; /* Lighter gray text */
-    --muted: var(--gray-base) 0% 25%; /* Slightly lighter dark gray */
-    --muted-foreground: var(--gray-base) 0% 60%; /* Muted gray text */
-    --accent: var(--orange-base) 90% 55%; /* Brighter Orange */
-    --accent-foreground: var(--gray-base) 0% 10%; /* Dark text */
-    --destructive: 0 70% 50%; /* Slightly muted red */
-    --destructive-foreground: 0 0% 98%;
-    --border: var(--gray-base) 0% 30%; /* Darker gray border */
-    --input: var(--gray-base) 0% 25%; /* Input border matches muted */
-    --ring: var(--teal-base) 70% 65%; /* Bright teal focus */
+    /* Dark Mode */
+    --background: var(--sdp-gray-hue) 10% 12%; /* Very dark gray */
+    --foreground: var(--sdp-gray-hue) 10% 90%; /* Light gray text */
+    --card: var(--sdp-gray-hue) 10% 16%; /* Slightly lighter card bg */
+    --card-foreground: var(--sdp-gray-hue) 10% 90%;
+    --popover: var(--sdp-gray-hue) 10% 14%; /* Dark popover */
+    --popover-foreground: var(--sdp-gray-hue) 10% 90%;
+    --primary: var(--sdp-blue-hue) 70% 65%; /* Brighter Blue */
+    --primary-foreground: var(--sdp-gray-hue) 10% 15%; /* Dark text */
+    --secondary: var(--sdp-orange-hue) 80% 65%; /* Brighter Orange */
+    --secondary-foreground: var(--sdp-gray-hue) 10% 15%; /* Dark text */
+    --muted: var(--sdp-gray-hue) 10% 25%; /* Slightly lighter dark gray */
+    --muted-foreground: var(--sdp-gray-hue) 10% 60%; /* Muted gray text */
+    --accent: var(--sdp-green-hue) 60% 60%; /* Brighter Green */
+    --accent-foreground: var(--sdp-gray-hue) 10% 15%; /* Dark text */
+    --destructive: var(--sdp-red-hue) 70% 55%; /* Slightly muted red */
+    --destructive-foreground: var(--sdp-gray-hue) 0% 98%; /* Light text */
+    --border: var(--sdp-gray-hue) 10% 30%; /* Darker gray border */
+    --input: var(--sdp-gray-hue) 10% 25%; /* Input border matches muted */
+    --ring: var(--sdp-blue-hue) 60% 75%; /* Bright blue focus */
 
-    /* Sidebar Dark */
-    --sidebar-background: hsl(var(--teal-base) 10% 10%); /* Darkest */
+    /* Dark Sidebar */
+    --sidebar-background: hsl(var(--sdp-gray-hue) 10% 10%); /* Darkest */
     --sidebar-foreground: hsl(var(--foreground));
     --sidebar-primary: hsl(var(--primary));
     --sidebar-primary-foreground: hsl(var(--primary-foreground));
-    --sidebar-accent: hsl(var(--gray-base) 0% 20%); /* Dark Gray accent */
-    --sidebar-accent-foreground: hsl(var(--secondary-foreground));
+    --sidebar-accent: hsl(var(--sdp-blue-hue) 70% 25%); /* Darker blue accent */
+    --sidebar-accent-foreground: hsl(var(--sdp-blue-hue) 70% 85%); /* Lighter text on dark blue */
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
   }
 
+  /* --- Admin Theme --- */
+  .admin-layout {
+      --adm-primary-hue: 260; /* Purple */
+      --adm-secondary-hue: 190; /* Cyan */
+      --adm-gray-hue: 220; /* Slate */
+
+      /* Admin Light */
+      --background: hsl(var(--adm-gray-hue) 15% 97%);
+      --foreground: hsl(var(--adm-gray-hue) 10% 20%);
+      --card: hsl(var(--adm-gray-hue) 0% 100%);
+      --card-foreground: hsl(var(--adm-gray-hue) 10% 20%);
+      --primary: hsl(var(--adm-primary-hue) 60% 55%); /* Purple */
+      --primary-foreground: hsl(var(--adm-gray-hue) 0% 100%);
+      --secondary: hsl(var(--adm-secondary-hue) 60% 50%); /* Cyan */
+      --secondary-foreground: hsl(var(--adm-gray-hue) 10% 15%);
+      --muted: hsl(var(--adm-gray-hue) 15% 94%);
+      --muted-foreground: hsl(var(--adm-gray-hue) 10% 45%);
+      --accent: hsl(var(--adm-secondary-hue) 60% 95%); /* Light Cyan Accent */
+      --accent-foreground: hsl(var(--adm-secondary-hue) 60% 30%);
+      --border: hsl(var(--adm-gray-hue) 15% 88%);
+      --input: hsl(var(--adm-gray-hue) 15% 88%);
+      --ring: hsl(var(--adm-primary-hue) 50% 70%);
+
+      /* Admin Sidebar Light */
+      --sidebar-background: hsl(var(--adm-gray-hue) 15% 18%); /* Dark Slate */
+      --sidebar-foreground: hsl(var(--adm-gray-hue) 15% 90%); /* Light text */
+      --sidebar-primary: hsl(var(--adm-primary-hue) 60% 65%); /* Brighter Purple */
+      --sidebar-primary-foreground: hsl(var(--adm-gray-hue) 0% 100%);
+      --sidebar-accent: hsl(var(--adm-gray-hue) 15% 25%); /* Slightly Lighter Slate */
+      --sidebar-accent-foreground: hsl(var(--adm-gray-hue) 15% 95%);
+      --sidebar-border: hsl(var(--adm-gray-hue) 15% 30%);
+      --sidebar-ring: hsl(var(--sidebar-primary));
+  }
+
+  .dark .admin-layout {
+      /* Admin Dark */
+      --background: hsl(var(--adm-gray-hue) 10% 10%); /* Very Dark Slate */
+      --foreground: hsl(var(--adm-gray-hue) 15% 90%);
+      --card: hsl(var(--adm-gray-hue) 10% 14%);
+      --card-foreground: hsl(var(--adm-gray-hue) 15% 90%);
+      --primary: hsl(var(--adm-primary-hue) 60% 65%); /* Brighter Purple */
+      --primary-foreground: hsl(var(--adm-gray-hue) 15% 95%);
+      --secondary: hsl(var(--adm-secondary-hue) 60% 60%); /* Brighter Cyan */
+      --secondary-foreground: hsl(var(--adm-gray-hue) 10% 10%);
+      --muted: hsl(var(--adm-gray-hue) 10% 20%);
+      --muted-foreground: hsl(var(--adm-gray-hue) 10% 60%);
+      --accent: hsl(var(--adm-secondary-hue) 60% 20%); /* Dark Cyan Accent */
+      --accent-foreground: hsl(var(--adm-secondary-hue) 60% 80%);
+      --border: hsl(var(--adm-gray-hue) 10% 25%);
+      --input: hsl(var(--adm-gray-hue) 10% 20%);
+      --ring: hsl(var(--adm-primary-hue) 50% 75%);
+
+      /* Admin Sidebar Dark (remains same as light for contrast) */
+      --sidebar-background: hsl(var(--adm-gray-hue) 15% 18%);
+      --sidebar-foreground: hsl(var(--adm-gray-hue) 15% 90%);
+      --sidebar-primary: hsl(var(--adm-primary-hue) 60% 65%);
+      --sidebar-primary-foreground: hsl(var(--adm-gray-hue) 0% 100%);
+      --sidebar-accent: hsl(var(--adm-gray-hue) 15% 25%);
+      --sidebar-accent-foreground: hsl(var(--adm-gray-hue) 15% 95%);
+      --sidebar-border: hsl(var(--adm-gray-hue) 15% 30%);
+      --sidebar-ring: hsl(var(--sidebar-primary));
+  }
+
+
+  /* --- Driver Theme --- */
+  .driver-layout {
+      --drv-primary-hue: 180; /* Teal/Cyan */
+      --drv-secondary-hue: 45; /* Gold/Yellow */
+      --drv-gray-hue: 210; /* Cool Gray */
+
+      /* Driver Light */
+      --background: hsl(var(--drv-gray-hue) 15% 98%);
+      --foreground: hsl(var(--drv-gray-hue) 10% 15%);
+      --card: hsl(var(--drv-gray-hue) 0% 100%);
+      --card-foreground: hsl(var(--drv-gray-hue) 10% 15%);
+      --primary: hsl(var(--drv-primary-hue) 80% 45%); /* Teal */
+      --primary-foreground: hsl(var(--drv-gray-hue) 0% 100%);
+      --secondary: hsl(var(--drv-secondary-hue) 85% 55%); /* Gold */
+      --secondary-foreground: hsl(var(--drv-gray-hue) 10% 10%);
+      --muted: hsl(var(--drv-gray-hue) 15% 94%);
+      --muted-foreground: hsl(var(--drv-gray-hue) 10% 45%);
+      --accent: hsl(var(--drv-primary-hue) 70% 95%); /* Light Teal Accent */
+      --accent-foreground: hsl(var(--drv-primary-hue) 70% 30%);
+      --border: hsl(var(--drv-gray-hue) 15% 88%);
+      --input: hsl(var(--drv-gray-hue) 15% 88%);
+      --ring: hsl(var(--drv-primary-hue) 70% 65%);
+
+      /* Driver Sidebar Light */
+      --sidebar-background: hsl(var(--drv-gray-hue) 15% 95%); /* Light gray */
+      --sidebar-foreground: hsl(var(--foreground));
+      --sidebar-primary: hsl(var(--primary));
+      --sidebar-primary-foreground: hsl(var(--primary-foreground));
+      --sidebar-accent: hsl(var(--drv-primary-hue) 70% 92%); /* Lighter teal */
+      --sidebar-accent-foreground: hsl(var(--primary));
+      --sidebar-border: hsl(var(--border));
+      --sidebar-ring: hsl(var(--ring));
+  }
+
+  .dark .driver-layout {
+      /* Driver Dark */
+      --background: hsl(var(--drv-gray-hue) 10% 12%); /* Dark Cool Gray */
+      --foreground: hsl(var(--drv-gray-hue) 10% 90%);
+      --card: hsl(var(--drv-gray-hue) 10% 16%);
+      --card-foreground: hsl(var(--drv-gray-hue) 10% 90%);
+      --primary: hsl(var(--drv-primary-hue) 70% 55%); /* Brighter Teal */
+      --primary-foreground: hsl(var(--drv-gray-hue) 10% 10%);
+      --secondary: hsl(var(--drv-secondary-hue) 80% 60%); /* Brighter Gold */
+      --secondary-foreground: hsl(var(--drv-gray-hue) 10% 10%);
+      --muted: hsl(var(--drv-gray-hue) 10% 20%);
+      --muted-foreground: hsl(var(--drv-gray-hue) 10% 60%);
+      --accent: hsl(var(--drv-primary-hue) 70% 20%); /* Dark Teal Accent */
+      --accent-foreground: hsl(var(--drv-primary-hue) 70% 80%);
+      --border: hsl(var(--drv-gray-hue) 10% 25%);
+      --input: hsl(var(--drv-gray-hue) 10% 20%);
+      --ring: hsl(var(--drv-primary-hue) 60% 70%);
+
+       /* Driver Sidebar Dark */
+      --sidebar-background: hsl(var(--drv-gray-hue) 10% 10%); /* Darkest */
+      --sidebar-foreground: hsl(var(--foreground));
+      --sidebar-primary: hsl(var(--primary));
+      --sidebar-primary-foreground: hsl(var(--primary-foreground));
+      --sidebar-accent: hsl(var(--drv-primary-hue) 70% 18%); /* Dark teal accent */
+      --sidebar-accent-foreground: hsl(var(--drv-primary-hue) 70% 85%);
+      --sidebar-border: hsl(var(--border));
+      --sidebar-ring: hsl(var(--ring));
+  }
+
+
+   /* --- Store Owner Theme --- */
+  .store-owner-layout {
+      --sto-primary-hue: 340; /* Pink/Magenta */
+      --sto-secondary-hue: 270; /* Indigo */
+      --sto-gray-hue: 210; /* Neutral Gray */
+
+      /* Store Owner Light */
+      --background: hsl(var(--sto-gray-hue) 10% 98%);
+      --foreground: hsl(var(--sto-gray-hue) 10% 15%);
+      --card: hsl(var(--sto-gray-hue) 0% 100%);
+      --card-foreground: hsl(var(--sto-gray-hue) 10% 15%);
+      --primary: hsl(var(--sto-primary-hue) 70% 55%); /* Pink */
+      --primary-foreground: hsl(var(--sto-gray-hue) 0% 100%);
+      --secondary: hsl(var(--sto-secondary-hue) 50% 60%); /* Indigo */
+      --secondary-foreground: hsl(var(--sto-gray-hue) 0% 100%);
+      --muted: hsl(var(--sto-gray-hue) 10% 94%);
+      --muted-foreground: hsl(var(--sto-gray-hue) 10% 45%);
+      --accent: hsl(var(--sto-primary-hue) 70% 96%); /* Very Light Pink Accent */
+      --accent-foreground: hsl(var(--sto-primary-hue) 70% 40%);
+      --border: hsl(var(--sto-gray-hue) 10% 88%);
+      --input: hsl(var(--sto-gray-hue) 10% 88%);
+      --ring: hsl(var(--sto-primary-hue) 60% 70%);
+
+      /* Store Owner Sidebar Light */
+      --sidebar-background: hsl(var(--sto-gray-hue) 10% 96%);
+      --sidebar-foreground: hsl(var(--foreground));
+      --sidebar-primary: hsl(var(--primary));
+      --sidebar-primary-foreground: hsl(var(--primary-foreground));
+      --sidebar-accent: hsl(var(--sto-primary-hue) 70% 94%); /* Light pink */
+      --sidebar-accent-foreground: hsl(var(--primary));
+      --sidebar-border: hsl(var(--border));
+      --sidebar-ring: hsl(var(--ring));
+  }
+
+  .dark .store-owner-layout {
+      /* Store Owner Dark */
+      --background: hsl(var(--sto-gray-hue) 8% 10%);
+      --foreground: hsl(var(--sto-gray-hue) 10% 90%);
+      --card: hsl(var(--sto-gray-hue) 8% 14%);
+      --card-foreground: hsl(var(--sto-gray-hue) 10% 90%);
+      --primary: hsl(var(--sto-primary-hue) 70% 65%); /* Brighter Pink */
+      --primary-foreground: hsl(var(--sto-gray-hue) 10% 10%);
+      --secondary: hsl(var(--sto-secondary-hue) 50% 65%); /* Brighter Indigo */
+      --secondary-foreground: hsl(var(--sto-gray-hue) 0% 100%);
+      --muted: hsl(var(--sto-gray-hue) 8% 18%);
+      --muted-foreground: hsl(var(--sto-gray-hue) 10% 60%);
+      --accent: hsl(var(--sto-primary-hue) 70% 18%); /* Dark Pink Accent */
+      --accent-foreground: hsl(var(--sto-primary-hue) 70% 85%);
+      --border: hsl(var(--sto-gray-hue) 8% 25%);
+      --input: hsl(var(--sto-gray-hue) 8% 18%);
+      --ring: hsl(var(--sto-primary-hue) 60% 75%);
+
+       /* Store Owner Sidebar Dark */
+      --sidebar-background: hsl(var(--sto-gray-hue) 8% 8%); /* Darkest */
+      --sidebar-foreground: hsl(var(--foreground));
+      --sidebar-primary: hsl(var(--primary));
+      --sidebar-primary-foreground: hsl(var(--primary-foreground));
+      --sidebar-accent: hsl(var(--sto-primary-hue) 70% 15%); /* Dark pink */
+      --sidebar-accent-foreground: hsl(var(--sto-primary-hue) 70% 80%);
+      --sidebar-border: hsl(var(--border));
+      --sidebar-ring: hsl(var(--ring));
+  }
+
   /* --- Category Theme --- */
   /* Define themed variables for Store Categories */
-  /* Base category theme using Secondary color */
+  /* Base category theme using Secondary color from base theme */
   .theme-category-electronics,
   .theme-category-clothing,
   .theme-category-groceries,
@@ -104,7 +297,7 @@ body {
   .theme-category-restaurants,
   .theme-category-coffee-shops,
   .theme-category-other {
-    --store-accent: hsl(var(--secondary)); /* Default to secondary gray */
+    --store-accent: hsl(var(--secondary)); /* Default to secondary */
     --store-accent-foreground: hsl(var(--secondary-foreground));
   }
 
@@ -161,13 +354,13 @@ body {
     /* Body 1 (default): 16px, Regular */
     p, body { @apply text-base font-normal leading-relaxed; } /* 16px */
     /* Body 2: 14px, Regular */
-    .text-body2 { @apply text-sm font-normal leading-normal; } /* 14px */
+    .text-body2 { @apply text-[0.875rem] font-normal leading-normal; } /* 14px - Explicit px */
     /* Lead text: Larger muted text */
     .lead { @apply text-lg font-normal text-muted-foreground; } /* 18px */
 
     /* Smaller text styles */
     /* Caption: 12px, Regular */
-    .caption { @apply text-xs font-normal leading-none text-muted-foreground; } /* 12px */
+    .caption { @apply text-[0.75rem] font-normal leading-none text-muted-foreground; } /* 12px - Explicit px */
     /* Overline: 10px, SemiBold, Uppercase */
     .overline { @apply text-[0.625rem] font-semibold uppercase tracking-wider text-muted-foreground; } /* 10px */
 
@@ -183,7 +376,8 @@ body {
 
      /* Input/Label specific application */
     label {
-      @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70; /* From spec */
+      /* Use body2 styles for labels */
+       @apply text-body2 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
     }
     /* Apply body2 to descriptions */
     [id$="-form-item-description"] {
@@ -191,7 +385,12 @@ body {
     }
     /* Apply body2 to form messages */
     [id$="-form-item-message"] {
-        @apply text-body2 font-medium; /* Keep font-medium for errors */
+        @apply text-body2 font-medium text-destructive; /* Keep font-medium for errors */
+    }
+
+     /* Shadcn Button Text - Override */
+    .btn-text-uppercase-semibold {
+        @apply uppercase font-semibold tracking-wider text-xs; /* Use 12px/semibold instead of 14px */
     }
 
 }
@@ -216,10 +415,6 @@ body {
    html {
      scroll-behavior: smooth;
    }
-   /* Button Text */
-    .btn-text-uppercase-semibold {
-        @apply uppercase font-semibold tracking-wider text-xs; /* Use 12px/semibold instead of 14px */
-    }
 }
 
 /* Custom scrollbar styles */
@@ -300,12 +495,14 @@ body {
 .ripple {
   position: absolute;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.6); /* White ripple */
+  /* Use a semi-transparent version of primary-foreground for light mode */
+  background-color: hsla(var(--primary-foreground), 0.6);
   transform: scale(0);
   animation: ripple 600ms linear;
 }
 .dark .ripple {
-   background-color: rgba(0, 0, 0, 0.4); /* Dark ripple */
+   /* Use a semi-transparent version of primary-foreground for dark mode */
+   background-color: hsla(var(--primary-foreground), 0.4);
 }
 
 

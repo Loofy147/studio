@@ -4,8 +4,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
 import { cn } from '@/lib/utils';
-import { LayoutAnimator } from '@/components/LayoutAnimator';
-import { Logo } from '@/components/Logo';
+import { LayoutAnimator } from '@/components/LayoutAnimator'; // Import LayoutAnimator
+import { Logo } from '@/components/Logo'; // Correct single import
 
 // Configure Inter font
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>{/* Add suppressHydrationWarning for theme changes */}
+    <html lang="en" suppressHydrationWarning> {/* Add suppressHydrationWarning for theme changes */}
       {/* Apply Inter font variable to body */}
       <body
         className={cn(
@@ -29,7 +29,7 @@ export default function RootLayout({
           "font-sans antialiased flex flex-col min-h-screen bg-background" // Use 'font-sans' which defaults to the variable
         )}
       >
-        <Header />
+        <Header /> {/* Add Header */}
         <main className="flex-grow w-full">
            <LayoutAnimator>
              {children}

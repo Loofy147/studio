@@ -106,9 +106,9 @@ export function Header() {
                 </SheetTrigger>
                 {/* Mobile Menu Content */}
                 <SheetContent side="left" className={cn("w-[280px] sm:w-[320px] p-0 bg-background", headerStyle)}> {/* Apply theme class */}
-                     <VisuallyHidden asChild>
-                        <SheetTitle>Main Navigation Menu</SheetTitle>
-                    </VisuallyHidden>
+                     <VisuallyHidden.Root asChild>
+                         <SheetTitle>Main Navigation Menu</SheetTitle>
+                     </VisuallyHidden.Root>
                     <SheetHeader className="p-4 border-b">
                          {/* Use themed logo */}
                         <SheetTitle className="flex items-center gap-2 text-xl">

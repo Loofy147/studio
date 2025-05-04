@@ -3,19 +3,20 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, DeliveryAddress } from '@/services/store';
+import { getUserProfile, UserProfile, Order, getUserOrders, Subscription, getUserSubscriptions, DeliveryAddress, addUserAddress, updateUserAddress, deleteUserAddress } from '@/services/store'; // Added missing imports
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge, badgeVariants, type BadgeProps } from "@/components/ui/badge";
-import { User, ShoppingBag, MapPin, Phone, Mail, Award, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Building, Store as StoreIcon, Check, Play, Pause, Users as UsersIcon, BookmarkPlus, BookmarkMinus, ArrowLeft } from 'lucide-react';
+import { Badge, badgeVariants } from "@/components/ui/badge";
+import type { BadgeProps } from "@/components/ui/badge"; // Explicit import
+import { User, ShoppingBag, MapPin, Phone, Mail, Award, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Building, Store as StoreIcon, Check, Play, Pause, Users as UsersIcon, BookmarkPlus, BookmarkMinus, ArrowLeft, Plus, Edit, Trash2, Briefcase, Home, Repeat } from 'lucide-react'; // Added more icons
 import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 import { cn, formatCurrency } from "@/lib/utils";
-import React from 'react';
+import React from 'react'; // Import React
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -29,7 +30,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutAnimator } from "@/components/LayoutAnimator"; // Ensure correct import
+import { LayoutAnimator } from "@/components/LayoutAnimator"; // Import LayoutAnimator
+import { AddressDialog } from './AddressDialog'; // Import AddressDialog
 
 
 // Re-define AddressFormData if needed or import from a shared types file
@@ -74,6 +76,10 @@ export default function ProfilePage() {
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [isLoadingSubs, setIsLoadingSubs] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingSubId, setUpdatingSubId] = useState<string | null>(null); // Added state for subscription updates
+
+  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState<AddressFormData | null>(null);
 
 
   useEffect(() => {
@@ -139,6 +145,52 @@ export default function ProfilePage() {
   }, [userId]);
 
     // Note: Address save/delete logic moved to Address page/component
+     const handleOpenAddressDialog = (address?: DeliveryAddress) => {
+        setCurrentAddress(address ? { ...address } : null);
+        setIsAddressDialogOpen(true);
+    };
+
+    const handleSaveAddress = async (addressFormData: AddressFormData) => {
+        if (!profile) return;
+        // Logic moved from AddressDialog to here
+        try {
+            let updatedProfile: UserProfile | null = null;
+            if (addressFormData.id) { // Editing existing address
+                updatedProfile = await updateUserAddress(userId, addressFormData.id, addressFormData);
+            } else { // Adding new address
+                 // Create a new object without the 'id' property if it exists
+                const { id, ...newAddressData } = addressFormData;
+                updatedProfile = await addUserAddress(userId, newAddressData as Omit<DeliveryAddress, 'id'>);
+            }
+            if (updatedProfile) {
+                setProfile(updatedProfile); // Update local profile state
+                 toast({ title: "Address Saved", description: "Your address list has been updated." });
+                setIsAddressDialogOpen(false);
+            } else {
+                 throw new Error("Failed to save address.");
+            }
+        } catch (error) {
+            console.error("Error saving address:", error);
+            toast({ title: "Error Saving Address", description: "Could not save the address. Please try again.", variant: "destructive" });
+             throw error; // Re-throw so AddressDialog knows it failed
+        }
+    };
+
+     const handleDeleteAddress = useCallback(async (addressId: string) => {
+        if (!profile) return;
+        try {
+            const updatedProfile = await deleteUserAddress(userId, addressId);
+            if (updatedProfile) {
+                setProfile(updatedProfile);
+                 toast({ title: "Address Deleted", description: "The address has been removed.", variant: 'destructive' });
+            } else {
+                 toast({ title: "Deletion Failed", description: "Could not delete the address. Make sure it's not your only or default address.", variant: 'destructive' });
+            }
+        } catch (error) {
+            console.error("Error deleting address:", error);
+            toast({ title: "Error Deleting Address", description: "An error occurred while deleting the address.", variant: 'destructive' });
+        }
+    }, [userId, profile, toast]);
 
 
   const ProfileInfoSkeleton = () => (
@@ -454,8 +506,8 @@ export default function ProfilePage() {
                     <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
                         <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
                     </h2>
-                     <Link href="/orders" passHref>
-                         <Button variant="link" className="text-primary px-0">View All Orders</Button>
+                     <Link href="/orders" passHref legacyBehavior>
+                         <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
                      </Link>
                 </div>
 
@@ -679,6 +731,19 @@ export default function ProfilePage() {
                      </Card>
                 ) : null}
             </div>
+
+             {/* Address Dialog for managing addresses */}
+             {profile && (
+                 <AddressDialog
+                    isOpen={isAddressDialogOpen}
+                    onOpenChange={setIsAddressDialogOpen}
+                    addressData={currentAddress}
+                    onSave={handleSaveAddress}
+                    userId={userId}
+                    userAddresses={profile.addresses || []} // Pass current addresses
+                 />
+             )}
+
         </div>
     </LayoutAnimator>
   );
