@@ -21,11 +21,11 @@ const storeOwnerNavItems = [
   // they should have unique hrefs like '/stores/products', '/stores/orders' etc.
   // Temporarily pointing them back to /stores for now until specific pages exist.
   { href: "/stores#products", label: "Products", icon: Package },
-  { href: "/stores#orders", label: "Orders", icon: Package },
+  { href: "/stores#orders", label: "Orders", icon: Package }, // Duplicate icon OK, but href must be distinct if used as key
   { href: "/stores#subscriptions", label: "Subscriptions", icon: CalendarClock },
   { href: "/stores#promotions", label: "Promotions", icon: Ticket },
   { href: "/stores#analytics", label: "Analytics", icon: BarChart },
-  { href: "/stores/settings", label: "Store Settings", icon: Settings },
+  { href: "/stores/settings", label: "Store Settings", icon: Settings }, // Distinct href
 ];
 
 export default function StoreOwnerLayout({ children }: { children: React.ReactNode }) {
@@ -104,8 +104,8 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                          </Link>
                      </SidebarMenuItem>
                       {/* Manage-specific links */}
-                      {manageStoreNavItems.map((item, index) => (
-                          <SidebarMenuItem key={`${item.href}-${index}`}> {/* Use index in key */}
+                      {manageStoreNavItems.map((item, index) => ( // Use index
+                          <SidebarMenuItem key={`manage-${index}`}> {/* Use index only */}
                              <Link href={item.href} passHref legacyBehavior>
                                  <SidebarMenuButton
                                      asChild
@@ -127,9 +127,8 @@ export default function StoreOwnerLayout({ children }: { children: React.ReactNo
                  </SidebarMenu>
              ) : (
                  <SidebarMenu className="px-2 py-4">
-                    {storeOwnerNavItems.map((item, index) => (
-                        // Use index in key to prevent duplicate key error if hrefs are the same
-                        <SidebarMenuItem key={`${item.href}-${index}`}> {/* Use index in key */}
+                    {storeOwnerNavItems.map((item, index) => ( // Use index
+                        <SidebarMenuItem key={`owner-${index}`}> {/* Use index only */}
                         <Link href={item.href} passHref legacyBehavior>
                             <SidebarMenuButton
                             asChild
