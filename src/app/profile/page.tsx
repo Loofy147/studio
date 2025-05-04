@@ -29,7 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutAnimator } from "@/components/LayoutAnimator";
+import { LayoutAnimator } from "@/components/LayoutAnimator"; // Ensure correct import
 
 // Re-define AddressFormData if needed or import from a shared types file
 interface AddressFormData {
@@ -73,6 +73,10 @@ export default function ProfilePage() {
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [isLoadingSubs, setIsLoadingSubs] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Note: States related to address dialog and editing removed as they belong to sub-pages
+  // const [updatingSubId, setUpdatingSubId] = useState<string | null>(null);
+  // const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
+  // const [currentAddress, setCurrentAddress] = useState<AddressFormData | null>(null);
 
 
   useEffect(() => {
@@ -137,12 +141,13 @@ export default function ProfilePage() {
     }
   }, [userId]);
 
+    // Note: Address save/delete logic moved to Address page/component
 
 
   const ProfileInfoSkeleton = () => (
      <Card className="border-primary/10 shadow-md">
         {/* Use p-6 for consistent padding */}
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-accent/5">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-secondary/5">
              <Skeleton className="h-24 w-24 rounded-full bg-muted/50" />
              <div className="space-y-2 flex-grow mt-2 sm:mt-0">
                 <Skeleton className="h-8 w-56 bg-muted/50" />
@@ -313,7 +318,7 @@ export default function ProfilePage() {
             {isLoadingProfile ? <ProfileInfoSkeleton /> : profile ? (
                 <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border border-primary/10">
                  {/* Use p-6 for padding */}
-                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-accent/5">
+                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-secondary/5">
                     <Avatar className="h-24 w-24 border-4 border-background shadow-md">
                         <AvatarImage src={`https://avatar.vercel.sh/${profile.email}?size=96`} alt={profile.name} />
                         <AvatarFallback className="text-3xl bg-muted">
@@ -452,7 +457,7 @@ export default function ProfilePage() {
                     <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
                         <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
                     </h2>
-                     <Link href="/orders" passHref legacyBehavior>
+                     <Link href="/orders" passHref>
                          <Button variant="link" className="text-primary px-0">View All Orders</Button>
                      </Link>
                 </div>
@@ -681,3 +686,5 @@ export default function ProfilePage() {
     </LayoutAnimator>
   );
 }
+
+    
