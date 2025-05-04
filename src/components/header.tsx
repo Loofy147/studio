@@ -5,12 +5,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building, Truck, Bell } from 'lucide-react'; // Added Bell
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import * as VisuallyHiddenPrimitive from '@radix-ui/react-visually-hidden'; // Import VisuallyHidden correctly
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"; // Correct import
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from '@/components/Logo';
+
 // Assume a cart state/hook exists (replace with actual implementation)
 // import { useCart } from '@/hooks/useCart';
 // Mock profile for conditional rendering examples (replace with actual auth logic)
@@ -105,9 +106,9 @@ export function Header() {
                 </SheetTrigger>
                 {/* Mobile Menu Content */}
                 <SheetContent side="left" className={cn("w-[280px] sm:w-[320px] p-0 bg-background", headerStyle)}> {/* Apply theme class */}
-                     <VisuallyHiddenPrimitive.Root asChild>
+                     <VisuallyHidden asChild>
                         <SheetTitle>Main Navigation Menu</SheetTitle>
-                    </VisuallyHiddenPrimitive.Root>
+                    </VisuallyHidden>
                     <SheetHeader className="p-4 border-b">
                          {/* Use themed logo */}
                         <SheetTitle className="flex items-center gap-2 text-xl">
@@ -240,7 +241,8 @@ export function Header() {
                                 <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px] rounded-full animate-pulse-badge" aria-hidden="true"> {/* Use pulse animation */}
                                     {cartItemCount}
                                 </Badge>
-                            </a>
+                            )}
+                        </a>
                      </Button>
                  </Link>
              )}
