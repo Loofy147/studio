@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -5,10 +6,10 @@ import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, S
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Store, Package, Users, Settings, BarChart2, FileText, ShieldCheck, LifeBuoy, Truck, MessageSquare, BrainCircuit, LogOut } from 'lucide-react';
+import { LayoutDashboard, Store, Package, Users, Settings, BarChart2, FileText, ShieldCheck, LifeBuoy, Truck, MessageSquare, LogOut } from 'lucide-react'; // Removed BrainCircuit
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Logo } from '@/components/Logo';
+import { Logo } from '@/components/Logo'; // Correct import
 
 // Admin specific navigation items
 const adminNavItems = [
@@ -18,7 +19,7 @@ const adminNavItems = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/orders", label: "Orders", icon: FileText },
   { href: "/admin/drivers", label: "Drivers", icon: Truck },
-  { href: "/admin/ai-model", label: "AI Model", icon: BrainCircuit },
+  // { href: "/admin/ai-model", label: "AI Model", icon: BrainCircuit }, // Removed AI Model Link
   { href: "/admin/reports", label: "Reports", icon: BarChart2 },
   { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/support", label: "Support", icon: LifeBuoy },

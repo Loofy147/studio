@@ -324,20 +324,10 @@ body {
   .dark .theme-category-other { --store-accent: hsl(240, 10%, 60%); }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  *:focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
-  }
-}
-
-/* Typography Definitions - Based on Theme Spec */
+/* Apply Typography styles */
 @layer base {
     html {
-        font-size: 16px;
+        @apply text-[16px]; /* Base font size 16px */
     }
 
     /* Headings */
@@ -354,13 +344,13 @@ body {
     /* Body 1 (default): 16px, Regular */
     p, body { @apply text-base font-normal leading-relaxed; } /* 16px */
     /* Body 2: 14px, Regular */
-    .text-body2 { @apply text-[0.875rem] font-normal leading-normal; } /* 14px - Explicit px */
+    .text-body2 { @apply text-[0.875rem] font-normal leading-normal; } /* 14px */
     /* Lead text: Larger muted text */
     .lead { @apply text-lg font-normal text-muted-foreground; } /* 18px */
 
     /* Smaller text styles */
     /* Caption: 12px, Regular */
-    .caption { @apply text-[0.75rem] font-normal leading-none text-muted-foreground; } /* 12px - Explicit px */
+    .caption { @apply text-[0.75rem] font-normal leading-none text-muted-foreground; } /* 12px */
     /* Overline: 10px, SemiBold, Uppercase */
     .overline { @apply text-[0.625rem] font-semibold uppercase tracking-wider text-muted-foreground; } /* 10px */
 
@@ -372,7 +362,7 @@ body {
 
      /* Lists */
     ul, ol { @apply my-4 ml-6 [&>li]:mt-2; }
-    li>ul, li>ol { @apply my-2; } /* Nested lists */
+    li > ul, li > ol { @apply my-2; } /* Nested lists */
 
      /* Input/Label specific application */
     label {
@@ -385,16 +375,24 @@ body {
     }
     /* Apply body2 to form messages */
     [id$="-form-item-message"] {
-        @apply text-body2 font-medium text-destructive; /* Keep font-medium for errors */
+        /* Keep font-medium for errors */
+        @apply text-body2 font-medium text-destructive;
     }
 
-     /* Shadcn Button Text - Override */
+    /* Base apply for Shadcn components */
+    * {
+        @apply border-border;
+    }
+
+    *:focus-visible {
+        @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    }
+
+    /* Shadcn Button Text - Uppercase Semibold Helper */
     .btn-text-uppercase-semibold {
-        @apply uppercase font-semibold tracking-wider text-xs; /* Use 12px/semibold instead of 14px */
+        @apply uppercase font-semibold tracking-wider text-xs; /* Use 12px/semibold */
     }
-
 }
-
 
 /* Utility Classes */
 @layer utilities {
