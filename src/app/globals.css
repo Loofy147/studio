@@ -11,281 +11,319 @@ body {
 }
 
 @layer base {
-  /* SDP Theme Variables (Default) */
+  /* Default Theme (Teal/Orange) */
   :root {
-    /* --- Theme: SwiftDispatch Primary (SDP) --- */
-    /* A modern, trustworthy blue, paired with a vibrant orange and clean neutrals. */
-    --sdp-primary: 217 91% 60%; /* Bright Blue */
-    --sdp-primary-foreground: 210 40% 98%; /* Almost White */
-    --sdp-secondary: 24 95% 53%; /* Vibrant Orange */
-    --sdp-secondary-foreground: 24 95% 15%; /* Dark Orange-Brown */
-    --sdp-accent: 160 70% 45%; /* Teal Green */
-    --sdp-accent-foreground: 160 70% 98%; /* Almost White */
-    --sdp-background: 0 0% 100%; /* White */
-    --sdp-foreground: 224 71% 4%; /* Very Dark Blue */
-    --sdp-card: 0 0% 100%; /* White */
-    --sdp-card-foreground: 224 71% 4%; /* Very Dark Blue */
-    --sdp-popover: 0 0% 100%; /* White */
-    --sdp-popover-foreground: 224 71% 4%; /* Very Dark Blue */
-    --sdp-muted: 210 40% 96%; /* Very Light Gray-Blue */
-    --sdp-muted-foreground: 215 20% 65%; /* Medium Gray-Blue */
-    --sdp-border: 214 32% 91%; /* Light Gray-Blue */
-    --sdp-input: 214 32% 91%; /* Light Gray-Blue */
-    --sdp-ring: 217 91% 70%; /* Lighter Blue */
-    --sdp-destructive: 0 84% 60%; /* Bright Red */
-    --sdp-destructive-foreground: 0 0% 98%; /* Almost White */
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 180 100% 25.1%; /* Teal */
+    --primary-foreground: 180 100% 96.1%;
+    --secondary: 210 20% 98%; /* Light Gray */
+    --secondary-foreground: 224 71.4% 4.1%;
+    --muted: 210 20% 94%; /* Slightly darker muted */
+    --muted-foreground: 215 20% 65.1%;
+    --accent: 28 100% 50%; /* Orange */
+    --accent-foreground: 28 100% 5%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 20% 88%; /* Lighter border */
+    --input: 210 20% 92%; /* Input background */
+    --ring: 180 100% 35.1%; /* Slightly darker teal for focus rings */
+    --radius: 0.5rem; /* Consistent with shadcn default */
 
-    --radius: 0.5rem; /* Standard radius */
+    /* Chart Colors (Example) */
+    --chart-1: hsl(var(--primary));
+    --chart-2: hsl(var(--accent));
+    --chart-3: hsl(120, 70%, 45%); /* Green */
+    --chart-4: hsl(300 70% 50%); /* Violet */
+    --chart-5: hsl(50 80% 55%); /* Gold */
 
-    /* Apply SDP theme as default */
-    --background: var(--sdp-background);
-    --foreground: var(--sdp-foreground);
-    --card: var(--sdp-card);
-    --card-foreground: var(--sdp-card-foreground);
-    --popover: var(--sdp-popover);
-    --popover-foreground: var(--sdp-popover-foreground);
-    --primary: var(--sdp-primary);
-    --primary-foreground: var(--sdp-primary-foreground);
-    --secondary: var(--sdp-secondary);
-    --secondary-foreground: var(--sdp-secondary-foreground);
-    --muted: var(--sdp-muted);
-    --muted-foreground: var(--sdp-muted-foreground);
-    --accent: var(--sdp-accent);
-    --accent-foreground: var(--sdp-accent-foreground);
-    --destructive: var(--sdp-destructive);
-    --destructive-foreground: var(--sdp-destructive-foreground);
-    --border: var(--sdp-border);
-    --input: var(--sdp-input);
-    --ring: var(--sdp-ring);
-
-    --chart-1: var(--sdp-primary);
-    --chart-2: var(--sdp-secondary);
-    --chart-3: var(--sdp-accent);
-    --chart-4: var(--sdp-muted-foreground);
-    --chart-5: 217 91% 70%; /* Lighter Primary Blue */
-
-    /* --- THEME: Store Owner --- */
-    /* Professional and reliable: Deep blue primary, earthy secondary, gold accent. */
-    --store-owner-primary: 220 70% 45%; /* Slate Blue */
-    --store-owner-primary-foreground: 0 0% 100%; /* White */
-    --store-owner-secondary: 35 30% 60%; /* Muted Tan/Brown */
-    --store-owner-secondary-foreground: 35 30% 10%; /* Dark Brown */
-    --store-owner-accent: 40 90% 50%; /* Golden Yellow */
-    --store-owner-accent-foreground: 40 90% 10%; /* Dark Gold */
-    --store-owner-background: 210 30% 98%; /* Very Light Cool Gray */
-    --store-owner-foreground: 215 25% 10%; /* Dark Slate */
-    --store-owner-card: 0 0% 100%; /* White */
-    --store-owner-card-foreground: 215 25% 10%; /* Dark Slate */
-    --store-owner-border: 210 20% 85%; /* Light Gray */
-    --store-owner-ring: 220 70% 55%; /* Lighter Slate Blue */
-    /* Sidebar Theme */
-    --store-owner-sidebar-background: 215 25% 25%; /* Darker Slate Blue */
-    --store-owner-sidebar-foreground: 210 30% 90%; /* Light Gray */
-    --store-owner-sidebar-primary: 220 70% 65%; /* Brighter Slate Blue */
-    --store-owner-sidebar-primary-foreground: 215 25% 5%; /* Very Dark Slate */
-    --store-owner-sidebar-accent: 215 18% 35%; /* Hover Accent */
-    --store-owner-sidebar-accent-foreground: 0 0% 100%; /* White */
-    --store-owner-sidebar-border: 215 15% 40%; /* Sidebar Border */
-    --store-owner-sidebar-ring: 220 70% 65%; /* Ring */
-
-    /* --- THEME: Driver --- */
-    /* Energetic and efficient: Teal primary, warm orange secondary, lime accent. */
-    --driver-primary: 175 75% 40%; /* Teal */
-    --driver-primary-foreground: 175 75% 95%; /* Very Light Teal */
-    --driver-secondary: 28 85% 55%; /* Warm Orange */
-    --driver-secondary-foreground: 28 85% 10%; /* Dark Orange */
-    --driver-accent: 80 60% 50%; /* Lime Green */
-    --driver-accent-foreground: 80 60% 10%; /* Dark Lime */
-    --driver-background: 210 15% 97%; /* Very Light Gray */
-    --driver-foreground: 210 20% 12%; /* Dark Gray-Blue */
-    --driver-card: 0 0% 100%; /* White */
-    --driver-card-foreground: 210 20% 12%; /* Dark Gray-Blue */
-    --driver-border: 210 10% 88%; /* Light Gray */
-    --driver-ring: 175 75% 50%; /* Brighter Teal */
-    /* Sidebar Theme */
-    --driver-sidebar-background: 175 30% 30%; /* Dark Teal */
-    --driver-sidebar-foreground: 175 30% 95%; /* Very Light Teal */
-    --driver-sidebar-primary: 175 75% 55%; /* Brighter Teal */
-    --driver-sidebar-primary-foreground: 175 30% 5%; /* Very Dark Teal */
-    --driver-sidebar-accent: 175 25% 40%; /* Hover Accent */
-    --driver-sidebar-accent-foreground: 175 25% 98%; /* Very Light Teal */
-    --driver-sidebar-border: 175 20% 45%; /* Sidebar Border */
-    --driver-sidebar-ring: 175 75% 50%; /* Ring */
-
-    /* --- THEME: Admin --- */
-    /* Authoritative and clear: Deep purple primary, neutral gray secondary, blue accent. */
-    --admin-primary: 260 60% 55%; /* Deep Purple */
-    --admin-primary-foreground: 260 60% 98%; /* Almost White */
-    --admin-secondary: 220 10% 50%; /* Medium Gray */
-    --admin-secondary-foreground: 220 10% 95%; /* Very Light Gray */
-    --admin-accent: 217 91% 60%; /* Bright Blue (from SDP) */
-    --admin-accent-foreground: 217 91% 98%; /* Almost White */
-    --admin-background: 225 10% 98%; /* Very Light Gray */
-    --admin-foreground: 225 15% 15%; /* Dark Gray */
-    --admin-card: 0 0% 100%; /* White */
-    --admin-card-foreground: 225 15% 15%; /* Dark Gray */
-    --admin-border: 225 10% 85%; /* Light Gray */
-    --admin-ring: 260 60% 65%; /* Lighter Purple */
-    /* Sidebar Theme */
-    --admin-sidebar-background: 225 20% 22%; /* Dark Slate Gray */
-    --admin-sidebar-foreground: 215 20% 92%; /* Light Gray */
-    --admin-sidebar-primary: 260 60% 68%; /* Brighter Purple */
-    --admin-sidebar-primary-foreground: 260 60% 10%; /* Very Dark Purple */
-    --admin-sidebar-accent: 225 15% 32%; /* Hover Accent */
-    --admin-sidebar-accent-foreground: 0 0% 100%; /* White */
-    --admin-sidebar-border: 225 10% 38%; /* Sidebar Border */
-    --admin-sidebar-ring: 260 60% 68%; /* Ring */
-
-    /* Store Category Accent Colors */
-    --store-accent-electronics: 220 70% 45%; /* SDP Primary Blue */
-    --store-accent-clothing: 330 60% 60%; /* Pink/Magenta */
-    --store-accent-groceries: 90 50% 50%; /* Lime Green */
-    --store-accent-books: 30 60% 55%; /* Dark Orange */
-    --store-accent-home-goods: 190 50% 55%; /* Cyan/Teal */
-    --store-accent-toys: 50 100% 60%; /* Bright Yellow */
-    --store-accent-restaurants: 15 75% 55%; /* Reddish Orange */
-    --store-accent-coffee-shops: 35 40% 45%; /* Brown */
-    --store-accent-other: 240 10% 50%; /* Neutral Gray */
+    /* Sidebar Theme Variables (Default - matching light theme) */
+    --sidebar-background: hsl(210 20% 98%);
+    --sidebar-foreground: hsl(224 71.4% 4.1%);
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(210 20% 94%); /* Muted as accent */
+    --sidebar-accent-foreground: hsl(224 71.4% 4.1%);
+    --sidebar-border: hsl(var(--border));
+    --sidebar-ring: hsl(var(--ring));
   }
 
   .dark {
-    /* Dark Mode SDP Theme */
-    --sdp-primary: 217 91% 65%; /* Lighter Blue */
-    --sdp-primary-foreground: 217 91% 10%; /* Dark Blue */
-    --sdp-secondary: 28 95% 60%; /* Lighter Orange */
-    --sdp-secondary-foreground: 28 95% 10%; /* Dark Orange-Brown */
-    --sdp-accent: 160 70% 55%; /* Lighter Teal */
-    --sdp-accent-foreground: 160 70% 10%; /* Dark Teal */
-    --sdp-background: 224 71% 10%; /* Very Dark Blue */
-    --sdp-foreground: 210 40% 92%; /* Light Gray-Blue */
-    --sdp-card: 224 71% 15%; /* Dark Blue */
-    --sdp-card-foreground: 210 40% 92%; /* Light Gray-Blue */
-    --sdp-popover: 224 71% 15%; /* Dark Blue */
-    --sdp-popover-foreground: 210 40% 92%; /* Light Gray-Blue */
-    --sdp-muted: 215 28% 17%; /* Darker Gray-Blue */
-    --sdp-muted-foreground: 215 20% 65%; /* Medium Gray-Blue */
-    --sdp-border: 217 33% 25%; /* Dark Gray-Blue Border */
-    --sdp-input: 217 33% 25%; /* Dark Gray-Blue Border */
-    --sdp-ring: 217 91% 75%; /* Even Lighter Blue */
-    --sdp-destructive: 0 72% 51%; /* Darker Red */
-    --sdp-destructive-foreground: 0 0% 98%; /* Almost White */
+    /* Dark Mode Theme */
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 180 90% 45%; /* Brighter Teal */
+    --primary-foreground: 180 90% 5%;
+    --secondary: 215 25% 16.7%; /* Dark Gray */
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 20% 25%; /* Dark Muted */
+    --muted-foreground: 215 20% 65%;
+    --accent: 28 90% 55%; /* Brighter Orange */
+    --accent-foreground: 28 90% 5%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 15% 35%; /* Dark Border */
+    --input: 215 15% 30%; /* Dark Input */
+    --ring: 180 90% 55%; /* Even brighter teal for focus rings */
 
-    /* Apply SDP dark as default dark */
-    --background: hsl(var(--sdp-background));
-    --foreground: hsl(var(--sdp-foreground));
-    --card: hsl(var(--sdp-card));
-    --card-foreground: hsl(var(--sdp-card-foreground));
-    --popover: hsl(var(--sdp-popover));
-    --popover-foreground: hsl(var(--sdp-popover-foreground));
-    --primary: hsl(var(--sdp-primary));
-    --primary-foreground: hsl(var(--sdp-primary-foreground));
-    --secondary: hsl(var(--sdp-secondary));
-    --secondary-foreground: hsl(var(--sdp-secondary-foreground));
-    --muted: hsl(var(--sdp-muted));
-    --muted-foreground: hsl(var(--sdp-muted-foreground));
-    --accent: hsl(var(--sdp-accent));
-    --accent-foreground: hsl(var(--sdp-accent-foreground));
-    --destructive: hsl(var(--sdp-destructive));
-    --destructive-foreground: hsl(var(--sdp-destructive-foreground));
-    --border: hsl(var(--sdp-border));
-    --input: hsl(var(--sdp-input));
-    --ring: hsl(var(--sdp-ring));
-
-    /* --- THEME: Store Owner (Dark) --- */
-    --store-owner-primary: 220 70% 65%; /* Lighter Slate Blue */
-    --store-owner-primary-foreground: 220 70% 10%; /* Dark Slate Blue */
-    --store-owner-secondary: 35 30% 40%; /* Darker Tan */
-    --store-owner-secondary-foreground: 35 30% 90%; /* Light Tan */
-    --store-owner-accent: 40 90% 60%; /* Brighter Gold */
-    --store-owner-accent-foreground: 40 90% 10%; /* Dark Gold */
-    --store-owner-background: 215 25% 12%; /* Dark Slate */
-    --store-owner-foreground: 210 30% 95%; /* Very Light Gray */
-    --store-owner-card: 215 20% 18%; /* Darker Slate */
-    --store-owner-card-foreground: 210 30% 95%; /* Very Light Gray */
-    --store-owner-border: 215 15% 38%; /* Border */
-    --store-owner-ring: 220 70% 75%; /* Ring */
-    /* Sidebar Theme */
-    --store-owner-sidebar-background: 215 25% 25%;
-    --store-owner-sidebar-foreground: 210 30% 90%;
-    --store-owner-sidebar-primary: 220 70% 70%;
-    --store-owner-sidebar-primary-foreground: 215 25% 5%;
-    --store-owner-sidebar-accent: 215 18% 35%;
-    --store-owner-sidebar-accent-foreground: 0 0% 100%;
-    --store-owner-sidebar-border: 215 15% 40%;
-    --store-owner-sidebar-ring: 220 70% 70%;
-
-    /* --- THEME: Driver (Dark) --- */
-    --driver-primary: 175 75% 50%; /* Brighter Teal */
-    --driver-primary-foreground: 175 75% 5%; /* Very Dark Teal */
-    --driver-secondary: 28 85% 65%; /* Brighter Orange */
-    --driver-secondary-foreground: 28 85% 5%; /* Very Dark Orange */
-    --driver-accent: 80 60% 60%; /* Brighter Lime */
-    --driver-accent-foreground: 80 60% 8%; /* Dark Lime */
-    --driver-background: 210 20% 15%; /* Dark Gray-Blue */
-    --driver-foreground: 210 15% 92%; /* Light Gray */
-    --driver-card: 210 15% 20%; /* Darker Gray-Blue */
-    --driver-card-foreground: 210 15% 92%; /* Light Gray */
-    --driver-border: 210 15% 40%; /* Border */
-    --driver-ring: 175 75% 60%; /* Ring */
-    /* Sidebar Theme */
-    --driver-sidebar-background: 175 30% 30%;
-    --driver-sidebar-foreground: 175 30% 95%;
-    --driver-sidebar-primary: 175 75% 60%;
-    --driver-sidebar-primary-foreground: 175 30% 5%;
-    --driver-sidebar-accent: 175 25% 40%;
-    --driver-sidebar-accent-foreground: 175 25% 98%;
-    --driver-sidebar-border: 175 20% 45%;
-    --driver-sidebar-ring: 175 75% 60%;
-
-    /* --- THEME: Admin (Dark) --- */
-    --admin-primary: 260 60% 65%; /* Lighter Purple */
-    --admin-primary-foreground: 260 60% 10%; /* Dark Purple */
-    --admin-secondary: 220 10% 40%; /* Darker Gray */
-    --admin-secondary-foreground: 220 10% 85%; /* Light Gray */
-    --admin-accent: 217 91% 65%; /* Lighter Blue */
-    --admin-accent-foreground: 217 91% 10%; /* Dark Blue */
-    --admin-background: 225 15% 12%; /* Very Dark Gray */
-    --admin-foreground: 215 20% 95%; /* Light Gray */
-    --admin-card: 225 15% 18%; /* Darker Gray */
-    --admin-card-foreground: 215 20% 95%; /* Light Gray */
-    --admin-border: 225 10% 35%; /* Border */
-    --admin-ring: 260 60% 75%; /* Ring */
-    /* Sidebar Theme */
-    --admin-sidebar-background: 225 20% 22%;
-    --admin-sidebar-foreground: 215 20% 92%;
-    --admin-sidebar-primary: 260 60% 72%;
-    --admin-sidebar-primary-foreground: 260 60% 8%;
-    --admin-sidebar-accent: 225 15% 32%;
-    --admin-sidebar-accent-foreground: 0 0% 100%;
-    --admin-sidebar-border: 225 10% 38%;
-    --admin-sidebar-ring: 260 60% 72%;
-
-     /* Store Category Accents (Dark) */
-     .theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: hsl(222, 80%, 90%); }
-     .theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-     .theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-     .theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-     .theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-     .theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); }
-     .theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-     .theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-     .theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
+    /* Sidebar Dark */
+    --sidebar-background: hsl(224 71.4% 4.1%);
+    --sidebar-foreground: hsl(210 20% 98%);
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(215 25% 16.7%);
+    --sidebar-accent-foreground: hsl(210 20% 98%);
+    --sidebar-border: hsl(var(--border));
+    --sidebar-ring: hsl(var(--ring));
   }
 
-   /* Typography Scale */
-   /* Using Tailwind's default scale, but defining semantic styles */
-   h1, .text-h1 { @apply text-4xl font-extrabold tracking-tight lg:text-5xl; } /* Page Titles */
-   h2, .text-h2 { @apply text-3xl font-semibold tracking-tight first:mt-0; } /* Section Titles, Product Titles */
-   h3, .text-h3 { @apply text-2xl font-semibold tracking-tight; } /* Card Titles, Sub-sections */
-   h4, .text-h4 { @apply text-xl font-semibold tracking-tight; } /* Smaller headings */
-   p { @apply leading-7 [&:not(:first-child)]:mt-6; } /* Base paragraph with spacing */
-   .lead { @apply text-xl text-muted-foreground; } /* Lead paragraph */
-   .large { @apply text-lg font-semibold; } /* Large text */
-   small, .text-small { @apply text-sm font-medium leading-none; } /* Small text - Changed to text-small */
-   .muted { @apply text-sm text-muted-foreground; } /* Muted text */
-   /* Removed explicit .text-sm rule to avoid circular dependency */
-   .text-xs { @apply text-xs; } /* Extra small text */
+  /* --- THEME: Store Owner --- */
+  /* Professional and reliable: Deep blue primary, earthy secondary, gold accent. */
+  .store-owner-layout {
+    --so-primary: 220 70% 45%; /* Slate Blue */
+    --so-primary-foreground: 0 0% 100%; /* White */
+    --so-secondary: 35 30% 60%; /* Muted Tan/Brown */
+    --so-secondary-foreground: 35 30% 10%; /* Dark Brown */
+    --so-accent: 40 90% 50%; /* Golden Yellow */
+    --so-accent-foreground: 40 90% 10%; /* Dark Gold */
+    --so-background: 210 30% 98%; /* Very Light Cool Gray */
+    --so-foreground: 215 25% 10%; /* Dark Slate */
+    --so-card: 0 0% 100%;
+    --so-card-foreground: 215 25% 10%;
+    --so-popover: 0 0% 100%;
+    --so-popover-foreground: 215 25% 10%;
+    --so-muted: 210 20% 90%; /* Lighter Gray */
+    --so-muted-foreground: 215 20% 55%; /* Medium Slate */
+    --so-border: 210 20% 85%; /* Light Gray */
+    --so-input: 210 20% 88%;
+    --so-ring: 220 70% 55%; /* Lighter Slate Blue */
+    --so-destructive: 0 80% 55%; /* Standard Red */
+    --so-destructive-foreground: 0 0% 98%;
+
+    /* Sidebar Theme */
+    --so-sidebar-background: 215 25% 25%; /* Darker Slate Blue */
+    --so-sidebar-foreground: 210 30% 90%; /* Light Gray */
+    --so-sidebar-primary: 220 70% 65%; /* Brighter Slate Blue */
+    --so-sidebar-primary-foreground: 215 25% 5%; /* Very Dark Slate */
+    --so-sidebar-accent: 215 18% 35%; /* Hover Accent */
+    --so-sidebar-accent-foreground: 0 0% 100%; /* White */
+    --so-sidebar-border: 215 15% 40%; /* Sidebar Border */
+    --so-sidebar-ring: 220 70% 65%;
+  }
+
+  .dark .store-owner-layout {
+    --so-primary: 220 70% 65%;
+    --so-primary-foreground: 220 70% 10%;
+    --so-secondary: 35 30% 40%;
+    --so-secondary-foreground: 35 30% 90%;
+    --so-accent: 40 90% 60%;
+    --so-accent-foreground: 40 90% 10%;
+    --so-background: 215 25% 12%; /* Dark Slate */
+    --so-foreground: 210 30% 95%; /* Very Light Gray */
+    --so-card: 215 20% 18%; /* Darker Slate */
+    --so-card-foreground: 210 30% 95%;
+    --so-popover: 215 20% 15%;
+    --so-popover-foreground: 210 30% 95%;
+    --so-muted: 215 20% 25%;
+    --so-muted-foreground: 215 20% 60%;
+    --so-border: 215 15% 38%;
+    --so-input: 215 15% 35%;
+    --so-ring: 220 70% 75%;
+    --so-destructive: 0 75% 55%; /* Slightly darker red for dark */
+    --so-destructive-foreground: 0 0% 98%;
+
+    /* Sidebar Dark */
+    --so-sidebar-background: 215 25% 25%;
+    --so-sidebar-foreground: 210 30% 90%;
+    --so-sidebar-primary: 220 70% 70%;
+    --so-sidebar-primary-foreground: 215 25% 5%;
+    --so-sidebar-accent: 215 18% 35%;
+    --so-sidebar-accent-foreground: 0 0% 100%;
+    --so-sidebar-border: 215 15% 40%;
+    --so-sidebar-ring: 220 70% 70%;
+  }
+
+  /* --- THEME: Driver --- */
+  /* Energetic and efficient: Teal primary, warm orange secondary, lime accent. */
+  .driver-layout {
+    --drv-primary: 175 75% 40%; /* Teal */
+    --drv-primary-foreground: 175 75% 95%; /* Very Light Teal */
+    --drv-secondary: 28 85% 55%; /* Warm Orange */
+    --drv-secondary-foreground: 28 85% 10%; /* Dark Orange */
+    --drv-accent: 80 60% 50%; /* Lime Green */
+    --drv-accent-foreground: 80 60% 10%; /* Dark Lime */
+    --drv-background: 210 15% 97%; /* Very Light Gray */
+    --drv-foreground: 210 20% 12%; /* Dark Gray-Blue */
+    --drv-card: 0 0% 100%;
+    --drv-card-foreground: 210 20% 12%;
+    --drv-popover: 0 0% 100%;
+    --drv-popover-foreground: 210 20% 12%;
+    --drv-muted: 210 10% 92%; /* Lighter Gray */
+    --drv-muted-foreground: 210 15% 55%; /* Medium Gray */
+    --drv-border: 210 10% 88%; /* Light Gray */
+    --drv-input: 210 10% 90%;
+    --drv-ring: 175 75% 50%; /* Brighter Teal */
+    --drv-destructive: 0 80% 58%; /* Slightly brighter red */
+    --drv-destructive-foreground: 0 0% 98%;
+
+    /* Sidebar Theme */
+    --drv-sidebar-background: 175 30% 30%; /* Dark Teal */
+    --drv-sidebar-foreground: 175 30% 95%; /* Very Light Teal */
+    --drv-sidebar-primary: 175 75% 55%; /* Brighter Teal */
+    --drv-sidebar-primary-foreground: 175 30% 5%; /* Very Dark Teal */
+    --drv-sidebar-accent: 175 25% 40%; /* Hover Accent */
+    --drv-sidebar-accent-foreground: 175 25% 98%; /* Very Light Teal */
+    --drv-sidebar-border: 175 20% 45%; /* Sidebar Border */
+    --drv-sidebar-ring: 175 75% 50%;
+  }
+
+  .dark .driver-layout {
+    --drv-primary: 175 75% 50%;
+    --drv-primary-foreground: 175 75% 5%;
+    --drv-secondary: 28 85% 65%;
+    --drv-secondary-foreground: 28 85% 5%;
+    --drv-accent: 80 60% 60%;
+    --drv-accent-foreground: 80 60% 8%;
+    --drv-background: 210 20% 15%; /* Dark Gray-Blue */
+    --drv-foreground: 210 15% 92%; /* Light Gray */
+    --drv-card: 210 15% 20%; /* Darker Gray-Blue */
+    --drv-card-foreground: 210 15% 92%;
+    --drv-popover: 210 15% 18%;
+    --drv-popover-foreground: 210 15% 92%;
+    --drv-muted: 210 15% 28%;
+    --drv-muted-foreground: 210 15% 65%;
+    --drv-border: 210 15% 40%;
+    --drv-input: 210 15% 38%;
+    --drv-ring: 175 75% 60%;
+    --drv-destructive: 0 70% 55%; /* Darker red */
+    --drv-destructive-foreground: 0 0% 98%;
+
+    /* Sidebar Dark */
+    --drv-sidebar-background: 175 30% 30%;
+    --drv-sidebar-foreground: 175 30% 95%;
+    --drv-sidebar-primary: 175 75% 60%;
+    --drv-sidebar-primary-foreground: 175 30% 5%;
+    --drv-sidebar-accent: 175 25% 40%;
+    --drv-sidebar-accent-foreground: 175 25% 98%;
+    --drv-sidebar-border: 175 20% 45%;
+    --drv-sidebar-ring: 175 75% 60%;
+  }
+
+   /* --- THEME: Admin --- */
+   /* Authoritative and clear: Deep purple primary, neutral gray secondary, blue accent. */
+  .admin-layout {
+    --adm-primary: 260 60% 55%; /* Deep Purple */
+    --adm-primary-foreground: 260 60% 98%; /* Almost White */
+    --adm-secondary: 220 10% 50%; /* Medium Gray */
+    --adm-secondary-foreground: 220 10% 95%; /* Very Light Gray */
+    --adm-accent: 217 91% 60%; /* Bright Blue (from SDP) */
+    --adm-accent-foreground: 217 91% 98%; /* Almost White */
+    --adm-background: 225 10% 98%; /* Very Light Gray */
+    --adm-foreground: 225 15% 15%; /* Dark Gray */
+    --adm-card: 0 0% 100%;
+    --adm-card-foreground: 225 15% 15%;
+    --adm-popover: 0 0% 100%;
+    --adm-popover-foreground: 225 15% 15%;
+    --adm-muted: 225 10% 94%; /* Lighter Gray */
+    --adm-muted-foreground: 225 10% 60%; /* Medium Gray */
+    --adm-border: 225 10% 85%; /* Light Gray */
+    --adm-input: 225 10% 88%;
+    --adm-ring: 260 60% 65%; /* Lighter Purple */
+    --adm-destructive: 0 80% 60%; /* Standard Red */
+    --adm-destructive-foreground: 0 0% 98%;
+
+    /* Sidebar Theme */
+    --adm-sidebar-background: 225 20% 22%; /* Dark Slate Gray */
+    --adm-sidebar-foreground: 215 20% 92%; /* Light Gray */
+    --adm-sidebar-primary: 260 60% 68%; /* Brighter Purple */
+    --adm-sidebar-primary-foreground: 260 60% 10%; /* Very Dark Purple */
+    --adm-sidebar-accent: 225 15% 32%; /* Hover Accent */
+    --adm-sidebar-accent-foreground: 0 0% 100%; /* White */
+    --adm-sidebar-border: 225 10% 38%; /* Sidebar Border */
+    --adm-sidebar-ring: 260 60% 68%;
+  }
+
+   .dark .admin-layout {
+    --adm-primary: 260 60% 65%;
+    --adm-primary-foreground: 260 60% 10%;
+    --adm-secondary: 220 10% 40%;
+    --adm-secondary-foreground: 220 10% 85%;
+    --adm-accent: 217 91% 65%;
+    --adm-accent-foreground: 217 91% 10%;
+    --adm-background: 225 15% 12%; /* Very Dark Gray */
+    --adm-foreground: 215 20% 95%; /* Light Gray */
+    --adm-card: 225 15% 18%; /* Darker Gray */
+    --adm-card-foreground: 215 20% 95%;
+    --adm-popover: 225 15% 15%;
+    --adm-popover-foreground: 215 20% 95%;
+    --adm-muted: 225 10% 25%;
+    --adm-muted-foreground: 225 10% 65%;
+    --adm-border: 225 10% 35%;
+    --adm-input: 225 10% 32%;
+    --adm-ring: 260 60% 75%;
+    --adm-destructive: 0 75% 58%; /* Darker red */
+    --adm-destructive-foreground: 0 0% 98%;
+
+    /* Sidebar Dark */
+    --adm-sidebar-background: 225 20% 22%;
+    --adm-sidebar-foreground: 215 20% 92%;
+    --adm-sidebar-primary: 260 60% 72%;
+    --adm-sidebar-primary-foreground: 260 60% 8%;
+    --adm-sidebar-accent: 225 15% 32%;
+    --adm-sidebar-accent-foreground: 0 0% 100%;
+    --adm-sidebar-border: 225 10% 38%;
+    --adm-sidebar-ring: 260 60% 72%;
+  }
+
+  /* Base Typography Scale */
+  h1, .h1 { @apply text-4xl font-extrabold tracking-tight lg:text-5xl; }
+  h2, .h2 { @apply text-2xl font-bold tracking-tight lg:text-3xl; }
+  h3, .h3 { @apply text-xl font-semibold tracking-tight lg:text-2xl; }
+  h4, .h4 { @apply text-lg font-semibold tracking-tight lg:text-xl; }
+  p { @apply leading-relaxed [&:not(:first-child)]:mt-4; }
+  .lead { @apply text-lg text-muted-foreground lg:text-xl; }
+  .large { @apply text-base font-semibold lg:text-lg; }
+  .small { @apply text-sm font-medium leading-none; }
+  .muted { @apply text-sm text-muted-foreground; }
+  .extra-small { @apply text-xs tracking-wide; }
+
+  /* Define themed variables within the scope */
+  .theme-category-electronics,
+  .theme-category-clothing,
+  .theme-category-groceries,
+  .theme-category-books,
+  .theme-category-home-goods,
+  .theme-category-toys,
+  .theme-category-restaurants,
+  .theme-category-coffee-shops,
+  .theme-category-other {
+    /* Default accent color */
+    --store-accent: hsl(var(--accent));
+    --store-accent-foreground: hsl(var(--accent-foreground));
+  }
+
+  .theme-category-electronics { --store-accent: hsl(var(--primary)); --store-accent-foreground: hsl(var(--primary-foreground)); }
+  .theme-category-clothing { --store-accent: hsl(330, 60%, 60%); --store-accent-foreground: white; }
+  .theme-category-groceries { --store-accent: hsl(90, 50%, 50%); --store-accent-foreground: white; }
+  .theme-category-books { --store-accent: hsl(30, 60%, 55%); --store-accent-foreground: white; }
+  .theme-category-home-goods { --store-accent: hsl(190, 50%, 55%); --store-accent-foreground: white; }
+  .theme-category-toys { --store-accent: hsl(50, 100%, 60%); --store-accent-foreground: hsl(40, 80%, 10%); } /* Dark text for yellow */
+  .theme-category-restaurants { --store-accent: hsl(15, 75%, 55%); --store-accent-foreground: white; }
+  .theme-category-coffee-shops { --store-accent: hsl(35, 40%, 45%); --store-accent-foreground: white; }
+  .theme-category-other { --store-accent: hsl(240, 10%, 50%); --store-accent-foreground: white; }
+
+   /* Dark mode overrides for store accents */
+  .dark .theme-category-toys { --store-accent: hsl(50, 100%, 65%); }
+  .dark .theme-category-groceries { --store-accent: hsl(90, 50%, 55%); }
+  /* Add others if needed */
 
 }
 
@@ -293,17 +331,9 @@ body {
   * {
     @apply border-border;
   }
-   /* Apply border to all elements - adjusted to be less aggressive */
-   /* Consider applying borders more specifically */
 
-  /* Improved focus states globally */
   *:focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
-  }
-
-  /* Button uppercase style */
-  .btn-text-uppercase-semibold {
-    @apply uppercase font-semibold tracking-wider text-xs; /* Ensure text-xs for buttons */
   }
 }
 
@@ -323,953 +353,173 @@ body {
      white-space: nowrap;
      border-width: 0;
    }
-   /* Smooth scrolling for anchor links */
    html {
      scroll-behavior: smooth;
    }
+   .btn-text-uppercase-semibold {
+        @apply uppercase font-semibold tracking-wider text-xs;
+    }
 }
 
 /* Apply context-specific themes */
+/* Apply Store Owner Theme */
 .store-owner-layout {
-    --background: hsl(var(--store-owner-background));
-    --foreground: hsl(var(--store-owner-foreground));
-    --card: hsl(var(--store-owner-card));
-    --card-foreground: hsl(var(--store-owner-card-foreground));
-    --primary: hsl(var(--store-owner-primary));
-    --primary-foreground: hsl(var(--store-owner-primary-foreground));
-    --secondary: hsl(var(--store-owner-secondary));
-    --secondary-foreground: hsl(var(--store-owner-secondary-foreground));
-    --accent: hsl(var(--store-owner-accent));
-    --accent-foreground: hsl(var(--store-owner-accent-foreground));
-    --border: hsl(var(--store-owner-border));
-    --ring: hsl(var(--store-owner-ring));
+    --background: hsl(var(--so-background));
+    --foreground: hsl(var(--so-foreground));
+    --card: hsl(var(--so-card));
+    --card-foreground: hsl(var(--so-card-foreground));
+    --popover: hsl(var(--so-popover));
+    --popover-foreground: hsl(var(--so-popover-foreground));
+    --primary: hsl(var(--so-primary));
+    --primary-foreground: hsl(var(--so-primary-foreground));
+    --secondary: hsl(var(--so-secondary));
+    --secondary-foreground: hsl(var(--so-secondary-foreground));
+    --muted: hsl(var(--so-muted));
+    --muted-foreground: hsl(var(--so-muted-foreground));
+    --accent: hsl(var(--so-accent));
+    --accent-foreground: hsl(var(--so-accent-foreground));
+    --destructive: hsl(var(--so-destructive));
+    --destructive-foreground: hsl(var(--so-destructive-foreground));
+    --border: hsl(var(--so-border));
+    --input: hsl(var(--so-input));
+    --ring: hsl(var(--so-ring));
     @apply bg-background text-foreground;
 }
 .store-owner-layout .store-owner-sidebar {
-    --sidebar-background: hsl(var(--store-owner-sidebar-background));
-    --sidebar-foreground: hsl(var(--store-owner-sidebar-foreground));
-    --sidebar-primary: hsl(var(--store-owner-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--store-owner-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--store-owner-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--store-owner-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--store-owner-sidebar-border));
-    --sidebar-ring: hsl(var(--store-owner-sidebar-ring));
+    --sidebar-background: hsl(var(--so-sidebar-background));
+    --sidebar-foreground: hsl(var(--so-sidebar-foreground));
+    --sidebar-primary: hsl(var(--so-sidebar-primary));
+    --sidebar-primary-foreground: hsl(var(--so-sidebar-primary-foreground));
+    --sidebar-accent: hsl(var(--so-sidebar-accent));
+    --sidebar-accent-foreground: hsl(var(--so-sidebar-accent-foreground));
+    --sidebar-border: hsl(var(--so-sidebar-border));
+    --sidebar-ring: hsl(var(--so-sidebar-ring));
 }
 
+/* Apply Driver Theme */
 .driver-layout {
-    --background: hsl(var(--driver-background));
-    --foreground: hsl(var(--driver-foreground));
-    --card: hsl(var(--driver-card));
-    --card-foreground: hsl(var(--driver-card-foreground));
-    --primary: hsl(var(--driver-primary));
-    --primary-foreground: hsl(var(--driver-primary-foreground));
-    --secondary: hsl(var(--driver-secondary));
-    --secondary-foreground: hsl(var(--driver-secondary-foreground));
-    --accent: hsl(var(--driver-accent));
-    --accent-foreground: hsl(var(--driver-accent-foreground));
-    --border: hsl(var(--driver-border));
-    --ring: hsl(var(--driver-ring));
+    --background: hsl(var(--drv-background));
+    --foreground: hsl(var(--drv-foreground));
+    --card: hsl(var(--drv-card));
+    --card-foreground: hsl(var(--drv-card-foreground));
+    --popover: hsl(var(--drv-popover));
+    --popover-foreground: hsl(var(--drv-popover-foreground));
+    --primary: hsl(var(--drv-primary));
+    --primary-foreground: hsl(var(--drv-primary-foreground));
+    --secondary: hsl(var(--drv-secondary));
+    --secondary-foreground: hsl(var(--drv-secondary-foreground));
+    --muted: hsl(var(--drv-muted));
+    --muted-foreground: hsl(var(--drv-muted-foreground));
+    --accent: hsl(var(--drv-accent));
+    --accent-foreground: hsl(var(--drv-accent-foreground));
+    --destructive: hsl(var(--drv-destructive));
+    --destructive-foreground: hsl(var(--drv-destructive-foreground));
+    --border: hsl(var(--drv-border));
+    --input: hsl(var(--drv-input));
+    --ring: hsl(var(--drv-ring));
     @apply bg-background text-foreground;
 }
 .driver-layout .driver-sidebar {
-     --sidebar-background: hsl(var(--driver-sidebar-background));
-    --sidebar-foreground: hsl(var(--driver-sidebar-foreground));
-    --sidebar-primary: hsl(var(--driver-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--driver-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--driver-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--driver-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--driver-sidebar-border));
-    --sidebar-ring: hsl(var(--driver-sidebar-ring));
+    --sidebar-background: hsl(var(--drv-sidebar-background));
+    --sidebar-foreground: hsl(var(--drv-sidebar-foreground));
+    --sidebar-primary: hsl(var(--drv-sidebar-primary));
+    --sidebar-primary-foreground: hsl(var(--drv-sidebar-primary-foreground));
+    --sidebar-accent: hsl(var(--drv-sidebar-accent));
+    --sidebar-accent-foreground: hsl(var(--drv-sidebar-accent-foreground));
+    --sidebar-border: hsl(var(--drv-sidebar-border));
+    --sidebar-ring: hsl(var(--drv-sidebar-ring));
 }
 
+/* Apply Admin Theme */
 .admin-layout {
-    --background: hsl(var(--admin-background));
-    --foreground: hsl(var(--admin-foreground));
-    --card: hsl(var(--admin-card));
-    --card-foreground: hsl(var(--admin-card-foreground));
-    --primary: hsl(var(--admin-primary));
-    --primary-foreground: hsl(var(--admin-primary-foreground));
-    --secondary: hsl(var(--admin-secondary));
-    --secondary-foreground: hsl(var(--admin-secondary-foreground));
-    --accent: hsl(var(--admin-accent));
-    --accent-foreground: hsl(var(--admin-accent-foreground));
-    --border: hsl(var(--admin-border));
-    --ring: hsl(var(--admin-ring));
+    --background: hsl(var(--adm-background));
+    --foreground: hsl(var(--adm-foreground));
+    --card: hsl(var(--adm-card));
+    --card-foreground: hsl(var(--adm-card-foreground));
+    --popover: hsl(var(--adm-popover));
+    --popover-foreground: hsl(var(--adm-popover-foreground));
+    --primary: hsl(var(--adm-primary));
+    --primary-foreground: hsl(var(--adm-primary-foreground));
+    --secondary: hsl(var(--adm-secondary));
+    --secondary-foreground: hsl(var(--adm-secondary-foreground));
+    --muted: hsl(var(--adm-muted));
+    --muted-foreground: hsl(var(--adm-muted-foreground));
+    --accent: hsl(var(--adm-accent));
+    --accent-foreground: hsl(var(--adm-accent-foreground));
+    --destructive: hsl(var(--adm-destructive));
+    --destructive-foreground: hsl(var(--adm-destructive-foreground));
+    --border: hsl(var(--adm-border));
+    --input: hsl(var(--adm-input));
+    --ring: hsl(var(--adm-ring));
     @apply bg-background text-foreground;
 }
 .admin-layout .admin-sidebar {
-     --sidebar-background: hsl(var(--admin-sidebar-background));
-    --sidebar-foreground: hsl(var(--admin-sidebar-foreground));
-    --sidebar-primary: hsl(var(--admin-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--admin-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--admin-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--admin-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--admin-sidebar-border));
-    --sidebar-ring: hsl(var(--admin-sidebar-ring));
+    --sidebar-background: hsl(var(--adm-sidebar-background));
+    --sidebar-foreground: hsl(var(--adm-sidebar-foreground));
+    --sidebar-primary: hsl(var(--adm-sidebar-primary));
+    --sidebar-primary-foreground: hsl(var(--adm-sidebar-primary-foreground));
+    --sidebar-accent: hsl(var(--adm-sidebar-accent));
+    --sidebar-accent-foreground: hsl(var(--adm-sidebar-accent-foreground));
+    --sidebar-border: hsl(var(--adm-sidebar-border));
+    --sidebar-ring: hsl(var(--adm-sidebar-ring));
 }
-
-/* Store Category Accents (for dynamic theming via class) */
-.theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: white; }
-.theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); /* Dark text for yellow */ }
-.theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-.dark .theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: hsl(222, 80%, 90%); }
-.dark .theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.dark .theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.dark .theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.dark .theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.dark .theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); }
-.dark .theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.dark .theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.dark .theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
 
 /* Custom scrollbar styles */
-/* Works on Chrome, Edge, and Safari */
 ::-webkit-scrollbar {
-  width: 8px; /* Slightly thinner */
-  height: 8px;
+  width: 6px; /* Narrower */
+  height: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.5); /* More subtle track */
+  background: hsl(var(--muted) / 0.05); /* Very subtle */
   border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--border)); /* Use border color */
+  background-color: hsl(var(--border) / 0.5); /* Semi-transparent */
   border-radius: 10px;
-  border: 2px solid transparent; /* Create padding around thumb */
+  border: 1px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--muted-foreground)); /* Darker on hover */
+  background-color: hsl(var(--muted-foreground) / 0.5); /* Darker on hover */
 }
 
 /* Define the animations */
 @keyframes slide-in-from-bottom {
-  from { transform: translateY(10px); opacity: 0; } /* Reduced distance */
+  from { transform: translateY(10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
-/* Apply animations to components - use these classes where needed */
-.animate-slide-in {
-  animation: slide-in-from-bottom 0.4s ease-out; /* Slightly slower */
-}
-
-.animate-fade-in {
-  animation: fade-in 0.5s ease-in-out; /* Slightly slower */
-}
-
-/* Apply context-specific themes */
-.store-owner-layout {
-    --background: hsl(var(--store-owner-background));
-    --foreground: hsl(var(--store-owner-foreground));
-    --card: hsl(var(--store-owner-card));
-    --card-foreground: hsl(var(--store-owner-card-foreground));
-    --primary: hsl(var(--store-owner-primary));
-    --primary-foreground: hsl(var(--store-owner-primary-foreground));
-    --secondary: hsl(var(--store-owner-secondary));
-    --secondary-foreground: hsl(var(--store-owner-secondary-foreground));
-    --accent: hsl(var(--store-owner-accent));
-    --accent-foreground: hsl(var(--store-owner-accent-foreground));
-    --border: hsl(var(--store-owner-border));
-    --ring: hsl(var(--store-owner-ring));
-    @apply bg-background text-foreground;
-}
-.store-owner-layout .store-owner-sidebar {
-    --sidebar-background: hsl(var(--store-owner-sidebar-background));
-    --sidebar-foreground: hsl(var(--store-owner-sidebar-foreground));
-    --sidebar-primary: hsl(var(--store-owner-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--store-owner-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--store-owner-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--store-owner-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--store-owner-sidebar-border));
-    --sidebar-ring: hsl(var(--store-owner-sidebar-ring));
-}
-
-.driver-layout {
-    --background: hsl(var(--driver-background));
-    --foreground: hsl(var(--driver-foreground));
-    --card: hsl(var(--driver-card));
-    --card-foreground: hsl(var(--driver-card-foreground));
-    --primary: hsl(var(--driver-primary));
-    --primary-foreground: hsl(var(--driver-primary-foreground));
-    --secondary: hsl(var(--driver-secondary));
-    --secondary-foreground: hsl(var(--driver-secondary-foreground));
-    --accent: hsl(var(--driver-accent));
-    --accent-foreground: hsl(var(--driver-accent-foreground));
-    --border: hsl(var(--driver-border));
-    --ring: hsl(var(--driver-ring));
-    @apply bg-background text-foreground;
-}
-.driver-layout .driver-sidebar {
-     --sidebar-background: hsl(var(--driver-sidebar-background));
-    --sidebar-foreground: hsl(var(--driver-sidebar-foreground));
-    --sidebar-primary: hsl(var(--driver-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--driver-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--driver-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--driver-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--driver-sidebar-border));
-    --sidebar-ring: hsl(var(--driver-sidebar-ring));
-}
-
-.admin-layout {
-    --background: hsl(var(--admin-background));
-    --foreground: hsl(var(--admin-foreground));
-    --card: hsl(var(--admin-card));
-    --card-foreground: hsl(var(--admin-card-foreground));
-    --primary: hsl(var(--admin-primary));
-    --primary-foreground: hsl(var(--admin-primary-foreground));
-    --secondary: hsl(var(--admin-secondary));
-    --secondary-foreground: hsl(var(--admin-secondary-foreground));
-    --accent: hsl(var(--admin-accent));
-    --accent-foreground: hsl(var(--admin-accent-foreground));
-    --border: hsl(var(--admin-border));
-    --ring: hsl(var(--admin-ring));
-    @apply bg-background text-foreground;
-}
-.admin-layout .admin-sidebar {
-     --sidebar-background: hsl(var(--admin-sidebar-background));
-    --sidebar-foreground: hsl(var(--admin-sidebar-foreground));
-    --sidebar-primary: hsl(var(--admin-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--admin-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--admin-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--admin-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--admin-sidebar-border));
-    --sidebar-ring: hsl(var(--admin-sidebar-ring));
-}
-
-/* Store Category Accents (for dynamic theming via class) */
-.theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: white; }
-.theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); /* Dark text for yellow */ }
-.theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-.dark .theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: hsl(222, 80%, 90%); }
-.dark .theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.dark .theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.dark .theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.dark .theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.dark .theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); }
-.dark .theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.dark .theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.dark .theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-
-/* Custom scrollbar styles */
-/* Works on Chrome, Edge, and Safari */
-::-webkit-scrollbar {
-  width: 8px; /* Slightly thinner */
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.5); /* More subtle track */
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--border)); /* Use border color */
-  border-radius: 10px;
-  border: 2px solid transparent; /* Create padding around thumb */
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--muted-foreground)); /* Darker on hover */
-}
-
-/* Define the animations */
-@keyframes slide-in-from-bottom {
-  from { transform: translateY(10px); opacity: 0; } /* Reduced distance */
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Apply animations to components - use these classes where needed */
-.animate-slide-in {
-  animation: slide-in-from-bottom 0.4s ease-out; /* Slightly slower */
-}
-
-.animate-fade-in {
-  animation: fade-in 0.5s ease-in-out; /* Slightly slower */
-}
-
-/* Apply context-specific themes */
-.store-owner-layout {
-    --background: hsl(var(--store-owner-background));
-    --foreground: hsl(var(--store-owner-foreground));
-    --card: hsl(var(--store-owner-card));
-    --card-foreground: hsl(var(--store-owner-card-foreground));
-    --primary: hsl(var(--store-owner-primary));
-    --primary-foreground: hsl(var(--store-owner-primary-foreground));
-    --secondary: hsl(var(--store-owner-secondary));
-    --secondary-foreground: hsl(var(--store-owner-secondary-foreground));
-    --accent: hsl(var(--store-owner-accent));
-    --accent-foreground: hsl(var(--store-owner-accent-foreground));
-    --border: hsl(var(--store-owner-border));
-    --ring: hsl(var(--store-owner-ring));
-    @apply bg-background text-foreground;
-}
-.store-owner-layout .store-owner-sidebar {
-    --sidebar-background: hsl(var(--store-owner-sidebar-background));
-    --sidebar-foreground: hsl(var(--store-owner-sidebar-foreground));
-    --sidebar-primary: hsl(var(--store-owner-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--store-owner-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--store-owner-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--store-owner-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--store-owner-sidebar-border));
-    --sidebar-ring: hsl(var(--store-owner-sidebar-ring));
-}
-
-.driver-layout {
-    --background: hsl(var(--driver-background));
-    --foreground: hsl(var(--driver-foreground));
-    --card: hsl(var(--driver-card));
-    --card-foreground: hsl(var(--driver-card-foreground));
-    --primary: hsl(var(--driver-primary));
-    --primary-foreground: hsl(var(--driver-primary-foreground));
-    --secondary: hsl(var(--driver-secondary));
-    --secondary-foreground: hsl(var(--driver-secondary-foreground));
-    --accent: hsl(var(--driver-accent));
-    --accent-foreground: hsl(var(--driver-accent-foreground));
-    --border: hsl(var(--driver-border));
-    --ring: hsl(var(--driver-ring));
-    @apply bg-background text-foreground;
-}
-.driver-layout .driver-sidebar {
-     --sidebar-background: hsl(var(--driver-sidebar-background));
-    --sidebar-foreground: hsl(var(--driver-sidebar-foreground));
-    --sidebar-primary: hsl(var(--driver-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--driver-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--driver-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--driver-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--driver-sidebar-border));
-    --sidebar-ring: hsl(var(--driver-sidebar-ring));
-}
-
-.admin-layout {
-    --background: hsl(var(--admin-background));
-    --foreground: hsl(var(--admin-foreground));
-    --card: hsl(var(--admin-card));
-    --card-foreground: hsl(var(--admin-card-foreground));
-    --primary: hsl(var(--admin-primary));
-    --primary-foreground: hsl(var(--admin-primary-foreground));
-    --secondary: hsl(var(--admin-secondary));
-    --secondary-foreground: hsl(var(--admin-secondary-foreground));
-    --accent: hsl(var(--admin-accent));
-    --accent-foreground: hsl(var(--admin-accent-foreground));
-    --border: hsl(var(--admin-border));
-    --ring: hsl(var(--admin-ring));
-    @apply bg-background text-foreground;
-}
-.admin-layout .admin-sidebar {
-     --sidebar-background: hsl(var(--admin-sidebar-background));
-    --sidebar-foreground: hsl(var(--admin-sidebar-foreground));
-    --sidebar-primary: hsl(var(--admin-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--admin-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--admin-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--admin-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--admin-sidebar-border));
-    --sidebar-ring: hsl(var(--admin-sidebar-ring));
-}
-
-/* Store Category Accents (for dynamic theming via class) */
-.theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: white; }
-.theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); /* Dark text for yellow */ }
-.theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-.dark .theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: hsl(222, 80%, 90%); }
-.dark .theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.dark .theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.dark .theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.dark .theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.dark .theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); }
-.dark .theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.dark .theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.dark .theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-
-/* Custom scrollbar styles */
-/* Works on Chrome, Edge, and Safari */
-::-webkit-scrollbar {
-  width: 8px; /* Slightly thinner */
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.5); /* More subtle track */
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--border)); /* Use border color */
-  border-radius: 10px;
-  border: 2px solid transparent; /* Create padding around thumb */
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--muted-foreground)); /* Darker on hover */
-}
-
-/* Define the animations */
-@keyframes slide-in-from-bottom {
-  from { transform: translateY(10px); opacity: 0; } /* Reduced distance */
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Apply animations to components - use these classes where needed */
-.animate-slide-in {
-  animation: slide-in-from-bottom 0.4s ease-out; /* Slightly slower */
-}
-
-.animate-fade-in {
-  animation: fade-in 0.5s ease-in-out; /* Slightly slower */
-}
-
-/* Apply context-specific themes */
-.store-owner-layout {
-    --background: hsl(var(--store-owner-background));
-    --foreground: hsl(var(--store-owner-foreground));
-    --card: hsl(var(--store-owner-card));
-    --card-foreground: hsl(var(--store-owner-card-foreground));
-    --primary: hsl(var(--store-owner-primary));
-    --primary-foreground: hsl(var(--store-owner-primary-foreground));
-    --secondary: hsl(var(--store-owner-secondary));
-    --secondary-foreground: hsl(var(--store-owner-secondary-foreground));
-    --accent: hsl(var(--store-owner-accent));
-    --accent-foreground: hsl(var(--store-owner-accent-foreground));
-    --border: hsl(var(--store-owner-border));
-    --ring: hsl(var(--store-owner-ring));
-    @apply bg-background text-foreground;
-}
-.store-owner-layout .store-owner-sidebar {
-    --sidebar-background: hsl(var(--store-owner-sidebar-background));
-    --sidebar-foreground: hsl(var(--store-owner-sidebar-foreground));
-    --sidebar-primary: hsl(var(--store-owner-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--store-owner-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--store-owner-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--store-owner-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--store-owner-sidebar-border));
-    --sidebar-ring: hsl(var(--store-owner-sidebar-ring));
-}
-
-.driver-layout {
-    --background: hsl(var(--driver-background));
-    --foreground: hsl(var(--driver-foreground));
-    --card: hsl(var(--driver-card));
-    --card-foreground: hsl(var(--driver-card-foreground));
-    --primary: hsl(var(--driver-primary));
-    --primary-foreground: hsl(var(--driver-primary-foreground));
-    --secondary: hsl(var(--driver-secondary));
-    --secondary-foreground: hsl(var(--driver-secondary-foreground));
-    --accent: hsl(var(--driver-accent));
-    --accent-foreground: hsl(var(--driver-accent-foreground));
-    --border: hsl(var(--driver-border));
-    --ring: hsl(var(--driver-ring));
-    @apply bg-background text-foreground;
-}
-.driver-layout .driver-sidebar {
-     --sidebar-background: hsl(var(--driver-sidebar-background));
-    --sidebar-foreground: hsl(var(--driver-sidebar-foreground));
-    --sidebar-primary: hsl(var(--driver-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--driver-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--driver-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--driver-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--driver-sidebar-border));
-    --sidebar-ring: hsl(var(--driver-sidebar-ring));
-}
-
-.admin-layout {
-    --background: hsl(var(--admin-background));
-    --foreground: hsl(var(--admin-foreground));
-    --card: hsl(var(--admin-card));
-    --card-foreground: hsl(var(--admin-card-foreground));
-    --primary: hsl(var(--admin-primary));
-    --primary-foreground: hsl(var(--admin-primary-foreground));
-    --secondary: hsl(var(--admin-secondary));
-    --secondary-foreground: hsl(var(--admin-secondary-foreground));
-    --accent: hsl(var(--admin-accent));
-    --accent-foreground: hsl(var(--admin-accent-foreground));
-    --border: hsl(var(--admin-border));
-    --ring: hsl(var(--admin-ring));
-    @apply bg-background text-foreground;
-}
-.admin-layout .admin-sidebar {
-     --sidebar-background: hsl(var(--admin-sidebar-background));
-    --sidebar-foreground: hsl(var(--admin-sidebar-foreground));
-    --sidebar-primary: hsl(var(--admin-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--admin-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--admin-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--admin-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--admin-sidebar-border));
-    --sidebar-ring: hsl(var(--admin-sidebar-ring));
-}
-
-/* Store Category Accents (for dynamic theming via class) */
-.theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: white; }
-.theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); /* Dark text for yellow */ }
-.theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-.dark .theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: hsl(222, 80%, 90%); }
-.dark .theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.dark .theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.dark .theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.dark .theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.dark .theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); }
-.dark .theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.dark .theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.dark .theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-
-/* Custom scrollbar styles */
-/* Works on Chrome, Edge, and Safari */
-::-webkit-scrollbar {
-  width: 8px; /* Slightly thinner */
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.5); /* More subtle track */
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--border)); /* Use border color */
-  border-radius: 10px;
-  border: 2px solid transparent; /* Create padding around thumb */
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--muted-foreground)); /* Darker on hover */
-}
-
-/* Define the animations */
-@keyframes slide-in-from-bottom {
-  from { transform: translateY(10px); opacity: 0; } /* Reduced distance */
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Apply animations to components - use these classes where needed */
-.animate-slide-in {
-  animation: slide-in-from-bottom 0.4s ease-out; /* Slightly slower */
-}
-
-.animate-fade-in {
-  animation: fade-in 0.5s ease-in-out; /* Slightly slower */
-}
-/* Keyframes for animations */
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
-
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-/* Utility classes for shimmer effect and spin */
+/* Apply animations */
+.animate-slide-in { animation: slide-in-from-bottom 0.3s ease-out; }
+.animate-fade-in { animation: fade-in 0.4s ease-in-out; }
+.animate-spin { animation: spin 1s linear infinite; }
 .animate-shimmer {
-  background-image: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-image: linear-gradient(90deg, hsl(var(--muted)/0.5) 25%, hsl(var(--muted)/0.7) 50%, hsl(var(--muted)/0.5) 75%);
   background-size: 400% 100%;
   animation: shimmer 1.2s infinite linear;
 }
 
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Apply context-specific themes */
-.store-owner-layout {
-    --background: hsl(var(--store-owner-background));
-    --foreground: hsl(var(--store-owner-foreground));
-    --card: hsl(var(--store-owner-card));
-    --card-foreground: hsl(var(--store-owner-card-foreground));
-    --primary: hsl(var(--store-owner-primary));
-    --primary-foreground: hsl(var(--store-owner-primary-foreground));
-    --secondary: hsl(var(--store-owner-secondary));
-    --secondary-foreground: hsl(var(--store-owner-secondary-foreground));
-    --accent: hsl(var(--store-owner-accent));
-    --accent-foreground: hsl(var(--store-owner-accent-foreground));
-    --border: hsl(var(--store-owner-border));
-    --ring: hsl(var(--store-owner-ring));
-    @apply bg-background text-foreground;
-}
-.store-owner-layout .store-owner-sidebar {
-    --sidebar-background: hsl(var(--store-owner-sidebar-background));
-    --sidebar-foreground: hsl(var(--store-owner-sidebar-foreground));
-    --sidebar-primary: hsl(var(--store-owner-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--store-owner-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--store-owner-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--store-owner-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--store-owner-sidebar-border));
-    --sidebar-ring: hsl(var(--store-owner-sidebar-ring));
-}
-
-.driver-layout {
-    --background: hsl(var(--driver-background));
-    --foreground: hsl(var(--driver-foreground));
-    --card: hsl(var(--driver-card));
-    --card-foreground: hsl(var(--driver-card-foreground));
-    --primary: hsl(var(--driver-primary));
-    --primary-foreground: hsl(var(--driver-primary-foreground));
-    --secondary: hsl(var(--driver-secondary));
-    --secondary-foreground: hsl(var(--driver-secondary-foreground));
-    --accent: hsl(var(--driver-accent));
-    --accent-foreground: hsl(var(--driver-accent-foreground));
-    --border: hsl(var(--driver-border));
-    --ring: hsl(var(--driver-ring));
-    @apply bg-background text-foreground;
-}
-.driver-layout .driver-sidebar {
-     --sidebar-background: hsl(var(--driver-sidebar-background));
-    --sidebar-foreground: hsl(var(--driver-sidebar-foreground));
-    --sidebar-primary: hsl(var(--driver-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--driver-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--driver-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--driver-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--driver-sidebar-border));
-    --sidebar-ring: hsl(var(--driver-sidebar-ring));
-}
-
-.admin-layout {
-    --background: hsl(var(--admin-background));
-    --foreground: hsl(var(--admin-foreground));
-    --card: hsl(var(--admin-card));
-    --card-foreground: hsl(var(--admin-card-foreground));
-    --primary: hsl(var(--admin-primary));
-    --primary-foreground: hsl(var(--admin-primary-foreground));
-    --secondary: hsl(var(--admin-secondary));
-    --secondary-foreground: hsl(var(--admin-secondary-foreground));
-    --accent: hsl(var(--admin-accent));
-    --accent-foreground: hsl(var(--admin-accent-foreground));
-    --border: hsl(var(--admin-border));
-    --ring: hsl(var(--admin-ring));
-    @apply bg-background text-foreground;
-}
-.admin-layout .admin-sidebar {
-     --sidebar-background: hsl(var(--admin-sidebar-background));
-    --sidebar-foreground: hsl(var(--admin-sidebar-foreground));
-    --sidebar-primary: hsl(var(--admin-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--admin-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--admin-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--admin-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--admin-sidebar-border));
-    --sidebar-ring: hsl(var(--admin-sidebar-ring));
-}
-
-/* Store Category Accents (for dynamic theming via class) */
-.theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: white; }
-.theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); /* Dark text for yellow */ }
-.theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-.dark .theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: hsl(222, 80%, 90%); }
-.dark .theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.dark .theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.dark .theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.dark .theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.dark .theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); }
-.dark .theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.dark .theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.dark .theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-
-/* Custom scrollbar styles */
-/* Works on Chrome, Edge, and Safari */
-::-webkit-scrollbar {
-  width: 8px; /* Slightly thinner */
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.5); /* More subtle track */
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--border)); /* Use border color */
-  border-radius: 10px;
-  border: 2px solid transparent; /* Create padding around thumb */
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--muted-foreground)); /* Darker on hover */
-}
-
-/* Define the animations */
-@keyframes slide-in-from-bottom {
-  from { transform: translateY(10px); opacity: 0; } /* Reduced distance */
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Apply animations to components - use these classes where needed */
-.animate-slide-in {
-  animation: slide-in-from-bottom 0.4s ease-out; /* Slightly slower */
-}
-
-.animate-fade-in {
-  animation: fade-in 0.5s ease-in-out; /* Slightly slower */
-}
-/* Keyframes for animations */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Utility classes for shimmer effect and spin */
-.animate-shimmer {
-  background-image: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 400% 100%;
-  animation: shimmer 1.2s infinite linear;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Apply context-specific themes */
-.store-owner-layout {
-    --background: hsl(var(--store-owner-background));
-    --foreground: hsl(var(--store-owner-foreground));
-    --card: hsl(var(--store-owner-card));
-    --card-foreground: hsl(var(--store-owner-card-foreground));
-    --primary: hsl(var(--store-owner-primary));
-    --primary-foreground: hsl(var(--store-owner-primary-foreground));
-    --secondary: hsl(var(--store-owner-secondary));
-    --secondary-foreground: hsl(var(--store-owner-secondary-foreground));
-    --accent: hsl(var(--store-owner-accent));
-    --accent-foreground: hsl(var(--store-owner-accent-foreground));
-    --border: hsl(var(--store-owner-border));
-    --ring: hsl(var(--store-owner-ring));
-    @apply bg-background text-foreground;
-}
-.store-owner-layout .store-owner-sidebar {
-    --sidebar-background: hsl(var(--store-owner-sidebar-background));
-    --sidebar-foreground: hsl(var(--store-owner-sidebar-foreground));
-    --sidebar-primary: hsl(var(--store-owner-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--store-owner-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--store-owner-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--store-owner-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--store-owner-sidebar-border));
-    --sidebar-ring: hsl(var(--store-owner-sidebar-ring));
-}
-
-.driver-layout {
-    --background: hsl(var(--driver-background));
-    --foreground: hsl(var(--driver-foreground));
-    --card: hsl(var(--driver-card));
-    --card-foreground: hsl(var(--driver-card-foreground));
-    --primary: hsl(var(--driver-primary));
-    --primary-foreground: hsl(var(--driver-primary-foreground));
-    --secondary: hsl(var(--driver-secondary));
-    --secondary-foreground: hsl(var(--driver-secondary-foreground));
-    --accent: hsl(var(--driver-accent));
-    --accent-foreground: hsl(var(--driver-accent-foreground));
-    --border: hsl(var(--driver-border));
-    --ring: hsl(var(--driver-ring));
-    @apply bg-background text-foreground;
-}
-.driver-layout .driver-sidebar {
-     --sidebar-background: hsl(var(--driver-sidebar-background));
-    --sidebar-foreground: hsl(var(--driver-sidebar-foreground));
-    --sidebar-primary: hsl(var(--driver-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--driver-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--driver-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--driver-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--driver-sidebar-border));
-    --sidebar-ring: hsl(var(--driver-sidebar-ring));
-}
-
-.admin-layout {
-    --background: hsl(var(--admin-background));
-    --foreground: hsl(var(--admin-foreground));
-    --card: hsl(var(--admin-card));
-    --card-foreground: hsl(var(--admin-card-foreground));
-    --primary: hsl(var(--admin-primary));
-    --primary-foreground: hsl(var(--admin-primary-foreground));
-    --secondary: hsl(var(--admin-secondary));
-    --secondary-foreground: hsl(var(--admin-secondary-foreground));
-    --accent: hsl(var(--admin-accent));
-    --accent-foreground: hsl(var(--admin-accent-foreground));
-    --border: hsl(var(--admin-border));
-    --ring: hsl(var(--admin-ring));
-    @apply bg-background text-foreground;
-}
-.admin-layout .admin-sidebar {
-     --sidebar-background: hsl(var(--admin-sidebar-background));
-    --sidebar-foreground: hsl(var(--admin-sidebar-foreground));
-    --sidebar-primary: hsl(var(--admin-sidebar-primary));
-    --sidebar-primary-foreground: hsl(var(--admin-sidebar-primary-foreground));
-    --sidebar-accent: hsl(var(--admin-sidebar-accent));
-    --sidebar-accent-foreground: hsl(var(--admin-sidebar-accent-foreground));
-    --sidebar-border: hsl(var(--admin-sidebar-border));
-    --sidebar-ring: hsl(var(--admin-sidebar-ring));
-}
-
-/* Store Category Accents (for dynamic theming via class) */
-.theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: white; }
-.theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); /* Dark text for yellow */ }
-.theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-.dark .theme-category-electronics { --store-accent: hsl(var(--store-accent-electronics)); --store-accent-foreground: hsl(222, 80%, 90%); }
-.dark .theme-category-clothing { --store-accent: hsl(var(--store-accent-clothing)); --store-accent-foreground: white; }
-.dark .theme-category-groceries { --store-accent: hsl(var(--store-accent-groceries)); --store-accent-foreground: white; }
-.dark .theme-category-books { --store-accent: hsl(var(--store-accent-books)); --store-accent-foreground: white; }
-.dark .theme-category-home-goods { --store-accent: hsl(var(--store-accent-home-goods)); --store-accent-foreground: white; }
-.dark .theme-category-toys { --store-accent: hsl(var(--store-accent-toys)); --store-accent-foreground: hsl(40, 80%, 10%); }
-.dark .theme-category-restaurants { --store-accent: hsl(var(--store-accent-restaurants)); --store-accent-foreground: white; }
-.dark .theme-category-coffee-shops { --store-accent: hsl(var(--store-accent-coffee-shops)); --store-accent-foreground: white; }
-.dark .theme-category-other { --store-accent: hsl(var(--store-accent-other)); --store-accent-foreground: white; }
-
-
-/* Custom scrollbar styles */
-/* Works on Chrome, Edge, and Safari */
-::-webkit-scrollbar {
-  width: 8px; /* Slightly thinner */
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted) / 0.5); /* More subtle track */
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--border)); /* Use border color */
-  border-radius: 10px;
-  border: 2px solid transparent; /* Create padding around thumb */
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--muted-foreground)); /* Darker on hover */
-}
-
-/* Define the animations */
-@keyframes slide-in-from-bottom {
-  from { transform: translateY(10px); opacity: 0; } /* Reduced distance */
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Apply animations to components - use these classes where needed */
-.animate-slide-in {
-  animation: slide-in-from-bottom 0.4s ease-out; /* Slightly slower */
-}
-
-.animate-fade-in {
-  animation: fade-in 0.5s ease-in-out; /* Slightly slower */
-}
-/* Keyframes for animations */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Utility classes for shimmer effect and spin */
-.animate-shimmer {
-  background-image: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 400% 100%;
-  animation: shimmer 1.2s infinite linear;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
+/* Visually Hidden Utility */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

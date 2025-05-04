@@ -1,9 +1,8 @@
-
 "use client";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building } from 'lucide-react';
+import { ShoppingCart, User, PackageSearch, LogIn, Menu, Package, Settings, Shield, Building, Truck } from 'lucide-react'; // Added Truck
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -18,7 +17,7 @@ export function Header() {
    const pathname = usePathname();
    const isAdminRoute = pathname.startsWith('/admin');
    const isDriverRoute = pathname.startsWith('/driver');
-   const isStoreOwnerRoute = pathname.startsWith('/stores'); // Assuming /stores is the owner portal
+   const isStoreOwnerRoute = pathname.startsWith('/stores');
 
    // TODO: Replace with actual cart count from state management
    // const { cartItemCount } = useCart(); // Example usage
@@ -36,9 +35,10 @@ export function Header() {
 
    // Define different nav items based on route context
    const customerNavItems = [
-      { href: "/", label: "Browse Stores", icon: PackageSearch },
+      { href: "/", label: "Browse", icon: PackageSearch },
       { href: "/orders", label: "My Orders", icon: Package },
-      { href: "/stores", label: "Manage Stores", icon: Building }, // Added Manage Stores link for owners
+      { href: "/stores", label: "My Stores", icon: Building }, // Changed from "Manage Stores"
+      { href: "/driver/apply", label: "Drive", icon: Truck }, // Added Drive link
       { href: "/profile", label: "Profile", icon: User },
    ];
 
@@ -61,17 +61,17 @@ export function Header() {
         navItems = adminNavItems;
         logoLink = "/admin";
         accountLink = "/admin/profile"; // Example admin profile link
-        logoText = "SwiftDispatch Admin";
+        logoText = "SDP Admin";
     } else if (isDriverRoute) {
         navItems = driverNavItems;
         logoLink = "/driver/dashboard";
         accountLink = "/driver/profile";
-        logoText = "SwiftDispatch Driver";
+        logoText = "SDP Driver";
     } else if (isStoreOwnerRoute) {
         navItems = storeOwnerNavItems;
         logoLink = "/stores";
         accountLink = "/profile"; // Store owner uses main profile for now
-        logoText = "SwiftDispatch Stores";
+        logoText = "SDP Stores";
     } else {
          navItems = customerNavItems;
     }
@@ -80,28 +80,24 @@ export function Header() {
    const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm"> {/* Added subtle shadow */}
       <div className="container flex h-16 items-center px-4 md:px-6"> {/* Adjusted padding */}
         {/* Logo/Brand Name */}
          <div className="mr-4 md:mr-6 flex items-center"> {/* Container for logo and mobile trigger */}
              {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                     <Button variant="ghost" size="icon" className="md:hidden mr-2 rounded-full hover:bg-accent/50">
+                     <Button variant="ghost" size="icon" className="md:hidden mr-2 rounded-full hover:bg-primary/10"> {/* Themed hover */}
                         <Menu className="h-5 w-5 text-muted-foreground" />
                         <span className="sr-only">Toggle Menu</span>
                     </Button>
                 </SheetTrigger>
                 {/* Mobile Menu Content */}
-                <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0"> {/* Remove padding for full control */}
-                    {/* Add accessible title */}
-                    <VisuallyHidden asChild>
-                        <SheetTitle>Main Navigation</SheetTitle>
-                    </VisuallyHidden>
-                    <SheetHeader className="p-4 mb-0 border-b"> {/* Adjust padding/margin */}
+                <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0 bg-background"> {/* Explicit background */}
+                    <SheetHeader className="p-4 border-b border-border/60"> {/* Themed border */}
                         <SheetTitle className="flex items-center gap-2">
-                            <Logo className="h-6 w-auto text-primary"/> {/* Use Logo */}
-                            <span className="font-bold text-lg">{logoText}</span>
+                            <Logo className="h-7 w-auto text-primary"/> {/* Use Logo */}
+                            <span className="font-bold text-xl">{logoText}</span> {/* Larger title */}
                         </SheetTitle>
                     </SheetHeader>
                     {/* Mobile Navigation Links */}
@@ -112,10 +108,10 @@ export function Header() {
                             href={item.href}
                             onClick={closeMobileMenu}
                             className={cn(
-                                "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors",
+                                "flex items-center gap-3 rounded-lg px-3 py-3 transition-colors", // Increased padding
                                 pathname === item.href
-                                ? "bg-primary/10 text-primary font-semibold"
-                                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                                ? "bg-primary/10 text-primary font-semibold" // Clearer active state
+                                : "text-muted-foreground hover:bg-primary/5 hover:text-primary" // Themed hover
                             )}
                             >
                                 <item.icon className="h-5 w-5" />
@@ -127,7 +123,7 @@ export function Header() {
                             <Link
                                 href={accountLink}
                                 onClick={closeMobileMenu}
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                                className="flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground hover:bg-primary/5 hover:text-primary" // Themed hover
                             >
                                 <User className="h-5 w-5"/>
                                 Account
@@ -137,12 +133,12 @@ export function Header() {
                              <Link
                                 href="/cart" // Link to cart page
                                 onClick={closeMobileMenu}
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent/50 hover:text-foreground relative"
+                                className="flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground hover:bg-primary/5 hover:text-primary relative" // Themed hover
                             >
                                 <ShoppingCart className="h-5 w-5"/>
                                 Cart
                                 {cartItemCount > 0 && (
-                                    <Badge variant="destructive" className="absolute left-8 top-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] rounded-full">
+                                    <Badge variant="destructive" className="absolute left-8 top-2 h-5 w-5 p-0 flex items-center justify-center text-[10px] rounded-full"> {/* Adjusted position */}
                                         {cartItemCount}
                                     </Badge>
                                 )}
@@ -153,21 +149,21 @@ export function Header() {
             </Sheet>
 
             <Link href={logoLink} className="flex items-center space-x-2" onClick={closeMobileMenu}>
-                 <Logo className="h-8 w-auto text-primary"/> {/* Use Logo */}
-                <span className="font-bold text-lg hidden sm:inline-block">{logoText}</span>
+                 <Logo className="h-9 w-auto text-primary"/> {/* Slightly larger Logo */}
+                <span className="font-bold text-xl hidden sm:inline-block">{logoText}</span> {/* Larger text */}
             </Link>
         </div>
 
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium flex-1 ml-6">
+        <nav className="hidden md:flex items-center space-x-6 text-base font-medium flex-1 ml-6"> {/* Increased base font size */}
            {navItems.map((item) => (
                <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "transition-colors hover:text-primary",
-                  pathname === item.href ? "text-primary font-semibold" : "text-muted-foreground"
+                  "transition-colors hover:text-primary relative after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300", // Underline animation
+                  pathname === item.href ? "text-primary font-semibold after:w-full" : "text-muted-foreground" // Active state style
                 )}
                >
                 {item.label}
@@ -180,21 +176,20 @@ export function Header() {
             {/* Cart Button - Only for customer view */}
              {(!isAdminRoute && !isDriverRoute && !isStoreOwnerRoute) && (
                 <Link href="/cart" passHref>
-                     <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-accent/50" aria-label={`Shopping Cart with ${cartItemCount} items`}> {/* Added ARIA Label */}
+                     <Button variant="ghost" size="icon" className="relative rounded-full hover:bg-primary/10" aria-label={`Shopping Cart with ${cartItemCount} items`}> {/* Themed hover */}
                         <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
                         {cartItemCount > 0 && (
-                            <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] rounded-full" aria-hidden="true"> {/* Hide badge from screen reader */}
+                            <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px] rounded-full animate-pulse" aria-hidden="true"> {/* Pulse animation */}
                                 {cartItemCount}
                             </Badge>
                         )}
-                        {/* <span className="sr-only">Shopping Cart</span> - Removed in favor of aria-label */}
                      </Button>
                  </Link>
              )}
 
              {/* Login/Profile Button */}
               <Link href={accountLink} passHref>
-                 <Button variant="outline" size="sm" className="rounded-full border-border" aria-label="Account options"> {/* Use outline and border */}
+                 <Button variant="outline" size="sm" className="rounded-full border-primary/40 hover:bg-primary/5 hover:border-primary/60"> {/* Themed outline */}
                     <User className="h-4 w-4 md:mr-2" />
                      <span className="hidden md:inline">
                         {isAdminRoute ? 'Admin' : (isDriverRoute ? 'Driver' : (isStoreOwnerRoute ? 'Owner' : 'Account'))}
