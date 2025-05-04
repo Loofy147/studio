@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react"; // Added useCallback
@@ -10,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button, buttonVariants } from "@/components/ui/button"; // Import buttonVariants
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge, badgeVariants, type BadgeProps } from "@/components/ui/badge"; // Import badgeVariants & type
-import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon, Check } from 'lucide-react'; // Added Check icon
+import { User, ShoppingBag, MapPin, Phone, Mail, Award, Edit, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Building, Lock, CreditCard, Bell, Users as UsersIcon, Store as StoreIcon, Check, Play, Pause } from 'lucide-react'; // Added Check icon, Play, Pause
 import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
 import Link from "next/link";
@@ -275,7 +274,7 @@ export default function ProfilePage() {
 
 
   return (
-    <LayoutAnimator>
+    <LayoutAnimator> {/* Added Layout Animator */}
         {/* Use standard page padding and spacing */}
         <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 space-y-10">
             {/* Profile Header */}
@@ -652,5 +651,3 @@ export default function ProfilePage() {
     </LayoutAnimator>
   );
 }
-
-
