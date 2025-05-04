@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react"; // Added useCallback
@@ -370,6 +371,7 @@ export default function ProfilePage() {
     exit: { opacity: 0, scale: 0.95 }, // Add scale effect on exit
   };
 
+
   return (
     <LayoutAnimator> {/* Added Layout Animator */}
         {/* Use standard page padding and spacing */}
@@ -599,7 +601,9 @@ export default function ProfilePage() {
                         <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
                     </h2>
                      <Link href="/orders" passHref>
-                          <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
+                         <Button asChild variant="link" className="text-primary px-0">
+                             <a>View All Orders</a>
+                         </Button>
                      </Link>
                 </div>
 
