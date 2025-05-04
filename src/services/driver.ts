@@ -120,4 +120,3 @@ export async function updateDriverAvailability(driverId: string, availability: D
 
 // Add functions for creating, updating, deleting drivers as needed for Admin panel
 // e.g., updateDriverStatus, approveDriver, etc.
-```
