@@ -692,7 +692,7 @@ export default function ProfilePage() {
                 <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
             </h2>
              <Link href="/orders" passHref>
-                 <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
+                 <Button variant="link" className="text-primary px-0">View All Orders</Button>
              </Link>
         </div>
 
@@ -795,3 +795,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
