@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils'; // Import cn
 export default function StoreManagementPage() {
   const [userStores, setUserStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null(null);
+  const [error, setError] = useState<string | null>(null); // Fixed type definition
   const [showNewStoreForm, setShowNewStoreForm] = useState(false);
   const { toast } = useToast();
 
