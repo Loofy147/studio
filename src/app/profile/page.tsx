@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -91,10 +92,10 @@ export default function ProfilePage() {
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [isLoadingSubs, setIsLoadingSubs] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [updatingSubId, setUpdatingSubId] = useState<string | null(null);
+  const [updatingSubId, setUpdatingSubId] = useState<string | null>(null);
 
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState<AddressFormData | null(null);
+  const [currentAddress, setCurrentAddress] = useState<AddressFormData | null>(null);
 
 
   useEffect(() => {
@@ -197,7 +198,7 @@ export default function ProfilePage() {
         if (!profile) return;
         // Logic moved from AddressDialog to here
         try {
-            let updatedProfile: UserProfile | null(null;
+            let updatedProfile: UserProfile | null = null;
             if (addressFormData.id) { // Editing existing address
                 updatedProfile = await updateUserAddress(userId, addressFormData.id, addressFormData);
             } else { // Adding new address
@@ -735,9 +736,9 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-semibold flex items-center gap-2">
                 <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
             </h2>
-            <Button asChild variant="link" className="text-primary px-0">
-                <Link href="/orders">View All Orders</Link>
-            </Button>
+             <Link href="/orders" passHref>
+                 <Button variant="link" className="text-primary px-0">View All Orders</Button>
+             </Link>
         </div>
 
         {orderError && !isLoadingOrders && ( // Show order-specific error
@@ -839,3 +840,6 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+
+    
