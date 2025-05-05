@@ -1,15 +1,15 @@
 
 'use client';
 
-import React from 'react';
+import React from 'react'; // Ensure React is imported
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Plus, Bell, XCircle, ShoppingCart } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion"; // Ensure motion is imported correctly
-import type { Product } from "@/services/store";
+import { motion } from "framer-motion"; // Correct import
+import type { Product } from '@/services/store';
 import { formatCurrency, cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -64,12 +64,13 @@ const ProductCardComponent = ({ product, storeIsOpen, storeIsActive, delay = 0 }
     };
 
     return (
-        <motion.div // Correct usage
+        <motion.div // Correct usage of motion.div
             variants={cardVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
             className="h-full"
+            layout
         >
             <Card className={cn(
                 "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border hover:border-[hsl(var(--store-accent))] group bg-card p-0",
@@ -96,19 +97,28 @@ const ProductCardComponent = ({ product, storeIsOpen, storeIsActive, delay = 0 }
                         )}
                         {product.size && <Badge variant="secondary" className="absolute bottom-1 right-1 caption px-1.5 py-0.5 bg-black/50 text-white border-none shadow">{product.size}</Badge>}
                     </div>
+                    {/* Use p-4 pb-1 */}
                     <div className="p-4 pb-1">
+                        {/* Apply Heading 2 */}
                         <CardTitle className="h2 line-clamp-1">{product.name}</CardTitle>
+                        {/* Apply Caption */}
                         <Badge variant="outline" className="mt-1 capitalize caption font-normal px-1.5 py-0.5 tracking-wide">{product.category}</Badge>
                     </div>
                 </CardHeader>
+                {/* Use p-4 pt-1 */}
                 <CardContent className="flex-grow p-4 pt-1 space-y-1">
+                    {/* Apply Heading 2 */}
                     <p className="h2 font-bold text-[hsl(var(--store-accent))]">{formatCurrency(product.price)}</p>
+                    {/* Apply Body 2 */}
                     <p className="text-body2 text-muted-foreground line-clamp-2">{product.description}</p>
                     {product.ingredients && (
+                        /* Apply Caption */
                         <p className="caption pt-1">Ingredients: {product.ingredients.join(', ')}</p>
                     )}
                 </CardContent>
+                {/* Use p-4 pt-0 */}
                 <CardFooter className="p-4 pt-0 mt-auto">
+                    {/* Use solid primary button */}
                     <Button
                         size="sm"
                         variant="default"
@@ -119,7 +129,7 @@ const ProductCardComponent = ({ product, storeIsOpen, storeIsActive, delay = 0 }
                         onClick={handleAddToCart}
                         style={{ '--store-accent': 'hsl(var(--store-accent))' } as React.CSSProperties}
                         disabled={!storeIsOpen || !storeIsActive}
-                        withRipple
+                        withRipple // Enable ripple effect
                         >
                         {storeIsOpen && storeIsActive ? (
                             <>
@@ -128,9 +138,9 @@ const ProductCardComponent = ({ product, storeIsOpen, storeIsActive, delay = 0 }
                         ) : !storeIsActive ? (
                             <XCircle className="mr-1 h-4 w-4"/> Unavailable
                         ) : (
-                                <>
+                            <>
                                 <Bell className="mr-1 h-4 w-4"/> Pre-order
-                                </>
+                            </>
                         )}
                     </Button>
                 </CardFooter>
