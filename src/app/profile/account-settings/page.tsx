@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save, Loader2, Mail, Lock, Phone, User } from 'lucide-react'; // Import User icon
 import Link from 'next/link';
+import { AccountSettingsSkeleton } from '@/components/Skeletons'; // Import skeleton
 
 // Mock update functions (replace with actual API calls)
 async function updateProfileInfo(userId: string, data: { name?: string; phone?: string }) {
@@ -132,22 +133,14 @@ export default function AccountSettingsPage() {
 
 
     if (isLoading) {
-        return (
-            <div className="container mx-auto py-10 space-y-8">
-                <Skeleton className="h-8 w-32 mb-4" /> {/* Back Button */}
-                <Skeleton className="h-10 w-1/2" /> {/* Title */}
-                <Card><CardHeader><Skeleton className="h-6 w-1/4" /></CardHeader><CardContent><Skeleton className="h-32 w-full" /></CardContent></Card>
-                <Card><CardHeader><Skeleton className="h-6 w-1/4" /></CardHeader><CardContent><Skeleton className="h-32 w-full" /></CardContent></Card>
-                <Card><CardHeader><Skeleton className="h-6 w-1/4" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
-            </div>
-        );
+        return <AccountSettingsSkeleton />;
     }
 
     if (!profile) {
          return (
             <div className="container mx-auto py-10 text-center">
                 <p className="text-muted-foreground">Could not load profile data.</p>
-                  <Link href="/profile" passHref legacyBehavior>
+                  <Link href="/profile" passHref>
                      <Button variant="outline" className="mt-4">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Profile
                     </Button>

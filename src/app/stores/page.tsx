@@ -220,7 +220,7 @@ export default function StoreManagementPage() {
                     </CardContent>
                      {/* Use p-4 pt-0 */}
                     <CardFooter className="p-4 pt-0 mt-auto">
-                    <Link href={`/store/${store.id}/manage`} passHref legacyBehavior>
+                    <Link href={`/store/${store.id}/manage`} passHref>
                          {/* Use Primary Button */}
                         <Button className="w-full group/button bg-[var(--store-owner-primary)] text-[var(--store-owner-primary-foreground)] hover:bg-[var(--store-owner-primary)]/90" size="lg" withRipple>
                             <Edit className="mr-2 h-4 w-4" />
@@ -249,4 +249,3 @@ export default function StoreManagementPage() {
     </div>
   );
 }
-

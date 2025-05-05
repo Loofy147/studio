@@ -98,7 +98,6 @@ export default function DriverDashboardPage() {
 
   if (isLoading) {
     return (
-      <> {/* Wrap in Fragment to potentially resolve parsing issue */}
         <div className="space-y-8">
             <Skeleton className="h-8 w-48 bg-muted/50" />
             <Card className="bg-card border-border">
@@ -111,7 +110,6 @@ export default function DriverDashboardPage() {
             <CardContent><Skeleton className="h-16 w-full bg-muted/50" /></CardContent>
             </Card>
         </div>
-      </>
     );
   }
 

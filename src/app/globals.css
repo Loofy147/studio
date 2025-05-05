@@ -13,7 +13,7 @@ body {
 @layer base {
   /* --- Base Theme Variables --- */
   :root {
-    /* Core Palette Hues */
+    /* Core Palette Hues (SDP = SwiftDispatch Platform) */
     --sdp-blue-hue: 220; /* Primary */
     --sdp-orange-hue: 25; /* Secondary */
     --sdp-green-hue: 145; /* Accent */
@@ -21,27 +21,27 @@ body {
     --sdp-red-hue: 0; /* Destructive */
 
     /* Light Mode */
-    --background: var(--sdp-gray-hue) 20% 98%; /* Off-white */
-    --foreground: var(--sdp-gray-hue) 10% 10%; /* Dark Gray */
-    --card: var(--sdp-gray-hue) 0% 100%; /* White */
-    --card-foreground: var(--sdp-gray-hue) 10% 10%;
-    --popover: var(--sdp-gray-hue) 0% 100%;
-    --popover-foreground: var(--sdp-gray-hue) 10% 10%;
-    --primary: var(--sdp-blue-hue) 75% 55%; /* #3366FF */
-    --primary-foreground: var(--sdp-gray-hue) 0% 100%; /* White */
-    --secondary: var(--sdp-orange-hue) 90% 60%; /* #FF6633 */
-    --secondary-foreground: var(--sdp-gray-hue) 0% 100%; /* White */
-    --muted: var(--sdp-gray-hue) 15% 94%; /* Light Gray */
-    --muted-foreground: var(--sdp-gray-hue) 15% 45%; /* Medium Gray */
-    --accent: var(--sdp-green-hue) 60% 50%; /* #33CC99 - For success/confirmation */
-    --accent-foreground: var(--sdp-gray-hue) 0% 10%; /* Dark text for Green */
-    --destructive: var(--sdp-red-hue) 80% 60%; /* Red */
-    --destructive-foreground: var(--sdp-gray-hue) 0% 100%; /* White */
-    --border: var(--sdp-gray-hue) 15% 88%; /* Light Gray Border */
-    --input: var(--sdp-gray-hue) 15% 88%; /* Input border */
-    --ring: var(--sdp-blue-hue) 60% 70%; /* Lighter Blue for focus rings */
+    --background: hsl(var(--sdp-gray-hue) 20% 98%); /* Off-white */
+    --foreground: hsl(var(--sdp-gray-hue) 10% 10%); /* Dark Gray */
+    --card: hsl(var(--sdp-gray-hue) 0% 100%); /* White */
+    --card-foreground: hsl(var(--sdp-gray-hue) 10% 10%);
+    --popover: hsl(var(--sdp-gray-hue) 0% 100%);
+    --popover-foreground: hsl(var(--sdp-gray-hue) 10% 10%);
+    --primary: hsl(var(--sdp-blue-hue) 75% 55%); /* #3366FF */
+    --primary-foreground: hsl(var(--sdp-gray-hue) 0% 100%); /* White */
+    --secondary: hsl(var(--sdp-orange-hue) 90% 60%); /* #FF6633 */
+    --secondary-foreground: hsl(var(--sdp-gray-hue) 0% 100%); /* White */
+    --muted: hsl(var(--sdp-gray-hue) 15% 94%); /* Light Gray */
+    --muted-foreground: hsl(var(--sdp-gray-hue) 15% 45%); /* Medium Gray */
+    --accent: hsl(var(--sdp-green-hue) 60% 50%); /* #33CC99 - For success/confirmation */
+    --accent-foreground: hsl(var(--sdp-gray-hue) 0% 10%); /* Dark text for Green */
+    --destructive: hsl(var(--sdp-red-hue) 80% 60%); /* Red */
+    --destructive-foreground: hsl(var(--sdp-gray-hue) 0% 100%); /* White */
+    --border: hsl(var(--sdp-gray-hue) 15% 88%); /* Light Gray Border */
+    --input: hsl(var(--sdp-gray-hue) 15% 88%); /* Input border */
+    --ring: hsl(var(--sdp-blue-hue) 60% 70%); /* Lighter Blue for focus rings */
 
-    --radius: 0.5rem;
+    --radius: 0.5rem; /* 8px */
 
     /* Chart Colors (Derived from palette) */
     --chart-1: hsl(var(--primary));
@@ -59,29 +59,41 @@ body {
     --sidebar-accent-foreground: hsl(var(--primary)); /* Use primary text on light blue */
     --sidebar-border: hsl(var(--border));
     --sidebar-ring: hsl(var(--ring));
+
+    /* --- Category Theme Variables --- */
+    /* Define HSL hues for each category */
+    --category-hue-electronics: 210; /* Blue */
+    --category-hue-clothing: 330; /* Pink */
+    --category-hue-groceries: 90; /* Green */
+    --category-hue-books: 30; /* Brownish Orange */
+    --category-hue-home-goods: 190; /* Cyan */
+    --category-hue-toys: 50; /* Yellow */
+    --category-hue-restaurants: 15; /* Reddish Orange */
+    --category-hue-coffee-shops: 35; /* Brown */
+    --category-hue-other: 240; /* Grayish Blue */
   }
 
   .dark {
     /* Dark Mode */
-    --background: var(--sdp-gray-hue) 10% 12%; /* Very dark gray */
-    --foreground: var(--sdp-gray-hue) 10% 90%; /* Light gray text */
-    --card: var(--sdp-gray-hue) 10% 16%; /* Slightly lighter card bg */
-    --card-foreground: var(--sdp-gray-hue) 10% 90%;
-    --popover: var(--sdp-gray-hue) 10% 14%; /* Dark popover */
-    --popover-foreground: var(--sdp-gray-hue) 10% 90%;
-    --primary: var(--sdp-blue-hue) 70% 65%; /* Brighter Blue */
-    --primary-foreground: var(--sdp-gray-hue) 10% 15%; /* Dark text */
-    --secondary: var(--sdp-orange-hue) 80% 65%; /* Brighter Orange */
-    --secondary-foreground: var(--sdp-gray-hue) 10% 15%; /* Dark text */
-    --muted: var(--sdp-gray-hue) 10% 25%; /* Slightly lighter dark gray */
-    --muted-foreground: var(--sdp-gray-hue) 10% 60%; /* Muted gray text */
-    --accent: var(--sdp-green-hue) 60% 60%; /* Brighter Green */
-    --accent-foreground: var(--sdp-gray-hue) 10% 15%; /* Dark text */
-    --destructive: var(--sdp-red-hue) 70% 55%; /* Slightly muted red */
-    --destructive-foreground: var(--sdp-gray-hue) 0% 98%; /* Light text */
-    --border: var(--sdp-gray-hue) 10% 30%; /* Darker gray border */
-    --input: var(--sdp-gray-hue) 10% 25%; /* Input border matches muted */
-    --ring: var(--sdp-blue-hue) 60% 75%; /* Bright blue focus */
+    --background: hsl(var(--sdp-gray-hue) 10% 12%); /* Very dark gray */
+    --foreground: hsl(var(--sdp-gray-hue) 10% 90%); /* Light gray text */
+    --card: hsl(var(--sdp-gray-hue) 10% 16%); /* Slightly lighter card bg */
+    --card-foreground: hsl(var(--sdp-gray-hue) 10% 90%);
+    --popover: hsl(var(--sdp-gray-hue) 10% 14%); /* Dark popover */
+    --popover-foreground: hsl(var(--sdp-gray-hue) 10% 90%);
+    --primary: hsl(var(--sdp-blue-hue) 70% 65%); /* Brighter Blue */
+    --primary-foreground: hsl(var(--sdp-gray-hue) 10% 15%); /* Dark text */
+    --secondary: hsl(var(--sdp-orange-hue) 80% 65%); /* Brighter Orange */
+    --secondary-foreground: hsl(var(--sdp-gray-hue) 10% 15%); /* Dark text */
+    --muted: hsl(var(--sdp-gray-hue) 10% 25%); /* Slightly lighter dark gray */
+    --muted-foreground: hsl(var(--sdp-gray-hue) 10% 60%); /* Muted gray text */
+    --accent: hsl(var(--sdp-green-hue) 60% 60%); /* Brighter Green */
+    --accent-foreground: hsl(var(--sdp-gray-hue) 10% 15%); /* Dark text */
+    --destructive: hsl(var(--sdp-red-hue) 70% 55%); /* Slightly muted red */
+    --destructive-foreground: hsl(var(--sdp-gray-hue) 0% 98%); /* Light text */
+    --border: hsl(var(--sdp-gray-hue) 10% 30%); /* Darker gray border */
+    --input: hsl(var(--sdp-gray-hue) 10% 25%); /* Input border matches muted */
+    --ring: hsl(var(--sdp-blue-hue) 60% 75%); /* Bright blue focus */
 
     /* Dark Sidebar */
     --sidebar-background: hsl(var(--sdp-gray-hue) 10% 10%); /* Darkest */
@@ -113,6 +125,8 @@ body {
       --muted-foreground: hsl(var(--adm-gray-hue) 10% 45%);
       --accent: hsl(var(--adm-secondary-hue) 60% 95%); /* Light Cyan Accent */
       --accent-foreground: hsl(var(--adm-secondary-hue) 60% 30%);
+      --destructive: hsl(var(--sdp-red-hue) 80% 60%);
+      --destructive-foreground: hsl(var(--sdp-gray-hue) 0% 100%);
       --border: hsl(var(--adm-gray-hue) 15% 88%);
       --input: hsl(var(--adm-gray-hue) 15% 88%);
       --ring: hsl(var(--adm-primary-hue) 50% 70%);
@@ -142,6 +156,8 @@ body {
       --muted-foreground: hsl(var(--adm-gray-hue) 10% 60%);
       --accent: hsl(var(--adm-secondary-hue) 60% 20%); /* Dark Cyan Accent */
       --accent-foreground: hsl(var(--adm-secondary-hue) 60% 80%);
+      --destructive: hsl(var(--sdp-red-hue) 70% 55%);
+      --destructive-foreground: hsl(var(--sdp-gray-hue) 0% 98%);
       --border: hsl(var(--adm-gray-hue) 10% 25%);
       --input: hsl(var(--adm-gray-hue) 10% 20%);
       --ring: hsl(var(--adm-primary-hue) 50% 75%);
@@ -156,7 +172,6 @@ body {
       --sidebar-border: hsl(var(--adm-gray-hue) 15% 30%);
       --sidebar-ring: hsl(var(--sidebar-primary));
   }
-
 
   /* --- Driver Theme --- */
   .driver-layout {
@@ -177,6 +192,8 @@ body {
       --muted-foreground: hsl(var(--drv-gray-hue) 10% 45%);
       --accent: hsl(var(--drv-primary-hue) 70% 95%); /* Light Teal Accent */
       --accent-foreground: hsl(var(--drv-primary-hue) 70% 30%);
+      --destructive: hsl(var(--sdp-red-hue) 80% 60%);
+      --destructive-foreground: hsl(var(--sdp-gray-hue) 0% 100%);
       --border: hsl(var(--drv-gray-hue) 15% 88%);
       --input: hsl(var(--drv-gray-hue) 15% 88%);
       --ring: hsl(var(--drv-primary-hue) 70% 65%);
@@ -206,6 +223,8 @@ body {
       --muted-foreground: hsl(var(--drv-gray-hue) 10% 60%);
       --accent: hsl(var(--drv-primary-hue) 70% 20%); /* Dark Teal Accent */
       --accent-foreground: hsl(var(--drv-primary-hue) 70% 80%);
+      --destructive: hsl(var(--sdp-red-hue) 70% 55%);
+      --destructive-foreground: hsl(var(--sdp-gray-hue) 0% 98%);
       --border: hsl(var(--drv-gray-hue) 10% 25%);
       --input: hsl(var(--drv-gray-hue) 10% 20%);
       --ring: hsl(var(--drv-primary-hue) 60% 70%);
@@ -221,8 +240,7 @@ body {
       --sidebar-ring: hsl(var(--ring));
   }
 
-
-   /* --- Store Owner Theme --- */
+  /* --- Store Owner Theme --- */
   .store-owner-layout {
       --sto-primary-hue: 340; /* Pink/Magenta */
       --sto-secondary-hue: 270; /* Indigo */
@@ -241,6 +259,8 @@ body {
       --muted-foreground: hsl(var(--sto-gray-hue) 10% 45%);
       --accent: hsl(var(--sto-primary-hue) 70% 96%); /* Very Light Pink Accent */
       --accent-foreground: hsl(var(--sto-primary-hue) 70% 40%);
+      --destructive: hsl(var(--sdp-red-hue) 80% 60%);
+      --destructive-foreground: hsl(var(--sdp-gray-hue) 0% 100%);
       --border: hsl(var(--sto-gray-hue) 10% 88%);
       --input: hsl(var(--sto-gray-hue) 10% 88%);
       --ring: hsl(var(--sto-primary-hue) 60% 70%);
@@ -270,6 +290,8 @@ body {
       --muted-foreground: hsl(var(--sto-gray-hue) 10% 60%);
       --accent: hsl(var(--sto-primary-hue) 70% 18%); /* Dark Pink Accent */
       --accent-foreground: hsl(var(--sto-primary-hue) 70% 85%);
+      --destructive: hsl(var(--sdp-red-hue) 70% 55%);
+      --destructive-foreground: hsl(var(--sdp-gray-hue) 0% 98%);
       --border: hsl(var(--sto-gray-hue) 8% 25%);
       --input: hsl(var(--sto-gray-hue) 8% 18%);
       --ring: hsl(var(--sto-primary-hue) 60% 75%);
@@ -284,44 +306,6 @@ body {
       --sidebar-border: hsl(var(--border));
       --sidebar-ring: hsl(var(--ring));
   }
-
-  /* --- Category Theme --- */
-  /* Define themed variables for Store Categories */
-  /* Base category theme using Secondary color from base theme */
-  .theme-category-electronics,
-  .theme-category-clothing,
-  .theme-category-groceries,
-  .theme-category-books,
-  .theme-category-home-goods,
-  .theme-category-toys,
-  .theme-category-restaurants,
-  .theme-category-coffee-shops,
-  .theme-category-other {
-    --store-accent: hsl(var(--secondary)); /* Default to secondary */
-    --store-accent-foreground: hsl(var(--secondary-foreground));
-  }
-
-  /* Overrides for specific categories */
-  .theme-category-electronics { --store-accent: hsl(210, 80%, 55%); --store-accent-foreground: white; } /* Blue */
-  .theme-category-clothing { --store-accent: hsl(330, 60%, 60%); --store-accent-foreground: white; } /* Pink */
-  .theme-category-groceries { --store-accent: hsl(90, 50%, 50%); --store-accent-foreground: white; } /* Green */
-  .theme-category-books { --store-accent: hsl(30, 60%, 55%); --store-accent-foreground: white; } /* Brownish Orange */
-  .theme-category-home-goods { --store-accent: hsl(190, 50%, 55%); --store-accent-foreground: white; } /* Cyan */
-  .theme-category-toys { --store-accent: hsl(50, 100%, 60%); --store-accent-foreground: hsl(40, 80%, 10%); } /* Yellow (Dark Text) */
-  .theme-category-restaurants { --store-accent: hsl(15, 75%, 55%); --store-accent-foreground: white; } /* Reddish Orange */
-  .theme-category-coffee-shops { --store-accent: hsl(35, 40%, 45%); --store-accent-foreground: white; } /* Brown */
-  .theme-category-other { --store-accent: hsl(240, 10%, 50%); --store-accent-foreground: white; } /* Grayish Blue */
-
-   /* Dark mode overrides for store accents */
-  .dark .theme-category-electronics { --store-accent: hsl(210, 80%, 65%); }
-  .dark .theme-category-clothing { --store-accent: hsl(330, 60%, 70%); }
-  .dark .theme-category-groceries { --store-accent: hsl(90, 50%, 60%); }
-  .dark .theme-category-books { --store-accent: hsl(30, 60%, 65%); }
-  .dark .theme-category-home-goods { --store-accent: hsl(190, 50%, 65%); }
-  .dark .theme-category-toys { --store-accent: hsl(50, 100%, 65%); }
-  .dark .theme-category-restaurants { --store-accent: hsl(15, 75%, 65%); }
-  .dark .theme-category-coffee-shops { --store-accent: hsl(35, 40%, 55%); }
-  .dark .theme-category-other { --store-accent: hsl(240, 10%, 60%); }
 }
 
 /* Apply Typography styles */
@@ -331,29 +315,22 @@ body {
     }
 
     /* Headings */
-    /* Heading 1: 32px, Bold */
-    h1, .h1 { @apply text-[2rem] font-bold leading-tight tracking-tighter; } /* 32px */
-    /* Heading 2: 24px, SemiBold */
-    h2, .h2 { @apply text-[1.5rem] font-semibold leading-snug tracking-tight; } /* 24px */
-    /* Heading 3: 20px, SemiBold */
-    h3, .h3 { @apply text-[1.25rem] font-semibold leading-normal tracking-tight; } /* 20px */
-    /* Heading 4: 18px, SemiBold */
+    h1, .h1 { @apply text-[2.5rem] font-extrabold leading-tight tracking-tight; } /* ~40px */
+    h2, .h2 { @apply text-[1.75rem] font-bold leading-snug tracking-tight; } /* ~28px */
+    h3, .h3 { @apply text-[1.375rem] font-semibold leading-normal tracking-tight; } /* ~22px */
     h4, .h4 { @apply text-[1.125rem] font-semibold leading-normal tracking-tight; } /* 18px */
 
     /* Paragraph and Body Text */
-    /* Body 1 (default): 16px, Regular */
     p, body { @apply text-base font-normal leading-relaxed; } /* 16px */
-    /* Body 2: 14px, Regular */
     .text-body2 { @apply text-[0.875rem] font-normal leading-normal; } /* 14px */
-    /* Lead text: Larger muted text */
     .lead { @apply text-lg font-normal text-muted-foreground; } /* 18px */
 
     /* Smaller text styles */
-    /* Caption: 12px, Regular */
     .caption { @apply text-[0.75rem] font-normal leading-none text-muted-foreground; } /* 12px */
-    /* Overline: 10px, SemiBold, Uppercase */
     .overline { @apply text-[0.625rem] font-semibold uppercase tracking-wider text-muted-foreground; } /* 10px */
 
+    /* Button Text Helper */
+    .btn-text-uppercase-semibold { @apply text-[0.875rem] uppercase font-semibold tracking-wider; } /* 14px */
 
     /* Link styles */
     a {
@@ -367,9 +344,9 @@ body {
      /* Input/Label specific application */
     label {
       /* Use body2 styles for labels */
-       @apply text-body2 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
+       @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70; /* Adjusted to text-sm for forms */
     }
-    /* Apply body2 to descriptions */
+    /* Apply Body 2 to descriptions */
     [id$="-form-item-description"] {
        @apply text-body2 text-muted-foreground;
     }
@@ -386,11 +363,6 @@ body {
 
     *:focus-visible {
         @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
-    }
-
-    /* Shadcn Button Text - Uppercase Semibold Helper */
-    .btn-text-uppercase-semibold {
-        @apply uppercase font-semibold tracking-wider text-xs; /* Use 12px/semibold */
     }
 }
 
@@ -412,31 +384,32 @@ body {
    }
    html {
      scroll-behavior: smooth;
+     scroll-padding-top: 5rem; /* Add padding for sticky header */
    }
 }
 
 /* Custom scrollbar styles */
 ::-webkit-scrollbar {
-  width: 8px; /* Slightly wider */
-  height: 8px;
+  width: 12px; /* Slightly wider */
+  height: 12px;
 }
 ::-webkit-scrollbar-track {
   background: hsl(var(--muted) / 0.1); /* More subtle track */
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--border) / 0.6); /* Use border color, slightly transparent */
+  background-color: hsl(var(--border)); /* Use border color */
   border-radius: 10px;
-  border: 2px solid transparent; /* Create inset effect */
+  border: 3px solid transparent; /* Create inset effect */
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(var(--muted-foreground) / 0.6); /* Darker on hover */
+  background-color: hsl(var(--muted-foreground)); /* Darker on hover */
 }
 
 /* Define the animations */
 @keyframes slide-in-from-bottom {
-  from { transform: translateY(15px); opacity: 0; } /* Start slightly lower */
+  from { transform: translateY(20px); opacity: 0; } /* Start slightly lower */
   to { transform: translateY(0); opacity: 1; }
 }
 @keyframes fade-in {
@@ -459,7 +432,7 @@ body {
 /* Subtle pulse for notification badges */
 @keyframes pulse-badge {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(0.95); }
+  50% { opacity: 0.7; transform: scale(0.9); } /* More subtle */
 }
 /* Ripple effect for buttons */
 @keyframes ripple {
@@ -471,8 +444,8 @@ body {
 
 
 /* Apply animations */
-.animate-slide-in { animation: slide-in-from-bottom 0.4s ease-out; } /* Slightly longer */
-.animate-fade-in { animation: fade-in 0.5s ease-in-out; } /* Slightly longer */
+.animate-slide-in { animation: slide-in-from-bottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); } /* Smoother ease */
+.animate-fade-in { animation: fade-in 0.6s ease-in-out; } /* Slightly longer fade */
 .animate-spin { animation: spin 1s linear infinite; }
 .animate-spin-wheel { animation: spin-wheel 1.5s linear infinite; } /* Slower wheel */
 .animate-shimmer {
@@ -494,13 +467,14 @@ body {
   position: absolute;
   border-radius: 50%;
   /* Use a semi-transparent version of primary-foreground for light mode */
-  background-color: hsla(var(--primary-foreground), 0.6);
+  background-color: hsla(var(--primary-foreground), 0.4); /* Less opaque */
   transform: scale(0);
   animation: ripple 600ms linear;
+  pointer-events: none; /* Ensure ripple doesn't interfere with clicks */
 }
 .dark .ripple {
    /* Use a semi-transparent version of primary-foreground for dark mode */
-   background-color: hsla(var(--primary-foreground), 0.4);
+   background-color: hsla(var(--primary-foreground), 0.25); /* Less opaque */
 }
 
 
@@ -515,4 +489,29 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Apply store-specific accent color */
+@layer utilities {
+  /* Generate classes for each category */
+  .theme-category-electronics { --store-accent: hsl(var(--category-hue-electronics), 80%, 55%); --store-accent-foreground: white; }
+  .theme-category-clothing { --store-accent: hsl(var(--category-hue-clothing), 60%, 60%); --store-accent-foreground: white; }
+  .theme-category-groceries { --store-accent: hsl(var(--category-hue-groceries), 50%, 50%); --store-accent-foreground: white; }
+  .theme-category-books { --store-accent: hsl(var(--category-hue-books), 60%, 55%); --store-accent-foreground: white; }
+  .theme-category-home-goods { --store-accent: hsl(var(--category-hue-home-goods), 50%, 55%); --store-accent-foreground: white; }
+  .theme-category-toys { --store-accent: hsl(var(--category-hue-toys), 100%, 60%); --store-accent-foreground: hsl(var(--category-hue-toys), 80%, 10%); } /* Dark text for Yellow */
+  .theme-category-restaurants { --store-accent: hsl(var(--category-hue-restaurants), 75%, 55%); --store-accent-foreground: white; }
+  .theme-category-coffee-shops { --store-accent: hsl(var(--category-hue-coffee-shops), 40%, 45%); --store-accent-foreground: white; }
+  .theme-category-other { --store-accent: hsl(var(--category-hue-other), 10%, 50%); --store-accent-foreground: white; }
+
+  /* Dark Mode Overrides */
+  .dark .theme-category-electronics { --store-accent: hsl(var(--category-hue-electronics), 80%, 65%); }
+  .dark .theme-category-clothing { --store-accent: hsl(var(--category-hue-clothing), 60%, 70%); }
+  .dark .theme-category-groceries { --store-accent: hsl(var(--category-hue-groceries), 50%, 60%); }
+  .dark .theme-category-books { --store-accent: hsl(var(--category-hue-books), 60%, 65%); }
+  .dark .theme-category-home-goods { --store-accent: hsl(var(--category-hue-home-goods), 50%, 65%); }
+  .dark .theme-category-toys { --store-accent: hsl(var(--category-hue-toys), 100%, 65%); } /* Keep dark text */
+  .dark .theme-category-restaurants { --store-accent: hsl(var(--category-hue-restaurants), 75%, 65%); }
+  .dark .theme-category-coffee-shops { --store-accent: hsl(var(--category-hue-coffee-shops), 40%, 55%); }
+  .dark .theme-category-other { --store-accent: hsl(var(--category-hue-other), 10%, 60%); }
 }

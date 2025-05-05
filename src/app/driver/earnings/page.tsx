@@ -16,6 +16,7 @@ import { motion } from 'framer-motion'; // Import motion
 import { type DateRange } from 'react-day-picker';
 import { ChartTooltipContent, ChartTooltip, ChartContainer, ChartConfig } from '@/components/ui/chart'; // Import Chart components
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'; // Import Recharts components
+import { EarningsSkeleton } from '@/components/Skeletons'; // Import skeleton
 
 // Mock Earning Data Structure
 interface EarningEntry {
@@ -138,39 +139,6 @@ export default function DriverEarningsPage() {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
     };
-
-    const EarningsSkeleton = () => (
-        <div className="space-y-8">
-            {/* Title Skeleton */}
-            <Skeleton className="h-8 w-64 bg-muted/50" />
-            {/* KPI Cards Skeleton */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card><CardHeader><Skeleton className="h-5 w-24 bg-muted/50 mb-2" /><Skeleton className="h-7 w-32 bg-muted/50" /></CardHeader></Card>
-                <Card><CardHeader><Skeleton className="h-5 w-24 bg-muted/50 mb-2" /><Skeleton className="h-7 w-32 bg-muted/50" /></CardHeader></Card>
-                <Card><CardHeader><Skeleton className="h-5 w-24 bg-muted/50 mb-2" /><Skeleton className="h-7 w-32 bg-muted/50" /></CardHeader></Card>
-            </div>
-            {/* Filter Skeleton */}
-             <div className="flex flex-col md:flex-row gap-4">
-                <Skeleton className="h-10 w-full md:w-1/3 bg-muted/50"/>
-                 <Skeleton className="h-10 w-32 bg-muted/50"/>
-            </div>
-            {/* Chart Skeleton */}
-            <Card>
-                <CardHeader><Skeleton className="h-6 w-1/2 bg-muted/50" /></CardHeader>
-                <CardContent><Skeleton className="h-64 w-full bg-muted/50" /></CardContent>
-            </Card>
-            {/* Table Skeleton */}
-            <Card>
-                <CardHeader><Skeleton className="h-6 w-1/3 bg-muted/50" /></CardHeader>
-                <CardContent>
-                    <Skeleton className="h-10 w-full bg-muted/50 mb-2" /> {/* Header row */}
-                    <Skeleton className="h-12 w-full bg-muted/50 mb-1" />
-                    <Skeleton className="h-12 w-full bg-muted/50 mb-1" />
-                    <Skeleton className="h-12 w-full bg-muted/50" />
-                </CardContent>
-            </Card>
-        </div>
-    );
 
     if (isLoading) {
         return <EarningsSkeleton />;
@@ -334,5 +302,3 @@ export default function DriverEarningsPage() {
         </motion.div>
     );
 }
-
-    

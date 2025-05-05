@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -8,10 +9,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserProfile, getUserProfile, getFriendProfiles } from "@/services/store"; // Assuming these exist
-import { SendHorizonal, Paperclip, Phone, Video, UserPlus, Search } from 'lucide-react'; // Added icons
+import { SendHorizonal, Paperclip, Phone, Video, UserPlus, Search, ShoppingBag } from 'lucide-react'; // Added ShoppingBag
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils'; // Import formatCurrency
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import Image from 'next/image'; // Import Image
 
 // Mock message structure
 interface Message {
@@ -299,14 +301,23 @@ export default function ChatPage() {
                                              {msg.type === 'product' && msg.productDetails ? (
                                                 <div className="flex flex-col gap-2">
                                                      <p className="text-xs font-medium opacity-90 mb-1">Shared a product:</p>
-                                                    <Card className="bg-card/80 p-2 flex gap-2 items-center">
-                                                        <Image src={msg.productDetails.imageUrl || '/placeholder.png'} alt={msg.productDetails.name} width={40} height={40} className="rounded-sm" />
-                                                        <div className="text-xs">
+                                                     {/* Use a Card-like structure for product details */}
+                                                    <Card className="bg-card/80 p-2 flex gap-2 items-center border shadow-sm">
+                                                        <Image
+                                                             src={msg.productDetails.imageUrl || '/placeholder.png'}
+                                                             alt={msg.productDetails.name}
+                                                             width={40} height={40}
+                                                             className="rounded-sm border"
+                                                             data-ai-hint="product image"
+                                                         />
+                                                        <div className="text-xs flex-grow">
                                                             <p className="font-semibold truncate">{msg.productDetails.name}</p>
                                                             <p>{formatCurrency(msg.productDetails.price)}</p>
                                                         </div>
                                                          {/* Add "Buy as Gift" button */}
-                                                        <Button size="sm" variant="secondary" className="ml-auto h-7 text-xs" disabled>Buy Gift</Button>
+                                                         <Button size="sm" variant="secondary" className="ml-auto h-7 text-xs" onClick={() => alert('Buy as Gift functionality not implemented.')}>
+                                                             <ShoppingBag className="mr-1 h-3 w-3"/> Buy Gift
+                                                         </Button>
                                                     </Card>
                                                      <p className="mt-1">{msg.content}</p> {/* Display text content too */}
                                                 </div>
@@ -362,9 +373,4 @@ export default function ChatPage() {
             </main>
         </div>
     );
-}
-
-// Helper to format currency
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 }

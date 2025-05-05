@@ -158,8 +158,8 @@ export default function CartPage() {
     };
 
     return (
-        // Use space-y-10
-        <div className="container mx-auto px-4 py-12 space-y-10">
+        // Use space-y-12
+        <div className="container mx-auto px-4 py-12 space-y-12">
             <div className="flex items-center gap-3 border-b pb-4">
                 <ShoppingCart className="h-8 w-8 text-primary" />
                 {/* Use H1 */}

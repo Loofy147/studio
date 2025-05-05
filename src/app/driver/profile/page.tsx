@@ -57,12 +57,11 @@ export default function DriverProfilePage() {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await getDriverById(driverId);
-         // Assign mock data if service call fails (for development)
+        // Assign mock data if service call fails (for development)
         if (!mockDrivers) mockDrivers = [ // Initialize if not already done
              {id: 'driver-001', name: 'Driver Dan', email: 'dan.driver@dispatch.com', phone: '555-555-6666', vehicleType: 'car', status: 'active', availability: 'available', rating: 4.7, licensePlate: 'DRV-123', joinedAt: new Date(Date.now() - 90*86400000)}
          ];
-        const driverData = data ?? mockDrivers.find(d => d.id === driverId) ?? null; // Fallback to mock
+         const driverData = await getDriverById(driverId) ?? mockDrivers.find(d => d.id === driverId) ?? null; // Fallback to mock
 
         if (driverData) {
           setDriver(driverData);

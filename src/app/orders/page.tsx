@@ -16,10 +16,11 @@ import Link from "next/link"; // Import Link
 import { cn, formatCurrency } from "@/lib/utils"; // Import cn and formatCurrency
 import React from 'react'; // Import React for forwardRef etc.
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
-
+import type { BadgeProps } from "@/components/ui/badge"; // Explicit import
+import { OrderCardSkeleton } from '@/components/Skeletons'; // Import skeleton
 
 // Map status to progress value, icon, color, and variant
-const statusDetails: Record<Order['status'], { value: number; icon: React.ElementType; color: string; variant: VariantProps<typeof badgeVariants>["variant"]; description: string; progressColor: string }> = {
+const statusDetails: Record<Order['status'], { value: number; icon: React.ElementType; color: string; variant: BadgeProps["variant"]; description: string; progressColor: string }> = {
     'Pending': { value: 10, icon: Hourglass, color: 'text-yellow-600 dark:text-yellow-400', variant: 'outline', description: 'Order placed, awaiting confirmation.', progressColor: 'bg-yellow-500' },
     'Processing': { value: 35, icon: PackageSearch, color: 'text-blue-600 dark:text-blue-400', variant: 'outline', description: 'Store is preparing your order.', progressColor: 'bg-blue-500' },
     'Shipped': { value: 70, icon: Truck, color: 'text-purple-600 dark:text-purple-400', variant: 'secondary', description: 'Your order is on its way.', progressColor: 'bg-purple-500' },
@@ -54,47 +55,6 @@ export default function OrdersPage() {
     fetchOrders();
   }, [userId]);
 
-  const OrderCardSkeleton = () => (
-    <Card className="overflow-hidden border bg-card/50 animate-pulse"> {/* Use card background */}
-        <CardHeader className="bg-muted/30 p-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
-                 <div>
-                     <Skeleton className="h-6 w-36 mb-1.5 bg-muted/50" />
-                     <Skeleton className="h-4 w-56 bg-muted/50" />
-                 </div>
-                 <Skeleton className="h-7 w-28 rounded-full mt-1 sm:mt-0 bg-muted/50" />
-            </div>
-        </CardHeader>
-        <CardContent className="p-4 space-y-5">
-             <div>
-                 <Skeleton className="h-4 w-20 mb-2 bg-muted/50" /> {/* Items title */}
-                 <div className="space-y-2">
-                    <Skeleton className="h-4 w-full bg-muted/50" />
-                    <Skeleton className="h-4 w-5/6 bg-muted/50" />
-                 </div>
-                 <Skeleton className="h-5 w-24 mt-3 ml-auto bg-muted/50" /> {/* Total */}
-             </div>
-             <Separator />
-            <div className="space-y-2">
-                <Skeleton className="h-4 w-32 mb-2 bg-muted/50" /> {/* Tracking Status title */}
-                <div className="flex items-center gap-2">
-                    <Skeleton className="h-5 w-5 rounded-full bg-muted/50" />
-                    <Skeleton className="h-4 w-48 bg-muted/50" />
-                </div>
-                <Skeleton className="h-2 w-full rounded-full bg-muted/50" /> {/* Progress bar skeleton */}
-            </div>
-             <Separator />
-             <div className="flex items-start gap-2">
-                 <Skeleton className="h-4 w-4 mt-0.5 shrink-0 bg-muted/50" />
-                 <Skeleton className="h-4 w-full bg-muted/50" />
-             </div>
-        </CardContent>
-         <CardFooter className="bg-muted/30 p-4 flex justify-end gap-2">
-            <Skeleton className="h-9 w-24 bg-muted/50" />
-            <Skeleton className="h-9 w-32 bg-muted/50" />
-         </CardFooter>
-    </Card>
-  );
 
   // Animation variants
   const containerVariants = {
@@ -266,7 +226,7 @@ export default function OrdersPage() {
                 <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
                <p className="text-lg font-medium">You haven't placed any orders yet.</p>
                <p className="text-sm mt-2">Start exploring stores and find something you like!</p>
-               <Link href="/" passHref legacyBehavior>
+               <Link href="/" passHref>
                     <Button variant="default" className="mt-6">
                         Browse Stores
                     </Button>

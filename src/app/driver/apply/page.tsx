@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-// Updated: Removed Moped icon as it doesn't exist
+// Updated: Using Bike icon as a placeholder for Motorcycle and Scooter
 import { Truck as TruckIcon, User, Mail, Phone, Car, Bike, Info } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { motion } from 'framer-motion';
@@ -220,8 +220,7 @@ export default function DriverApplyPage() {
                                             </FormControl>
                                             <SelectContent>
                                                 <SelectItem value="car"><div className="flex items-center gap-2"><Car className="h-4 w-4 text-muted-foreground"/>Car</div></SelectItem>
-                                                {/* Updated: Using Bike icon as a placeholder */}
-                                                <SelectItem value="motorcycle"><div className="flex items-center gap-2"><Bike className="h-4 w-4 text-muted-foreground"/>Motorcycle</div></SelectItem>
+                                                <SelectItem value="motorcycle"><div className="flex items-center gap-2"><Bike className="h-4 w-4 text-muted-foreground"/>Motorcycle</div></SelectItem> {/* Using Bike icon */}
                                                 <SelectItem value="bicycle"><div className="flex items-center gap-2"><Bike className="h-4 w-4 text-muted-foreground"/>Bicycle</div></SelectItem>
                                                 <SelectItem value="scooter"><div className="flex items-center gap-2"><Bike className="h-4 w-4 text-muted-foreground"/>Scooter</div></SelectItem> {/* Reusing Bike icon */}
                                                 <SelectItem value="van"><div className="flex items-center gap-2"><TruckIcon className="h-4 w-4 text-muted-foreground"/>Van/Truck</div></SelectItem>
@@ -251,7 +250,8 @@ export default function DriverApplyPage() {
                             </div>
 
                             {/* Submission Button */}
-                            <Button type="submit" disabled={isSubmitting} className="w-full py-3 text-lg font-semibold">
+                             {/* Use Primary button */}
+                            <Button type="submit" disabled={isSubmitting} className="w-full" size="lg" withRipple>
                                 {isSubmitting ? "Submitting Application..." : "Submit Application"}
                             </Button>
                         </form>

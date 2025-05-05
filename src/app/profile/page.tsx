@@ -13,7 +13,7 @@ import { Badge, badgeVariants } from "@/components/ui/badge";
 import type { BadgeProps } from "@/components/ui/badge"; // Explicit import
 import { User, ShoppingBag, MapPin, Phone, Mail, Award, Settings, LogOut, PackageCheck, Truck, Hourglass, XCircle, Eye, CalendarClock, Building, Store as StoreIcon, Check, Play, Pause, Users as UsersIcon, BookmarkPlus, BookmarkMinus, ArrowLeft, Plus, Edit, Trash2, Briefcase, Home, Repeat } from 'lucide-react'; // Added more icons
 import { format } from 'date-fns';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
 import Link from "next/link";
 import { cn, formatCurrency } from "@/lib/utils";
 import React from 'react'; // Import React
@@ -32,6 +32,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutAnimator } from "@/components/LayoutAnimator"; // Import LayoutAnimator
 import { AddressDialog } from './AddressDialog'; // Import AddressDialog
+import { ProfileInfoSkeleton, OrderHistorySkeleton, SubscriptionsSkeleton } from '@/components/Skeletons'; // Import specific skeletons
 
 
 // Re-define AddressFormData if needed or import from a shared types file
@@ -193,136 +194,6 @@ export default function ProfilePage() {
     }, [userId, profile, toast]);
 
 
-  const ProfileInfoSkeleton = () => (
-     <Card className="border-primary/10 shadow-md">
-        {/* Use p-6 for consistent padding */}
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-secondary/5">
-             <Skeleton className="h-24 w-24 rounded-full bg-muted/50" />
-             <div className="space-y-2 flex-grow mt-2 sm:mt-0">
-                <Skeleton className="h-8 w-56 bg-muted/50" />
-                <Skeleton className="h-6 w-64 bg-muted/50" />
-                <Skeleton className="h-5 w-40 bg-muted/50" />
-             </div>
-            <div className="flex gap-2 self-start sm:self-center">
-                <Skeleton className="h-9 w-32 bg-muted/50" />
-            </div>
-        </CardHeader>
-        {/* Use p-6 for consistent padding */}
-        <CardContent className="space-y-6 p-6 pt-4">
-            <Separator />
-             {/* Address Skeleton */}
-              <div className="space-y-4">
-                 <div className="flex justify-between items-center">
-                    <Skeleton className="h-6 w-36 bg-muted/50" />
-                    <Skeleton className="h-9 w-28 bg-muted/50" />
-                 </div>
-                 <div className="space-y-3">
-                     <Skeleton className="h-8 w-full bg-muted/50" /> {/* Simulate address card */}
-                 </div>
-             </div>
-             <Separator />
-             {/* Friends/Followed Stores Skeleton */}
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-4 border rounded-md">
-                     <Skeleton className="h-7 w-7 rounded bg-muted/50" />
-                     <Skeleton className="h-5 w-32 bg-muted/50" />
-                  </div>
-                   <div className="flex items-center gap-3 p-4 border rounded-md">
-                     <Skeleton className="h-7 w-7 rounded bg-muted/50" />
-                     <Skeleton className="h-5 w-36 bg-muted/50" />
-                  </div>
-             </div>
-             <Separator />
-             <div className="flex items-center gap-3 p-4 border rounded-lg bg-gradient-to-r from-yellow-100/20 via-amber-50/20 to-orange-100/20 dark:from-yellow-900/30 dark:via-amber-950/30 dark:to-orange-950/30">
-                 <Skeleton className="h-10 w-10 rounded-full bg-muted/50" />
-                 <div className="space-y-1">
-                    <Skeleton className="h-5 w-28 bg-muted/50" />
-                    <Skeleton className="h-7 w-20 bg-muted/50" />
-                 </div>
-            </div>
-        </CardContent>
-     </Card>
-  )
-
-   const OrderHistorySkeleton = () => (
-    <Card className="border-primary/10 shadow-md">
-        {/* Use p-4 for consistent padding */}
-        <CardHeader className="flex flex-row justify-between items-center p-4">
-            <div className="space-y-1">
-                <Skeleton className="h-6 w-40 bg-muted/50" />
-                <Skeleton className="h-4 w-56 bg-muted/50" />
-            </div>
-            <Skeleton className="h-9 w-32 bg-muted/50" />
-        </CardHeader>
-        <CardContent className="p-0">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-[100px] pl-4"><Skeleton className="h-4 w-16 bg-muted/50" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-24 bg-muted/50" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-32 bg-muted/50" /></TableHead>
-                        <TableHead className="hidden md:table-cell text-right"><Skeleton className="h-4 w-20 bg-muted/50" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-24 bg-muted/50" /></TableHead>
-                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-16 bg-muted/50" /></TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {Array.from({ length: 3 }).map((_, i) => (
-                        <TableRow key={i} className="hover:bg-muted/20">
-                            <TableCell className="pl-4"><Skeleton className="h-4 w-16 bg-muted/50" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-24 bg-muted/50" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-32 bg-muted/50" /></TableCell>
-                             <TableCell className="hidden md:table-cell text-right"><Skeleton className="h-4 w-20 bg-muted/50" /></TableCell>
-                            <TableCell><Skeleton className="h-6 w-20 rounded-full bg-muted/50" /></TableCell> {/* Status */}
-                            <TableCell className="text-right pr-4"><Skeleton className="h-8 w-8 inline-block bg-muted/50" /></TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </CardContent>
-    </Card>
-   )
-
-   const SubscriptionsSkeleton = () => (
-     <Card className="border-primary/10 shadow-md">
-         {/* Use p-4 for consistent padding */}
-        <CardHeader className="flex flex-row justify-between items-center p-4">
-            <div className="space-y-1">
-                <Skeleton className="h-7 w-44 bg-muted/50" />
-                <Skeleton className="h-4 w-60 bg-muted/50" />
-            </div>
-            <Skeleton className="h-9 w-32 bg-muted/50" /> {/* View All Button */}
-        </CardHeader>
-        <CardContent className="p-0">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="pl-4"><Skeleton className="h-4 w-32 bg-muted/50" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-24 bg-muted/50" /></TableHead>
-                        <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-28 bg-muted/50" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-20 bg-muted/50" /></TableHead>
-                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-28 bg-muted/50" /></TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                     {Array.from({ length: 2 }).map((_, i) => (
-                        <TableRow key={i} className="hover:bg-muted/20">
-                            <TableCell className="pl-4"><Skeleton className="h-4 w-full" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-full" /></TableCell>
-                             <TableCell><Skeleton className="h-6 w-20 rounded-full bg-muted/50" /></TableCell> {/* Status */}
-                            <TableCell className="text-right pr-4 space-x-1">
-                                <Skeleton className="h-8 w-8 inline-block rounded-md bg-muted/50" />
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </CardContent>
-     </Card>
-   )
-
-
   // Separate error messages for clarity
   const profileError = error?.includes("profile") ? error.replace(/Failed to load (recent orders|subscriptions)\./g, '').trim() : null;
   const orderError = error?.includes("orders") ? "Failed to load recent orders." : null;
@@ -341,410 +212,408 @@ export default function ProfilePage() {
 
 
   return (
-    <LayoutAnimator> {/* Added Layout Animator */}
-        {/* Use standard page padding and spacing */}
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 space-y-10">
-            {/* Profile Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border pb-6">
-                {/* Use Heading 1 size */}
-                <h1 className="h1 flex items-center gap-3 text-foreground"> {/* Use h1 class */}
-                    <User className="h-8 w-8 text-primary" /> Your Profile Overview
-                </h1>
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive self-start sm:self-center">
-                    <LogOut className="mr-2 h-4 w-4" /> Log Out
-                </Button>
+    // Use standard page padding and spacing
+    <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 space-y-12">
+        {/* Profile Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border pb-6">
+            {/* Use Heading 1 size */}
+            <h1 className="h1 flex items-center gap-3 text-foreground"> {/* Use h1 class */}
+                <User className="h-8 w-8 text-primary" /> Your Profile Overview
+            </h1>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive self-start sm:self-center">
+                <LogOut className="mr-2 h-4 w-4" /> Log Out
+            </Button>
+        </div>
+
+        {profileError && !isLoadingProfile && ( // Show profile-specific error
+            <Alert variant="destructive">
+                <XCircle className="h-4 w-4" />
+                <AlertTitle>Error Loading Profile</AlertTitle>
+                <AlertDescription>{profileError}</AlertDescription>
+            </Alert>
+        )}
+
+        {/* Profile Information Section */}
+        {isLoadingProfile ? <ProfileInfoSkeleton /> : profile ? (
+            <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border border-primary/10">
+             {/* Use p-6 for padding */}
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-secondary/5">
+                <Avatar className="h-24 w-24 border-4 border-background shadow-md">
+                    <AvatarImage src={`https://avatar.vercel.sh/${profile.email}?size=96`} alt={profile.name} />
+                    <AvatarFallback className="text-3xl bg-muted">
+                        {profile.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    </AvatarFallback>
+                </Avatar>
+                <div className="flex-grow mt-2 sm:mt-0">
+                     {/* Use Heading 2 size */}
+                    <CardTitle className="h2 text-primary">{profile.name}</CardTitle> {/* Use h2 class */}
+                     {/* Use text-lg */}
+                    <CardDescription className="flex items-center gap-1.5 text-lg mt-1 text-muted-foreground">
+                        <Mail className="h-5 w-5"/>{profile.email}
+                    </CardDescription>
+                    {profile.phone && (
+                         {/* Use text-base */}
+                        <CardDescription className="flex items-center gap-1.5 text-base mt-1 text-muted-foreground">
+                            <Phone className="h-4 w-4"/>{profile.phone}
+                        </CardDescription>
+                    )}
+                </div>
+                <Link href="/profile/account-settings" passHref>
+                     <Button variant="default" size="sm" className="self-start sm:self-center" withRipple>
+                        <Settings className="mr-2 h-4 w-4" /> Account Settings
+                    </Button>
+                </Link>
+            </CardHeader>
+
+            {/* Use standard padding and spacing */}
+            <CardContent className="space-y-6 p-6 pt-4">
+                <Separator />
+                 {/* Default Address Display */}
+                <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                         {/* Use text-lg */}
+                        <h3 className="text-lg font-medium flex items-center gap-2 text-foreground"><MapPin className="h-5 w-5 text-primary"/>Default Delivery Address</h3>
+                        <Link href="/profile/addresses" passHref>
+                            <Button variant="outline" size="sm" withRipple>Manage Addresses</Button>
+                        </Link>
+                    </div>
+                    {profile.addresses && profile.addresses.length > 0 ? (
+                        profile.addresses.filter(a => a.isDefault).map(address => (
+                            <div key={address.id} className="p-3 border rounded-md bg-muted/30 text-sm text-muted-foreground">
+                                <span className="font-semibold text-foreground block">{address.label}</span>
+                                {address.street}, {address.city}, {address.state} {address.zipCode} {address.country && `(${address.country})`}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-sm text-muted-foreground italic">No default address set.</p>
+                    )}
+                </div>
+
+                {/* Friends & Followed Stores Links */}
+                <Separator />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Link href="/profile/friends" passHref>
+                         <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
+                             {/* Use p-4 */}
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
+                                {/* Use text-lg */}
+                                <CardTitle className="text-lg font-semibold flex items-center gap-2 text-foreground">
+                                    <UsersIcon className="h-5 w-5 text-primary"/> My Friends
+                                </CardTitle>
+                                <span className="text-base font-semibold text-primary">({profile.friendIds?.length || 0})</span>
+                            </CardHeader>
+                             {/* Use p-4 pt-0 */}
+                            <CardContent className="p-4 pt-0">
+                                <p className="text-sm text-muted-foreground">View and manage your friends list.</p>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                    <Link href="/profile/followed-stores" passHref>
+                         <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
+                             {/* Use p-4 */}
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
+                                 {/* Use text-lg */}
+                                <CardTitle className="text-lg font-semibold flex items-center gap-2 text-foreground">
+                                    <StoreIcon className="h-5 w-5 text-primary"/> Followed Stores
+                                </CardTitle>
+                                <span className="text-base font-semibold text-primary">({profile.followedStoreIds?.length || 0})</span>
+                            </CardHeader>
+                             {/* Use p-4 pt-0 */}
+                            <CardContent className="p-4 pt-0">
+                                <p className="text-sm text-muted-foreground">See updates from stores you follow.</p>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                </div>
+
+                <Separator />
+
+                {/* Loyalty Points */}
+                 <div className="flex items-center gap-4 bg-gradient-to-r from-yellow-100 via-amber-50 to-orange-100 dark:from-yellow-900/30 dark:via-amber-950/30 dark:to-orange-950/30 rounded-lg p-6 border border-secondary/30 shadow-inner"> {/* Use p-6 */}
+                    <Award className="h-10 w-10 text-secondary shrink-0" /> {/* Use h-10 w-10 */}
+                    <div>
+                         {/* Use text-lg */}
+                        <span className="font-semibold block text-lg text-foreground/90">Loyalty Points</span>
+                         {/* Use Heading 2 size */}
+                        <span className="h2 text-secondary">{profile.loyaltyPoints}</span> {/* Use h2 class */}
+                         {/* Use text-base */}
+                        <span className="text-muted-foreground text-base"> points earned</span>
+                    </div>
+                </div>
+
+
+                {/* Store Management Link (Conditional) */}
+                {profile.role === 'store_owner' && (
+                    <>
+                        <Separator />
+                         {/* Use p-6 */}
+                        <div className="space-y-3 border p-6 rounded-md bg-muted/30">
+                            {/* Use Heading 3 size */}
+                            <h3 className="h3 flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3> {/* Use h3 class */}
+                             {/* Use text-base */}
+                            <p className="text-base text-muted-foreground">Manage your stores, products, and orders.</p>
+                            <Link href="/stores" passHref>
+                                 <Button variant="default" size="lg" withRipple>Go to Store Management</Button> {/* Use size="lg" */}
+                            </Link>
+                        </div>
+                    </>
+                )}
+            </CardContent>
+        </Card>
+        ) : !profileError && !isLoadingProfile ? ( // Only show if not loading and no error message already shown
+         // Use p-6
+        <Card><CardContent className="p-6 text-muted-foreground text-center">Could not load profile information.</CardContent></Card>
+        ): null}
+
+
+        <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
+
+        {/* Recent Orders Section */}
+         {/* Use space-y-6 */}
+        <div className="space-y-6">
+             {/* Use Heading 2 size */}
+            <div className="flex justify-between items-center">
+                <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
+                    <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
+                </h2>
+                 <Link href="/orders" passHref>
+                     <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
+                 </Link>
             </div>
 
-            {profileError && !isLoadingProfile && ( // Show profile-specific error
+             {orderError && !isLoadingOrders && ( // Show order-specific error
                 <Alert variant="destructive">
                     <XCircle className="h-4 w-4" />
-                    <AlertTitle>Error Loading Profile</AlertTitle>
-                    <AlertDescription>{profileError}</AlertDescription>
+                    <AlertTitle>Error Loading Orders</AlertTitle>
+                    <AlertDescription>{orderError}</AlertDescription>
                 </Alert>
             )}
 
-            {/* Profile Information Section */}
-            {isLoadingProfile ? <ProfileInfoSkeleton /> : profile ? (
-                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border border-primary/10">
-                 {/* Use p-6 for padding */}
-                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 bg-gradient-to-r from-primary/5 via-background to-secondary/5">
-                    <Avatar className="h-24 w-24 border-4 border-background shadow-md">
-                        <AvatarImage src={`https://avatar.vercel.sh/${profile.email}?size=96`} alt={profile.name} />
-                        <AvatarFallback className="text-3xl bg-muted">
-                            {profile.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-grow mt-2 sm:mt-0">
-                         {/* Use Heading 2 size */}
-                        <CardTitle className="h2 text-primary">{profile.name}</CardTitle> {/* Use h2 class */}
-                         {/* Use text-lg */}
-                        <CardDescription className="flex items-center gap-1.5 text-lg mt-1 text-muted-foreground">
-                            <Mail className="h-5 w-5"/>{profile.email}
-                        </CardDescription>
-                        {profile.phone && (
-                             {/* Use text-base */}
-                            <CardDescription className="flex items-center gap-1.5 text-base mt-1 text-muted-foreground">
-                                <Phone className="h-4 w-4"/>{profile.phone}
-                            </CardDescription>
-                        )}
-                    </div>
-                    <Link href="/profile/account-settings" passHref legacyBehavior>
-                         <Button variant="default" size="sm" className="self-start sm:self-center" withRipple>
-                            <Settings className="mr-2 h-4 w-4" /> Account Settings
-                        </Button>
-                    </Link>
-                </CardHeader>
-
-                {/* Use standard padding and spacing */}
-                <CardContent className="space-y-6 p-6 pt-4">
-                    <Separator />
-                     {/* Default Address Display */}
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-center">
-                             {/* Use text-lg */}
-                            <h3 className="text-lg font-medium flex items-center gap-2 text-foreground"><MapPin className="h-5 w-5 text-primary"/>Default Delivery Address</h3>
-                            <Link href="/profile/addresses" passHref legacyBehavior>
-                                <Button variant="outline" size="sm" withRipple>Manage Addresses</Button>
-                            </Link>
-                        </div>
-                        {profile.addresses && profile.addresses.length > 0 ? (
-                            profile.addresses.filter(a => a.isDefault).map(address => (
-                                <div key={address.id} className="p-3 border rounded-md bg-muted/30 text-sm text-muted-foreground">
-                                    <span className="font-semibold text-foreground block">{address.label}</span>
-                                    {address.street}, {address.city}, {address.state} {address.zipCode} {address.country && `(${address.country})`}
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-sm text-muted-foreground italic">No default address set.</p>
-                        )}
-                    </div>
-
-                    {/* Friends & Followed Stores Links */}
-                    <Separator />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Link href="/profile/friends" passHref legacyBehavior>
-                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
-                                 {/* Use p-4 */}
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
-                                    {/* Use text-lg */}
-                                    <CardTitle className="text-lg font-semibold flex items-center gap-2 text-foreground">
-                                        <UsersIcon className="h-5 w-5 text-primary"/> My Friends
-                                    </CardTitle>
-                                    <span className="text-base font-semibold text-primary">({profile.friendIds?.length || 0})</span>
-                                </CardHeader>
-                                 {/* Use p-4 pt-0 */}
-                                <CardContent className="p-4 pt-0">
-                                    <p className="text-sm text-muted-foreground">View and manage your friends list.</p>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                        <Link href="/profile/followed-stores" passHref legacyBehavior>
-                             <Card className="hover:shadow-md hover:border-primary/20 transition-all duration-150 cursor-pointer h-full border">
-                                 {/* Use p-4 */}
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
-                                     {/* Use text-lg */}
-                                    <CardTitle className="text-lg font-semibold flex items-center gap-2 text-foreground">
-                                        <StoreIcon className="h-5 w-5 text-primary"/> Followed Stores
-                                    </CardTitle>
-                                    <span className="text-base font-semibold text-primary">({profile.followedStoreIds?.length || 0})</span>
-                                </CardHeader>
-                                 {/* Use p-4 pt-0 */}
-                                <CardContent className="p-4 pt-0">
-                                    <p className="text-sm text-muted-foreground">See updates from stores you follow.</p>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                    </div>
-
-                    <Separator />
-
-                    {/* Loyalty Points */}
-                     <div className="flex items-center gap-4 bg-gradient-to-r from-yellow-100 via-amber-50 to-orange-100 dark:from-yellow-900/30 dark:via-amber-950/30 dark:to-orange-950/30 rounded-lg p-6 border border-secondary/30 shadow-inner"> {/* Use p-6 */}
-                        <Award className="h-10 w-10 text-secondary shrink-0" /> {/* Use h-10 w-10 */}
-                        <div>
-                             {/* Use text-lg */}
-                            <span className="font-semibold block text-lg text-foreground/90">Loyalty Points</span>
-                             {/* Use Heading 2 size */}
-                            <span className="h2 text-secondary">{profile.loyaltyPoints}</span> {/* Use h2 class */}
-                             {/* Use text-base */}
-                            <span className="text-muted-foreground text-base"> points earned</span>
-                        </div>
-                    </div>
-
-
-                    {/* Store Management Link (Conditional) */}
-                    {profile.role === 'store_owner' && (
-                        <>
-                            <Separator />
-                             {/* Use p-6 */}
-                            <div className="space-y-3 border p-6 rounded-md bg-muted/30">
-                                {/* Use Heading 3 size */}
-                                <h3 className="h3 flex items-center gap-2 text-foreground/90"><Building className="h-5 w-5 text-primary"/>Store Management</h3> {/* Use h3 class */}
-                                 {/* Use text-base */}
-                                <p className="text-base text-muted-foreground">Manage your stores, products, and orders.</p>
-                                <Link href="/stores" passHref legacyBehavior>
-                                     <Button variant="default" size="lg" withRipple>Go to Store Management</Button> {/* Use size="lg" */}
-                                </Link>
-                            </div>
-                        </>
-                    )}
-                </CardContent>
-            </Card>
-            ) : !profileError && !isLoadingProfile ? ( // Only show if not loading and no error message already shown
-             // Use p-6
-            <Card><CardContent className="p-6 text-muted-foreground text-center">Could not load profile information.</CardContent></Card>
-            ): null}
-
-
-            <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
-
-            {/* Recent Orders Section */}
-             {/* Use space-y-6 */}
-            <div className="space-y-6">
-                 {/* Use Heading 2 size */}
-                <div className="flex justify-between items-center">
-                    <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
-                        <ShoppingBag className="h-6 w-6 text-primary" /> Recent Order History
-                    </h2>
-                     <Link href="/orders" passHref legacyBehavior>
-                         <Button asChild variant="link" className="text-primary px-0"><a>View All Orders</a></Button>
-                     </Link>
-                </div>
-
-                 {orderError && !isLoadingOrders && ( // Show order-specific error
-                    <Alert variant="destructive">
-                        <XCircle className="h-4 w-4" />
-                        <AlertTitle>Error Loading Orders</AlertTitle>
-                        <AlertDescription>{orderError}</AlertDescription>
-                    </Alert>
-                )}
-
-                {isLoadingOrders ? <OrderHistorySkeleton /> : orders.length > 0 ? (
-                    <motion.div
-                       variants={listVariants}
-                       initial="hidden"
-                       animate="visible"
-                     >
-                         <Card className="shadow-sm overflow-hidden border border-primary/10">
-                             {/* Remove CardContent padding */}
-                            <CardContent className="p-0">
-                                <Table>
-                                    <TableHeader>
-                                         {/* Use text-xs */}
-                                        <TableRow className="bg-muted/20 hover:bg-muted/30 text-xs uppercase tracking-wider">
-                                             {/* Add padding */}
-                                            <TableHead className="w-[100px] pl-4">Order ID</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Store</TableHead>
-                                            <TableHead className="hidden md:table-cell text-right">Total</TableHead>
-                                            <TableHead>Status</TableHead>
-                                             {/* Add padding */}
-                                            <TableHead className="text-right pr-4">Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        <AnimatePresence>
-                                            {orders.map((order) => {
-                                                const details = orderStatusDetails[order.status];
-                                                const StatusIcon = details.icon;
-                                                const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
-                                                const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
-                                                const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
-
-                                                return (
-                                                     <motion.tr
-                                                        key={order.id}
-                                                        variants={itemVariants}
-                                                        initial="hidden"
-                                                        animate="visible"
-                                                        exit="exit"
-                                                        layout // Add layout animation
-                                                        className="hover:bg-muted/20 transition-colors duration-150"
-                                                     >
-                                                         {/* Add padding */}
-                                                        <TableCell className="font-mono text-xs pl-4">#{order.id.substring(order.id.length - 6)}</TableCell>
-                                                        <TableCell className="text-xs text-muted-foreground">{format(order.orderDate, 'MMM d, yyyy')}</TableCell>
-                                                        <TableCell className="text-sm">
-                                                            <Link href={`/store/${order.storeId}`} className="hover:underline font-medium">
-                                                                {order.storeName}
-                                                            </Link>
-                                                        </TableCell>
-                                                        <TableCell className="hidden md:table-cell text-right font-medium">{formatCurrency(order.totalAmount)}</TableCell>
-                                                        <TableCell>
-                                                            <Badge
-                                                                variant={details.variant === 'default' ? 'secondary' : details.variant} // Adjust variant logic
-                                                                className={cn(
-                                                                    'capitalize text-[11px] px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit', // Smaller text
-                                                                    details.color,
-                                                                    details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`, // Conditionally apply bg/border
-                                                                    order.status === 'Delivered' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400' // Specific success style
-                                                                )}
-                                                            >
-                                                                <StatusIcon className="h-3 w-3" />
-                                                                <span>{order.status}</span>
-                                                            </Badge>
-                                                        </TableCell>
-                                                         {/* Add padding */}
-                                                        <TableCell className="text-right pr-4">
-                                                            <Link href={`/orders?orderId=${order.id}`} passHref legacyBehavior>
-                                                                 <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="View Order Details">
-                                                                     <Eye className="h-4 w-4 text-foreground/70" />
-                                                                 </Button>
-                                                            </Link>
-                                                        </TableCell>
-                                                    </motion.tr>
-                                                );
-                                            })}
-                                       </AnimatePresence>
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-                ) : !orderError && !isLoadingOrders ? (
-                     <Card className="border-dashed border-border/50 bg-muted/20">
-                         {/* Use p-4 */}
-                         <CardContent className="p-10 text-center text-muted-foreground">
-                            <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
-                             {/* Use text-lg */}
-                           <p className="text-lg font-medium">No recent orders found.</p>
-                            {/* Use Body 2 */}
-                           <p className="text-body2 mt-2">Start shopping to see your orders here!</p>
-                           <Link href="/" passHref legacyBehavior>
-                                <Button variant="default" className="mt-6" withRipple>Browse Stores</Button>
-                           </Link>
-                       </CardContent>
-                     </Card>
-                ) : null}
-            </div>
-
-
-            <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
-
-            {/* Recent Subscriptions Section */}
-             {/* Use space-y-6 */}
-            <div className="space-y-6">
-                 {/* Use Heading 2 size */}
-                 <div className="flex justify-between items-center">
-                     <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
-                        <CalendarClock className="h-7 w-7 text-primary" /> Recent Subscriptions
-                    </h2>
-                    <Link href="/profile/subscriptions" passHref legacyBehavior>
-                         <Button variant="link" className="text-primary px-0">View All Subscriptions</Button>
-                     </Link>
-                </div>
-
-                {subError && !isLoadingSubs && ( // Show subscription-specific error
-                    <Alert variant="destructive">
-                        <XCircle className="h-4 w-4" />
-                        <AlertTitle>Error Loading Subscriptions</AlertTitle>
-                        <AlertDescription>{subError}</AlertDescription>
-                    </Alert>
-                )}
-
-                {isLoadingSubs ? <SubscriptionsSkeleton /> : subscriptions.length > 0 ? (
-                    <motion.div
-                        variants={listVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                         <Card className="shadow-sm overflow-hidden border border-primary/10">
-                             {/* Remove padding */}
-                            <CardContent className="p-0">
-                                <Table>
-                                    <TableHeader>
-                                         {/* Use text-xs */}
-                                        <TableRow className="bg-muted/20 hover:bg-muted/30 text-xs uppercase tracking-wider">
-                                             {/* Add padding */}
-                                            <TableHead className="pl-4">Offer</TableHead>
-                                            <TableHead>Store</TableHead>
-                                            <TableHead className="hidden md:table-cell">Next Delivery</TableHead>
-                                            <TableHead>Status</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
+            {isLoadingOrders ? <OrderHistorySkeleton /> : orders.length > 0 ? (
+                <motion.div
+                   variants={listVariants}
+                   initial="hidden"
+                   animate="visible"
+                 >
+                     <Card className="shadow-sm overflow-hidden border border-primary/10">
+                         {/* Remove CardContent padding */}
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                     {/* Use text-xs */}
+                                    <TableRow className="bg-muted/20 hover:bg-muted/30 text-xs uppercase tracking-wider">
+                                         {/* Add padding */}
+                                        <TableHead className="w-[100px] pl-4">Order ID</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Store</TableHead>
+                                        <TableHead className="hidden md:table-cell text-right">Total</TableHead>
+                                        <TableHead>Status</TableHead>
+                                         {/* Add padding */}
+                                        <TableHead className="text-right pr-4">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
                                     <AnimatePresence>
-                                            {subscriptions.map((sub) => {
-                                                const details = subscriptionStatusDetails[sub.status];
-                                                const StatusIcon = details.icon;
-                                                const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
-                                                const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
-                                                const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
+                                        {orders.map((order) => {
+                                            const details = orderStatusDetails[order.status];
+                                            const StatusIcon = details.icon;
+                                            const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
+                                            const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
+                                            const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
 
-                                                return (
-                                                    <motion.tr
-                                                        key={sub.id}
-                                                        variants={itemVariants}
-                                                        initial="hidden"
-                                                        animate="visible"
-                                                        exit="exit"
-                                                        layout
-                                                        className="hover:bg-muted/20 transition-colors duration-150"
-                                                    >
-                                                         {/* Add padding */}
-                                                        <TableCell className="font-medium pl-4">{sub.offerName}</TableCell>
-                                                        <TableCell>
-                                                            <Link href={`/store/${sub.storeId}`} className="hover:underline text-primary">
-                                                                {sub.storeName}
-                                                            </Link>
-                                                        </TableCell>
-                                                        <TableCell className="hidden md:table-cell">
-                                                            {sub.status === 'active' && sub.nextDeliveryDate ? format(sub.nextDeliveryDate, 'MMM d, yyyy') : '-'}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge
-                                                                variant={details.variant === 'default' ? 'secondary' : details.variant}
-                                                                className={cn(
-                                                                    'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit', // Use text-xs
-                                                                    details.color,
-                                                                    details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
-                                                                    sub.status === 'active' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
-                                                                )}
-                                                            >
-                                                                <StatusIcon className="h-3 w-3" />
-                                                                <span>{details.label}</span>
-                                                            </Badge>
-                                                        </TableCell>
-                                                        {/* Actions removed from overview */}
-                                                    </motion.tr>
-                                                );
-                                            })}
+                                            return (
+                                                 <motion.tr
+                                                    key={order.id}
+                                                    variants={itemVariants}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                    exit="exit"
+                                                    layout // Add layout animation
+                                                    className="hover:bg-muted/20 transition-colors duration-150"
+                                                 >
+                                                     {/* Add padding */}
+                                                    <TableCell className="font-mono text-xs pl-4">#{order.id.substring(order.id.length - 6)}</TableCell>
+                                                    <TableCell className="text-xs text-muted-foreground">{format(order.orderDate, 'MMM d, yyyy')}</TableCell>
+                                                    <TableCell className="text-sm">
+                                                        <Link href={`/store/${order.storeId}`} className="hover:underline font-medium">
+                                                            {order.storeName}
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell className="hidden md:table-cell text-right font-medium">{formatCurrency(order.totalAmount)}</TableCell>
+                                                    <TableCell>
+                                                        <Badge
+                                                            variant={details.variant === 'default' ? 'secondary' : details.variant} // Adjust variant logic
+                                                            className={cn(
+                                                                'capitalize text-[11px] px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit', // Smaller text
+                                                                details.color,
+                                                                details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`, // Conditionally apply bg/border
+                                                                order.status === 'Delivered' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400' // Specific success style
+                                                            )}
+                                                        >
+                                                            <StatusIcon className="h-3 w-3" />
+                                                            <span>{order.status}</span>
+                                                        </Badge>
+                                                    </TableCell>
+                                                     {/* Add padding */}
+                                                    <TableCell className="text-right pr-4">
+                                                        <Link href={`/orders?orderId=${order.id}`} passHref>
+                                                             <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/80" title="View Order Details">
+                                                                 <Eye className="h-4 w-4 text-foreground/70" />
+                                                             </Button>
+                                                        </Link>
+                                                    </TableCell>
+                                                </motion.tr>
+                                            );
+                                        })}
                                    </AnimatePresence>
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-                ) : !subError && !isLoadingSubs ? (
-                     <Card className="border-dashed border-border/50 bg-muted/20">
-                         {/* Use p-4 */}
-                        <CardContent className="p-10 text-center text-muted-foreground">
-                            <CalendarClock className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
-                             {/* Use text-lg */}
-                           <p className="text-lg font-medium">No active subscriptions found.</p>
-                            {/* Use Body 2 */}
-                            <p className="text-body2 mt-2">Explore stores offering daily or weekly deliveries!</p>
-                             <Link href="/" passHref legacyBehavior>
-                                <Button variant="default" className="mt-6" withRipple>Browse Stores</Button>
-                             </Link>
+                                </TableBody>
+                            </Table>
                         </CardContent>
-                     </Card>
-                ) : null}
+                    </Card>
+                </motion.div>
+            ) : !orderError && !isLoadingOrders ? (
+                 <Card className="border-dashed border-border/50 bg-muted/20">
+                     {/* Use p-4 */}
+                     <CardContent className="p-10 text-center text-muted-foreground">
+                        <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
+                         {/* Use text-lg */}
+                       <p className="text-lg font-medium">No recent orders found.</p>
+                        {/* Use Body 2 */}
+                       <p className="text-body2 mt-2">Start shopping to see your orders here!</p>
+                       <Link href="/" passHref>
+                            <Button variant="default" className="mt-6" withRipple>Browse Stores</Button>
+                       </Link>
+                   </CardContent>
+                 </Card>
+            ) : null}
+        </div>
+
+
+        <Separator className="my-10 border-border/50"/> {/* Use my-10 */}
+
+        {/* Recent Subscriptions Section */}
+         {/* Use space-y-6 */}
+        <div className="space-y-6">
+             {/* Use Heading 2 size */}
+             <div className="flex justify-between items-center">
+                 <h2 className="h2 flex items-center gap-2 text-foreground"> {/* Use h2 class */}
+                    <CalendarClock className="h-7 w-7 text-primary" /> Recent Subscriptions
+                </h2>
+                <Link href="/profile/subscriptions" passHref>
+                     <Button variant="link" className="text-primary px-0">View All Subscriptions</Button>
+                 </Link>
             </div>
 
-             {/* Address Dialog for managing addresses */}
-             {profile && (
-                 <AddressDialog
-                    isOpen={isAddressDialogOpen}
-                    onOpenChange={setIsAddressDialogOpen}
-                    addressData={currentAddress}
-                    onSave={handleSaveAddress}
-                    userId={userId}
-                    userAddresses={profile.addresses || []} // Pass current addresses
-                 />
-             )}
+            {subError && !isLoadingSubs && ( // Show subscription-specific error
+                <Alert variant="destructive">
+                    <XCircle className="h-4 w-4" />
+                    <AlertTitle>Error Loading Subscriptions</AlertTitle>
+                    <AlertDescription>{subError}</AlertDescription>
+                </Alert>
+            )}
 
+            {isLoadingSubs ? <SubscriptionsSkeleton /> : subscriptions.length > 0 ? (
+                <motion.div
+                    variants={listVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                     <Card className="shadow-sm overflow-hidden border border-primary/10">
+                         {/* Remove padding */}
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                     {/* Use text-xs */}
+                                    <TableRow className="bg-muted/20 hover:bg-muted/30 text-xs uppercase tracking-wider">
+                                         {/* Add padding */}
+                                        <TableHead className="pl-4">Offer</TableHead>
+                                        <TableHead>Store</TableHead>
+                                        <TableHead className="hidden md:table-cell">Next Delivery</TableHead>
+                                        <TableHead>Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                <AnimatePresence>
+                                        {subscriptions.map((sub) => {
+                                            const details = subscriptionStatusDetails[sub.status];
+                                            const StatusIcon = details.icon;
+                                            const badgeBaseColor = details.color.replace('text-', '').replace(/-\d+$/, '');
+                                            const badgeBgClass = `bg-${badgeBaseColor}-500/10 dark:bg-${badgeBaseColor}-500/20`;
+                                            const badgeBorderClass = `border-${badgeBaseColor}-500/30`;
+
+                                            return (
+                                                <motion.tr
+                                                    key={sub.id}
+                                                    variants={itemVariants}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                    exit="exit"
+                                                    layout
+                                                    className="hover:bg-muted/20 transition-colors duration-150"
+                                                >
+                                                     {/* Add padding */}
+                                                    <TableCell className="font-medium pl-4">{sub.offerName}</TableCell>
+                                                    <TableCell>
+                                                        <Link href={`/store/${sub.storeId}`} className="hover:underline text-primary">
+                                                            {sub.storeName}
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell className="hidden md:table-cell">
+                                                        {sub.status === 'active' && sub.nextDeliveryDate ? format(sub.nextDeliveryDate, 'MMM d, yyyy') : '-'}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge
+                                                            variant={details.variant === 'default' ? 'secondary' : details.variant}
+                                                            className={cn(
+                                                                'capitalize text-xs px-2 py-0.5 rounded-full font-medium border flex items-center gap-1 w-fit', // Use text-xs
+                                                                details.color,
+                                                                details.variant === 'destructive' ? '' : `${badgeBgClass} ${badgeBorderClass}`,
+                                                                sub.status === 'active' && 'bg-green-500/10 dark:bg-green-500/20 border-green-500/30 text-green-600 dark:text-green-400'
+                                                            )}
+                                                        >
+                                                            <StatusIcon className="h-3 w-3" />
+                                                            <span>{details.label}</span>
+                                                        </Badge>
+                                                    </TableCell>
+                                                    {/* Actions removed from overview */}
+                                                </motion.tr>
+                                            );
+                                        })}
+                               </AnimatePresence>
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            ) : !subError && !isLoadingSubs ? (
+                 <Card className="border-dashed border-border/50 bg-muted/20">
+                     {/* Use p-4 */}
+                    <CardContent className="p-10 text-center text-muted-foreground">
+                        <CalendarClock className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50"/>
+                         {/* Use text-lg */}
+                       <p className="text-lg font-medium">No active subscriptions found.</p>
+                        {/* Use Body 2 */}
+                        <p className="text-body2 mt-2">Explore stores offering daily or weekly deliveries!</p>
+                         <Link href="/" passHref>
+                            <Button variant="default" className="mt-6" withRipple>Browse Stores</Button>
+                         </Link>
+                    </CardContent>
+                 </Card>
+            ) : null}
         </div>
-    </LayoutAnimator>
+
+         {/* Address Dialog for managing addresses */}
+         {profile && (
+             <AddressDialog
+                isOpen={isAddressDialogOpen}
+                onOpenChange={setIsAddressDialogOpen}
+                addressData={currentAddress}
+                onSave={handleSaveAddress}
+                userId={userId}
+                userAddresses={profile.addresses || []} // Pass current addresses
+             />
+         )}
+
+    </div>
   );
 }

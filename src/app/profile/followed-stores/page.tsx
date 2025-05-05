@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -25,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from '@/components/ui/button';
+import { FollowedStoreCardSkeleton } from '@/components/Skeletons'; // Import skeleton
 
 
 export default function FollowedStoresPage() {
@@ -114,26 +116,6 @@ export default function FollowedStoresPage() {
     }, [userId, toast]);
 
 
-    const StoreCardSkeleton = () => (
-        <Card className="animate-pulse border">
-          <CardHeader className="p-0">
-            <Skeleton className="h-48 w-full bg-muted/50" />
-            <div className="p-4 space-y-2">
-               <Skeleton className="h-6 w-3/4 bg-muted/50" />
-               <Skeleton className="h-4 w-1/4 bg-muted/50" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <Skeleton className="h-4 w-full mb-1 bg-muted/50" />
-            <Skeleton className="h-4 w-5/6 bg-muted/50" />
-          </CardContent>
-          <CardFooter className="p-4 pt-2 flex justify-between items-center">
-             <Skeleton className="h-10 w-24 bg-muted/50 rounded-md" />
-             <Skeleton className="h-8 w-8 bg-muted/50 rounded-full" />
-          </CardFooter>
-        </Card>
-      );
-
     return (
         <div className="container mx-auto py-10 space-y-8">
              <div>
@@ -163,9 +145,9 @@ export default function FollowedStoresPage() {
                    initial="hidden"
                    animate="visible"
                >
-                 <StoreCardSkeleton />
-                 <StoreCardSkeleton />
-                 <StoreCardSkeleton />
+                 <FollowedStoreCardSkeleton />
+                 <FollowedStoreCardSkeleton />
+                 <FollowedStoreCardSkeleton />
                </motion.div>
              ) : followedStores.length > 0 ? (
                  <motion.div

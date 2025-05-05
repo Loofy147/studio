@@ -5,10 +5,10 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Plus } from 'lucide-react'; // Import Plus
+import { ArrowRight, Plus } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // Added missing import
 import type { Product } from "@/services/store";
 import { formatCurrency, cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -29,16 +29,17 @@ export const ProductCard = React.memo(({ product, storeIsOpen, storeIsActive, de
      if (!storeIsOpen && storeIsActive) {
          toast({
              title: "Store Closed",
-             description: `This store is currently closed. You can place a pre-order.`,
+             description: `${product.storeName || 'This store'} is currently closed. You can place a pre-order.`, // Added store name
              variant: "default"
          });
-         console.log(`Attempted to add ${product.name} from closed store. Pre-order?`);
+         // Implement pre-order logic here if needed
+         console.log(`Attempted to add ${product.name} from closed store ${product.storeName}. Pre-order?`);
          return;
      }
       if (!storeIsActive) {
           toast({
               title: "Store Unavailable",
-              description: `This store is currently unavailable.`,
+              description: `${product.storeName || 'This store'} is currently unavailable.`, // Added store name
               variant: "destructive"
           });
           return;
@@ -58,74 +59,100 @@ export const ProductCard = React.memo(({ product, storeIsOpen, storeIsActive, de
      });
    };
 
+  const cardVariants = {
+      hidden: { opacity: 0, y: 15 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.2, delay: delay * 0.04 } },
+      exit: { opacity: 0, y: -15, transition: { duration: 0.2 } },
+  };
+
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.2, delay: delay * 0.05 }}
-      className="h-full"
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        className="h-full"
     >
-      <Card className={cn(
-          "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border hover:border-primary/20 hover:bg-card/95 group bg-card p-0",
-          (!storeIsOpen || !storeIsActive) && "opacity-60 cursor-not-allowed" // Dim if closed or inactive
-      )}>
-        <CardHeader className="p-0">
-          <div className="relative w-full h-32 overflow-hidden rounded-t-md">
-            <Image
-              src={product.imageUrl || `https://picsum.photos/seed/${product.id}/300/200`}
-              alt={product.name}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 bg-muted"
-              data-ai-hint={`${product.category} product`}
-              priority={delay < 6}
-            />
-             {product.storeName && product.storeId && (
-                <Link href={`/store/${product.storeId}`} className="absolute bottom-1 left-1 z-10" onClick={(e) => e.stopPropagation()}>
-                    <Badge variant="secondary" className="caption px-1.5 py-0.5 bg-black/60 text-white border-none hover:bg-black/80 transition-colors">{product.storeName}</Badge>
-                </Link>
-             )}
-             {product.size && <Badge variant="secondary" className="absolute bottom-1 right-1 text-[10px] px-1.5 py-0.5 bg-black/50 text-white border-none">{product.size}</Badge>}
-          </div>
-          <div className="p-3 pb-0">
-            <CardTitle className="h3 line-clamp-1">{product.name}</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="flex-grow p-3 pt-1">
-          <p className="h2 text-primary font-bold">{formatCurrency(product.price)}</p>
-        </CardContent>
-        <CardFooter className="p-3 pt-0 mt-auto">
-             <Button
-                size="sm"
-                variant="default"
-                className={cn(
-                    "w-full group/button h-8 btn-text-uppercase-semibold",
-                     (!storeIsOpen || !storeIsActive) && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
-                )}
-                onClick={handleAddToCart}
-                disabled={!storeIsActive} // Disable only if completely inactive
-                withRipple
-                >
-                 {storeIsActive ? (
-                     storeIsOpen ? (
+        <Card className={cn(
+             "flex flex-col overflow-hidden h-full transition-all duration-300 hover:shadow-lg border hover:border-[hsl(var(--store-accent))] group bg-card p-0",
+             (!storeIsOpen || !storeIsActive) && "opacity-60 cursor-not-allowed" // Dim if closed or inactive
+             )}>
+            <CardHeader className="p-0">
+                <div className="relative w-full h-40 overflow-hidden">
+                    <Image
+                        src={product.imageUrl || `https://picsum.photos/seed/${product.id}/300/200`}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                        className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 bg-muted"
+                        data-ai-hint={`${product.category} product`}
+                        priority={delay < 6}
+                    />
+                    {/* Overlay to ensure visibility of badges */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
+                    {/* Store Name Badge (Top Left) */}
+                     {product.storeName && product.storeId && (
+                        <Badge variant="secondary" className="absolute top-1 left-1 caption font-medium px-1.5 py-0.5 bg-black/50 text-white border-none shadow">
+                             <Link href={`/store/${product.storeId}`} className="hover:underline text-white" onClick={(e) => e.stopPropagation()}>
+                                {product.storeName}
+                             </Link>
+                        </Badge>
+                     )}
+                    {/* Size Badge (Bottom Right) */}
+                    {product.size && <Badge variant="secondary" className="absolute bottom-1 right-1 caption px-1.5 py-0.5 bg-black/50 text-white border-none shadow">{product.size}</Badge>}
+                </div>
+                {/* Use p-4 pb-1 */}
+                <div className="p-4 pb-1">
+                    {/* Apply h2 style */}
+                    <CardTitle className="h2 line-clamp-1">{product.name}</CardTitle>
+                     {/* Apply caption style */}
+                    <Badge variant="outline" className="mt-1 capitalize caption font-normal px-1.5 py-0.5 tracking-wide">{product.category}</Badge>
+                </div>
+            </CardHeader>
+            {/* Use p-4 pt-1 */}
+            <CardContent className="flex-grow p-4 pt-1 space-y-1">
+                {/* Apply h2 style for price */}
+                <p className="h2 font-bold text-[hsl(var(--store-accent))]">{formatCurrency(product.price)}</p>
+                 {/* Apply body2 style */}
+                <p className="text-body2 text-muted-foreground line-clamp-2">{product.description}</p>
+                 {product.ingredients && (
+                     /* Apply caption style */
+                     <p className="caption pt-1">Ingredients: {product.ingredients.join(', ')}</p>
+                 )}
+            </CardContent>
+            {/* Use p-4 pt-0 */}
+            <CardFooter className="p-4 pt-0 mt-auto">
+                {/* Use Primary Button style (solid) */}
+                <Button
+                    size="sm"
+                    variant="default" // Solid primary button
+                    className={cn(
+                        "w-full group/button btn-text-uppercase-semibold", // Apply uppercase text style
+                         (!storeIsOpen || !storeIsActive) && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
+                    )}
+                    onClick={handleAddToCart}
+                    style={{ '--store-accent': 'hsl(var(--store-accent))' } as React.CSSProperties}
+                    disabled={!storeIsOpen || !storeIsActive}
+                    withRipple // Enable ripple effect
+                    >
+                     {storeIsOpen && storeIsActive ? (
                          <>
-                            <Plus className="mr-1 h-3 w-3 transition-transform duration-300 group-hover/button:rotate-90" /> Add to Cart
+                            <Plus className="mr-1 h-4 w-4 transition-transform duration-300 group-hover/button:rotate-90" /> Add to Cart
                          </>
+                     ) : !storeIsActive ? (
+                        <XCircle className="mr-1 h-4 w-4"/> Unavailable
                      ) : (
                           <>
-                             <Bell className="mr-1 h-3 w-3"/> Pre-order
+                             <Bell className="mr-1 h-4 w-4"/> Pre-order
                           </>
-                     )
-                 ) : (
-                    <XCircle className="mr-1 h-3 w-3"/> Unavailable
-                 )}
-
-            </Button>
-        </CardFooter>
-      </Card>
+                     )}
+                </Button>
+            </CardFooter>
+        </Card>
     </motion.div>
   );
 });
 
-ProductCard.displayName = 'ProductCard'; // Add display name
+ProductCard.displayName = 'ProductCard'; // Add display name for React DevTools
+

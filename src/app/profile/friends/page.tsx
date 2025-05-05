@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -26,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { FriendCardSkeleton } from '@/components/Skeletons'; // Import skeleton
 
 
 export default function FriendsListPage() {
@@ -113,26 +115,11 @@ export default function FriendsListPage() {
         friend.email.toLowerCase().includes(searchTerm.toLowerCase())
      );
 
-     const FriendCardSkeleton = () => (
-        <Card className="animate-pulse border p-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-                <Skeleton className="h-12 w-12 rounded-full bg-muted/50" />
-                <div className="space-y-1.5">
-                    <Skeleton className="h-5 w-32 bg-muted/50" />
-                    <Skeleton className="h-4 w-40 bg-muted/50" />
-                </div>
-            </div>
-             <div className="flex gap-2">
-                <Skeleton className="h-9 w-9 rounded-md bg-muted/50" />
-                <Skeleton className="h-9 w-9 rounded-full bg-muted/50" />
-             </div>
-        </Card>
-    );
 
     return (
         <div className="container mx-auto py-10 space-y-8">
             <div>
-                <Link href="/profile" passHref legacyBehavior>
+                <Link href="/profile" passHref>
                     <Button variant="ghost" size="sm" className="mb-2 text-muted-foreground hover:text-foreground">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Profile
                     </Button>

@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google'; // Import Inter font
 import './globals.css';
@@ -21,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning> {/* Add suppressHydrationWarning for theme changes */}
       {/* Apply Inter font variable to body */}
       <body
         className={cn(
@@ -31,14 +32,15 @@ export default function RootLayout({
       >
         <Header /> {/* Add Header */}
         <main className="flex-grow w-full">
-           {/* Added Layout Animator */}
-            {children}
-
+           {/* Added Layout Animator - Wrapping the children */}
+            <LayoutAnimator>
+                {children}
+            </LayoutAnimator>
         </main>
         <Toaster />
         <footer className="py-6 mt-auto border-t bg-muted/50">
             {/* Use p-4 padding */}
-            <div className="container mx-auto text-center text-sm text-muted-foreground flex flex-col items-center gap-2 p-4">
+            <div className="container mx-auto text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
                 <Logo className="h-6 w-auto mb-1 text-muted-foreground/80" /> {/* Use Logo */}
                 © {new Date().getFullYear()} SwiftDispatch Marketplace. All rights reserved.
             </div>

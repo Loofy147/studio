@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -26,20 +27,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from '@/components/ui/button';
-
-// Define BadgeProps type locally if not exported from Badge component
-import { type VariantProps } from "class-variance-authority"
-import { badgeVariants } from "@/components/ui/badge"
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+import type { BadgeProps } from "@/components/ui/badge"; // Explicit import
+import { SubscriptionsSkeleton } from '@/components/Skeletons'; // Import skeleton
 
 
 // Map status to icon and variant for the subscription table
 const subscriptionStatusDetails: Record<Subscription['status'], { icon: React.ElementType; variant: BadgeProps['variant']; color: string; label: string }> = {
-    'active': { icon: Play, variant: 'default', color: 'text-green-600 dark:text-green-400', label: 'Active' },
+    'active': { icon: Play, variant: 'success', color: 'text-accent-foreground dark:text-accent-foreground', label: 'Active' },
     'paused': { icon: Pause, variant: 'secondary', color: 'text-yellow-600 dark:text-yellow-400', label: 'Paused' },
-    'cancelled': { icon: XCircle, variant: 'destructive', color: 'text-red-600 dark:text-red-400', label: 'Cancelled' }
+    'cancelled': { icon: XCircle, variant: 'destructive', color: 'text-destructive-foreground dark:text-destructive-foreground', label: 'Cancelled' }
 };
 
 
@@ -111,48 +107,10 @@ export default function SubscriptionsPage() {
     }, [toast]);
 
 
-    const SubscriptionTableSkeleton = () => (
-     <Card>
-        <CardHeader className="flex flex-row justify-between items-center p-4">
-            <div className="space-y-1">
-                <Skeleton className="h-7 w-44 bg-muted/50" />
-                <Skeleton className="h-4 w-60 bg-muted/50" />
-            </div>
-        </CardHeader>
-        <CardContent className="p-0">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="pl-4"><Skeleton className="h-4 w-32 bg-muted/50" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-24 bg-muted/50" /></TableHead>
-                        <TableHead className="hidden md:table-cell"><Skeleton className="h-4 w-28 bg-muted/50" /></TableHead>
-                        <TableHead><Skeleton className="h-4 w-20 bg-muted/50" /></TableHead>
-                        <TableHead className="text-right pr-4"><Skeleton className="h-4 w-28 bg-muted/50" /></TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                     {Array.from({ length: 3 }).map((_, i) => (
-                        <TableRow key={i} className="hover:bg-muted/20">
-                            <TableCell className="pl-4"><Skeleton className="h-4 w-full" /></TableCell>
-                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                            <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-full" /></TableCell>
-                             <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell> {/* Status */}
-                            <TableCell className="text-right pr-4 space-x-1">
-                                <Skeleton className="h-8 w-8 inline-block rounded-md" />
-                                <Skeleton className="h-8 w-8 inline-block rounded-md" />
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </CardContent>
-     </Card>
-   );
-
     return (
         <div className="container mx-auto py-10 space-y-8">
              <div>
-                <Link href="/profile" passHref legacyBehavior>
+                <Link href="/profile" passHref>
                     <Button variant="ghost" size="sm" className="mb-2 text-muted-foreground hover:text-foreground">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Profile
                     </Button>
@@ -171,7 +129,7 @@ export default function SubscriptionsPage() {
                 </Alert>
             )}
 
-            {isLoadingSubs ? <SubscriptionTableSkeleton /> : subscriptions.length > 0 ? (
+            {isLoadingSubs ? <SubscriptionsSkeleton /> : subscriptions.length > 0 ? (
                  <motion.div
                      variants={containerVariants}
                      initial="hidden"
@@ -293,7 +251,7 @@ export default function SubscriptionsPage() {
                         <CalendarClock className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30"/>
                         <p className="text-lg font-medium">No active subscriptions found.</p>
                         <p className="text-sm mt-1">Explore stores offering daily or weekly deliveries!</p>
-                         <Link href="/" passHref legacyBehavior>
+                         <Link href="/" passHref>
                             <Button variant="default" className="mt-6">Browse Stores</Button>
                          </Link>
                     </CardContent>

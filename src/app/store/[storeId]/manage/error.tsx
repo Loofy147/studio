@@ -37,7 +37,7 @@ export default function StoreManageError({
                 >
                     Try again
                 </Button>
-                <Link href="/stores" passHref legacyBehavior>
+                <Link href="/stores" passHref>
                      <Button variant="outline">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Your Stores
                     </Button>
