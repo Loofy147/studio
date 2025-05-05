@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react'; // Ensure React is imported
@@ -7,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Plus, Bell, XCircle, ShoppingCart } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion"; // Correct import
+import { motion } from "framer-motion"; // Correct import for motion
 import type { Product } from '@/services/store';
 import { formatCurrency, cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -63,7 +64,8 @@ const ProductCardComponent = ({ product, storeIsOpen, storeIsActive, delay = 0 }
     };
 
     return (
-        <motion.div // Correct usage of motion.div
+        // Ensure no stray characters around here
+        <motion.div
             variants={cardVariants}
             initial="hidden"
             animate="visible"
