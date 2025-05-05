@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react'; // Ensure React is imported
@@ -124,7 +123,7 @@ const ProductCardComponent = ({ product, storeIsOpen, storeIsActive, delay = 0 }
                         variant="default"
                         className={cn(
                             "w-full group/button btn-text-uppercase-semibold",
-                            (!storeIsOpen || !storeIsActive) && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
+                             (!storeIsOpen || !storeIsActive) && "bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed"
                         )}
                         onClick={handleAddToCart}
                         style={{ '--store-accent': 'hsl(var(--store-accent))' } as React.CSSProperties}
